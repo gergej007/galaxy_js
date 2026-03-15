@@ -1,0 +1,126 @@
+.boss_container {
+    position: absolute;
+    z-index: 200;
+    width: 370px;
+    height: 205.5px;
+}
+.boss_main_img{
+    position: absolute;
+    z-index: 200;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+}
+/* .boss_tuz_1{
+    position: absolute;
+    box-shadow: 0px -1px 1px 2px rgba(79, 245, 245, 0.982);
+    z-index: 220;
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    background: rgb(221, 109, 255);
+} */
+/* .boss_tuz_2{
+    position: absolute;
+    box-shadow: 0px -1px 1px 2px rgba(79, 232, 252, 0.954);
+    z-index: 220;
+    width: 3px;
+    height: 28px;
+    border-radius: 3px;
+    background: rgb(25, 94, 232);
+} */
+/* .boss_tuz_3{
+    position: absolute;
+    box-shadow: 0px -1px 1px 2px rgba(254, 93, 57, 0.954);
+    z-index: 220;
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    background: rgb(223, 36, 2);
+} */
+/* .bs_lazer_lovedek{
+    position: absolute;
+    z-index: 300;
+    width:7px;
+    height: 20px;
+    background:rgb(218, 0, 0);
+    box-shadow: 2px 2px 4px rgba(255, 71, 20, 0.772);
+    border-radius: 2px;
+} */
+/* .celzott_bs_loves{
+    position: absolute;
+    box-shadow: 0px -1px 1px 2px rgba(209, 253, 255, 0.954);
+    z-index: 220;
+    width: 10px;
+    height: 10px;
+    border-radius: 4px;
+    background: rgb(38, 255, 248);
+} */
+
+.bs_loves_explosion{
+    width : 5px;
+    height : 5px;
+    position : absolute;
+    z-index: 300;
+}
+.blue_robbanas{
+    position: absolute;
+    width:  10px;
+    height: 10px;
+    border-radius: 15px;
+    z-index: 300;
+}
+.villam1{
+    width: 150px;
+    position: absolute;
+    z-index: 10;
+    border-radius: 50px;
+}
+.villam2{
+    position: absolute;
+    width: 500px;  
+    border-radius: 130px;
+    z-index: 20;
+}
+
+.villam3{
+    position: absolute;
+    width: 200px;  
+    border-radius: 150px;
+    z-index: 50;
+}
+
+.robbanas_y , .robbanas_x{
+    position: absolute;
+    z-index: 220;
+}
+.robbanas_x{  
+    height : 250;
+    border-radius: 80;
+    border-radius: 30px;    
+    height: 50px;
+}
+.robbanas_z{
+    position: absolute;
+    z-index: 250;
+}
+.atom_talalat{
+    position: absolute;
+    z-index: 170;
+    border-radius: 70px;
+}
+
+.tuzijatek{
+    position: absolute;
+    width: 500px;  
+}
+
+.asteroida_container{
+    position: absolute;
+    z-index: 350;
+}
+.asteroid_img{
+    width: 100%;
+}
+

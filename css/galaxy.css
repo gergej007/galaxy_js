@@ -1,0 +1,564 @@
+body {
+    min-width: 1060px;
+    background: black;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+.urhajo {
+    position: absolute;
+    z-index: 150; 
+}
+
+
+.urhajo_img {
+   position: absolute; 
+   z-index: 150;
+   height: 100%;
+   width: 100%;
+   top: 0;
+   left: 0;
+}
+
+.bazis {
+    height: 70px;
+    width:65px;  
+    position: absolute;
+    bottom: 0;
+    z-index: 200;  
+}    
+.bazis_img {   
+    position: absolute; 
+    top: 50%;           
+    left: 50%;          
+    height: 100%;       
+    width: 100%;        
+    transform: translate(-50%, -50%); 
+    z-index: 200;
+}
+
+.lovedek {
+    position: absolute;
+    z-index: 5;
+    box-shadow: 2px 2px 7px 2px rgba(66, 208, 247, .6);
+    -webkit-box-shadow: 2px 2px 7px 2px rgba(66, 208, 247, .6);
+    width: 6px;
+    height: 10px;
+    border-radius: 2px;
+    background: rgb(66, 208, 247);
+}
+
+.hyper_lovedek {
+    position: absolute;
+    box-shadow: 2px 2px 8px 2px rgba(177, 255, 69, 0.653);
+    -webkit-box-shadow: 2px 2px 8px 2px rgba(177, 255, 69, 0.653);
+    width: 7px;
+    height: 15px;
+    border-radius: 2px;
+    background: rgb(124, 255, 64);
+}
+
+.lazer_lovedek {
+    position: absolute;
+    z-index: 150;
+    width:5px;
+    height: 20px;
+    background:rgb(218, 0, 0);
+    box-shadow: 2px 2px 4px rgba(255, 71, 20, 0.772);
+    -webkit-box-shadow: 2px 2px 4px rgba(255, 71, 20, 0.772);    
+    border-radius: 2px;
+}
+.tracking_lazer_lovedek {
+    position: absolute;
+    z-index: 300;   
+    background:rgb(255, 213, 0);
+    box-shadow: 2px 2px 4px rgba(255, 234, 0, 0.772);
+    -webkit-box-shadow: 2px 2px 4px rgba(255, 234, 0, 0.772);
+    border-radius: 2px;
+}
+
+.homing_missile {
+    position: absolute;
+    z-index: 300;
+    height: 80px;
+    background: rgba(0,0,0,0);
+}
+.missile_img { 
+    position: absolute;   
+    height: 80%;
+}
+.missile_fire_img {    
+    position: absolute;
+    bottom: 0;
+    z-index: 300;
+    height: 20%;
+}
+
+.locked {
+    --s: 25px; 
+    border: 3px solid #da000f;     
+    
+    mask:
+      conic-gradient(at var(--s) var(--s), #0000 75%, #000 0)
+      0 0 / calc(100% - var(--s)) calc(100% - var(--s)),
+      linear-gradient(#000 0 0) content-box;
+    
+    -webkit-mask:
+      conic-gradient(at var(--s) var(--s), #0000 75%, #000 0)
+      0 0 / calc(100% - var(--s)) calc(100% - var(--s)),
+      linear-gradient(#000 0 0) content-box;
+}
+
+.robbanas {
+    position: absolute;
+    z-index: 50;
+}
+
+.atomic {
+    width: 25px;
+    height: 25px;
+    padding: 2px;
+    margin-left: 25px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.atomic_felirat {
+    float: right;
+    margin-right: 10px;
+}
+
+.counter_tuz {
+    position: absolute !important;
+    z-index: 220;
+    border-radius: 3px;
+}
+
+.counter_tuz_var0 {   
+    box-shadow: 0px -3px 10px 3px rgba(255, 219, 120, 0.8);
+    -webkit-box-shadow: 0px -3px 10px 3px rgba(255, 219, 120, 0.8);
+    background: rgb(255, 172, 38);
+    width: 7px;
+    height: 7px;   position: absolute;
+}
+
+.counter_tuz_var1 {
+    box-shadow: 0px -3px 10px 3px rgba(250, 243, 144, 0.8);
+    -webkit-box-shadow:  0px -3px 10px 3px rgba(250, 243, 144, 0.8);
+    background: rgb(248, 255, 41);
+    width: 7px;
+    height: 13px;        position: absolute !important;
+}
+
+.counter_tuz_var2 {
+    box-shadow: 0px -3px 10px 3px rgba(181, 254, 226, 0.8);
+    -webkit-box-shadow: 0px -3px 10px 3px rgba(181, 254, 226, 0.8);
+    background: rgb(22, 255, 193);
+    width: 7px;
+    height: 13px;          position: absolute;
+}
+
+.counter_tuz_var3 {
+    box-shadow: 0px -2px 10px 3px rgba(142, 180, 254, 0.8);
+    -webkit-box-shadow: 0px -2px 10px 3px rgba(142, 180, 254, 0.8);
+    background: rgb(107, 142, 255);
+    width: 6px;
+    height: 24px;           position: absolute;
+}
+
+.bomba {
+    position: absolute;
+    box-shadow: 4px 4px 4px rgba(255, 177, 59, 0.8);
+    -webkit-box-shadow:4px 4px 4px rgba(255, 177, 59, 0.8);
+    width: 14px;
+    height: 14px;
+    border-radius: 5px;
+    background: rgb(255, 55, 55);
+    z-index: 220;
+}
+
+.atombomba {
+    position: absolute;
+    z-index: 256;
+    width: 256px;
+}
+
+/*--------- BOUNTY  --------*/
+.bnty_container{
+    position: absolute;
+    height: 100px;
+    width: 116px; 
+    min-width: 116px;
+    z-index: 220;
+    overflow: visible;
+}
+.bnty_main_img{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.bnty_hp_indicator{
+    position: absolute;
+    overflow: hidden;
+    box-sizing: border-box;
+    width: 80px;
+    height: 8px;    
+    z-index: 220;
+}
+
+.bnty_hp_fill{
+    width: 100%; 
+    height: 100%;
+    background-color: #1dfe24;  
+    transform-origin: left; 
+}
+
+.bnty_hp_fill.low-health {
+    background-color: #FFC107; 
+}
+  
+.bnty_hp_fill.critical-health {
+    background-color: #f5493d; 
+}
+
+.bnty_dmg_img{
+    position: absolute;
+    height: 20px;
+    z-index: 230;
+}
+
+/*-------   UI   --------*/
+.felso_info_sav {
+    position: absolute;
+    width: 100%;
+    min-width: 1060px;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.eletek_keret {
+    margin: 15px;
+    padding: 5px;
+    z-index: 220;
+    width: 345px;
+    height: 33px;
+    text-align: center;
+    border: 2px dashed rgb(141, 219, 255);
+    color: rgb(255, 153, 0);
+    font-size: 24px;
+    letter-spacing: 0.3px;    
+    font-variant-numeric: tabular-nums;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+.eredmeny_keret {
+    margin: 15px;
+    padding: 5px;
+    z-index: 220;
+    width: 360px;
+    height: 33px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.3px;  
+    border: 2px dashed rgb(160, 225, 255);
+    color: rgb(255, 153, 0);
+    font-size: 24px;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+.kijelzo_color{
+    color:rgb(207, 232, 255);    
+    font-variant-numeric: tabular-nums;
+}
+
+/*-------    progress bar -------*/
+
+#progress_keret {
+    margin: 15px;
+    padding: 5px;
+    z-index: 300;
+    width: 330px;
+    height: 33px;
+    color: rgb(255, 153, 0);
+    text-align: center;
+    font-size: 24px;
+    letter-spacing: 1.5px;
+}
+
+#progress_keret.ui-progressbar.ui-widget.ui-widget-content.ui-corner-all {
+    background: rgba(28, 28, 97, 0.863);
+    border: 2px dashed rgb(141, 219, 255);
+    border-radius: 0;
+    padding: 7px 12px;
+}
+
+#progress_keret.ui-progressbar-value.ui-widget-header.ui-corner-left.ui-corner-right {
+    border: 1px solid rgb(77, 255, 86);
+    border-radius: 2px;
+    height: 93%;
+}
+
+.ui-progressbar-value {
+    background: rgb(37, 255, 48);
+}
+
+/*-------   dialog   -------*/
+
+.ui-dialog.ui-widget.ui-widget-content.ui-corner-all {
+    border: 1px solid rgba(255, 138, 4, 0.785);
+}
+
+.ui-widget-content {    
+    background-image: url("../kepek/galaxy_bg_2.gif");
+    opacity: 0.87;
+}
+
+.ui-dialog-titlebar-close {
+    display: none;
+}
+
+.ui-dialog .ui-dialog-title {
+    text-align: center;
+    width: 100%;
+    font-size: 22px;
+    color: rgb(245, 250, 255);
+}
+
+.ui-helper-clearfix {
+    background: rgba(255, 0, 0, 0.429);
+}
+
+.kezdo_panel {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    overflow: hidden;
+}
+
+.ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix {
+    height: 25px;
+    border: none;
+    background: rgba(255, 98, 0, 0.744);
+    color: rgb(245, 250, 255);
+    letter-spacing: 2px;
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.control_text {
+    font-size: 20px;
+    font-weight: bold;
+    color: aliceblue;
+    letter-spacing: 2px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.felso_text_box,
+.also_text_box {
+    font-size: 22px;
+    font-weight: bold;
+    color: rgb(245, 250, 255);
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+.felso_text_box {
+    margin-bottom: 30px;
+    margin-top: 10px;
+}
+
+.also_text_box {
+    margin-top: 5px;
+}
+
+.felso_div,
+.also_div {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 30px;
+}
+
+.bal_div,
+.jobb_div {
+    height: 150px;
+    width: 40%;
+    padding-top: 10px;
+    border: 1px solid rgb(248, 188, 131);
+    background: #fe9711be;
+    border-radius: 3px;
+}
+
+.bal_also_div,
+.kozepso_also_div,
+.jobb_also_div {
+    height: 130px;
+    width: 28%;
+    border: 1px solid rgb(248, 188, 131);
+    background: #fe9711be;
+    border-radius: 3px;
+}
+
+.thmbnail {
+    display: block;
+    margin: auto;
+}
+
+.arrow_img {
+    filter: opacity(60%) saturate(300%) brightness(50%) hue-rotate(330deg);
+    width: 64%;
+}
+
+.space_img {
+    filter: contrast(300%) invert(100%) opacity(40%) saturate(300%) brightness(50%) hue-rotate(330deg);
+    width: 74%;
+    margin-top: 40px;
+    margin-bottom: 25px;
+}
+
+.alt_img {
+    filter: contrast(300%) invert(100%) opacity(40%) saturate(300%) brightness(50%) hue-rotate(330deg);
+    width: 58%;
+    margin-top: 14px;
+    margin-bottom: 10px;
+}
+
+.esc_img {
+    filter: contrast(300%) invert(100%) opacity(40%) saturate(300%) brightness(50%) hue-rotate(330deg);
+    border-radius: 4px;
+    width: 47%;
+    margin-top: 14px;
+}
+
+.f5_img {
+    filter: contrast(300%) invert(100%) opacity(40%) saturate(300%) brightness(50%) hue-rotate(330deg);
+    border-radius: 4px;
+    width: 43%;
+    margin-top: 15px;
+}
+
+/*-------   dialog   -------*/
+
+.vegso_panel.ui-dialog-content.ui-widget-content.high_scores_keret {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;   
+}
+    .scores_mezo {              
+        font-size: 20px;
+        text-align: center;
+        border-right: 1px solid aliceblue;
+        padding:2px;
+    }
+
+    .headline,
+    .score_records {
+        display: flex;
+        justify-content: space-between;
+        width: 95%;
+        color: aliceblue;
+    }
+    .score_records{  
+        margin: 8px auto;       
+        border-radius: 2px;
+        background: #ffac41be;
+    }    
+    .headline{
+        border-bottom: 1px solid rgb(255, 244, 189);   
+        text-align: center;  
+        font-size: 18px;
+        font-weight: bold;
+        letter-spacing: 1.5px;
+        margin-left: 13px;
+        margin-bottom: 8px; 
+        margin-top: 5px;
+        padding-bottom: 3px; 
+    }
+    
+    .instrukciok_panel {
+        color: aliceblue;
+        font-size: 22px;
+        text-align: center;
+        margin-bottom: 10px;
+        font-weight: bold;
+        letter-spacing: 1.5px;
+    }  
+    .instrukciok_panel_also{
+        margin-top: 20px;
+        color: aliceblue;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        letter-spacing: 1.5px;
+    }
+    #uj_nev{       
+        width: 190px;
+        background: #ffd859e3;
+        color: rgb(255, 0, 0);
+        font-size: 20px;
+        letter-spacing: 1.5px;
+        font-weight: bold;
+        border: none;
+        outline: none;
+        border-radius: 2px;
+    }
+    #uj_nev::placeholder{
+        color:rgba(255, 0, 0, 0.68);
+        text-align: center;
+    }
+     #position.scores_mezo{
+        border-left: 1px solid aliceblue;
+        text-align: center;
+        letter-spacing: 2px;
+        width:70px;
+        font-weight: bold;
+    }
+
+    #name.scores_mezo{
+        margin-left:18px;
+        text-align: left;
+        letter-spacing: 2px;
+        width:210px;
+        font-weight: bold;
+    }
+    #score.scores_mezo{    
+        padding-right: 20px;    
+        letter-spacing: 2px;
+        width:120px;
+        text-align: right;
+        font-weight: bold;
+    }
+    #killed.scores_mezo{
+        padding-right: 20px;
+        text-align: right;
+        letter-spacing: 2px;
+        width: 80px;
+        font-weight: bold;
+    }
+
+    .life_kijelzo{
+        font-size: 29px;
+        float: left;
+        letter-spacing: 2px;        
+        margin-left: 25px;
+    }
+    .bonus_kijelzo{
+        font-variant-numeric: tabular-nums;
+        font-size: 29px;
+        letter-spacing: 2px;
+        float: right;
+        text-align: right;
+        margin-right: 25px;
+    }
+
+    .flares_gif_1{  
+        position: absolute;  
+        z-index: 300;   
+        width: 300px;
+        text-align: center;
+    }
