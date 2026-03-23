@@ -1,9 +1,9 @@
 function spacekraft_shot( enemy_data) {
-    const first_shot_delay = Math.round( Math.random() * 400) + 200 ;  
+    const first_shot_delay = Math.round( Math.random() * 700) + 250 ;  
     const bazis = $(base_level_entities.bazis.element);
     const bazis_rect = base_level_entities.bazis.rect;     
 
-    setTimeout( ()=> {
+    setTimeout( ()=> {                                
           
     const enemy_element = $(enemy_data.element);
     const enemy_rect = enemy_data.rect;
@@ -33,7 +33,11 @@ function spacekraft_shot( enemy_data) {
     }    
 
     const enemy_shot_data = get_enemy_shot_from_pool();
-    const enemy_shot_element = $(enemy_shot_data.element);
+    const enemy_shot_element = enemy_shot_data.element;
+    if( !enemy_shot_data || !enemy_shot_element || enemy_shot_element.length === 0){
+        console.log("enemy shot dropped due to invalid shot data!");
+        return;
+    }
     enemy_shot_data.shooter_id = enemy_data.id;
     
     const is_vertically_clear = (s_bottom < $(window).height() -( b_height + 70));  
@@ -53,11 +57,12 @@ function spacekraft_shot( enemy_data) {
                 
         projectile_selector( enemy_data, s_xpoz, enemy_shot_data, s_bottom, bazis_target_x, bazis_target_y, shot_initial_x );       
     }
+    const {frequency_multiplier_projectile, frequency_seed_projectile } = current_level_config;
     
-    if( enemy_element && enemy_element.length > 0 ){
-          let frequency = Math.round(Math.random() * frequency_multiplier_loves) + frequency_seed_loves;
+    if( enemy_element && enemy_element.length > 0 && enemy_element.is(':visible')){
+          let frequency = Math.round(Math.random() * frequency_multiplier_projectile) + frequency_seed_projectile;
           setTimeout(function () { 
-            spacekraft_shot( enemy_element ); }, frequency);  
+            spacekraft_shot( enemy_data ); }, frequency);  
         }
     }, first_shot_delay); 
 }
@@ -69,7 +74,8 @@ function projectile_selector( enemy_data, s_xpoz, shot_data, s_bottom, bazis_tar
         return; 
     }
     const shot_element = $(shot_data.element);
-    const rnd_speed = Math.round(Math.random() * (speed_multiplier_loves * ($(window).height()-s_bottom))) + speed_seed_loves;
+    const {speed_multiplier_projectile, speed_seed_projectile} = current_level_config;
+    const rnd_speed = Math.round(Math.random() * (speed_multiplier_projectile * ($(window).height()-s_bottom))) + speed_seed_projectile;
     const rnd_shot_type = Math.round(Math.random() * 3);
  
     const parent_direction = enemy_data.moving_direction;            
@@ -77,8 +83,8 @@ function projectile_selector( enemy_data, s_xpoz, shot_data, s_bottom, bazis_tar
     let final_target_y;    
     let animation_easing = "linear";     
 
-    const slide_direction = parent_direction === "moving_right" ? 100 : -100;
-    const slide_ammount = parseInt(( enemy_data.speed / $(window).width() ) * slide_direction);     
+    const slide_value = parent_direction === "moving_right" ? 100 : -100;
+    const slide_ammount_px = parseInt(( enemy_data.speed / $(window).width() ) * slide_value);     
 
     lazer_audio();
 
@@ -91,7 +97,7 @@ function projectile_selector( enemy_data, s_xpoz, shot_data, s_bottom, bazis_tar
 
         case 1:
             shot_element.addClass("counter_tuz_var1");      // Case 1: Untargeted projectile            
-            final_target_x  = s_xpoz + slide_ammount; 
+            final_target_x  = s_xpoz + slide_ammount_px; 
             final_target_y =  $(window).height();                
             break;           
 
@@ -103,7 +109,7 @@ function projectile_selector( enemy_data, s_xpoz, shot_data, s_bottom, bazis_tar
 
         case 3:
             shot_element.addClass("counter_tuz_var3");      // Case 4: Untargeted projectile           
-            final_target_x  = s_xpoz + slide_ammount;
+            final_target_x  = s_xpoz + slide_ammount_px;
             final_target_y = $(window).height();           
             break;             
         }

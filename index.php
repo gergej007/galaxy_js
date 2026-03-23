@@ -11,8 +11,8 @@
     <script type="text/javascript" src="jquery/jquery-1.8.2.js"></script>
     <script type="text/javascript" src="jquery/jquery-ui-1.9.1.custom.js"></script>
     
-    <script type="text/javascript" src="js/game/game_levels.js"></script>
     <script type="text/javascript" src="js/game/game_config.js"></script>
+    <script type="text/javascript" src="js/game/game_levels.js"></script>
     <script type="text/javascript" src="js/object_pooling/create_pooled_elements.js"></script>  
     <script type="text/javascript" src="js/object_pooling/object_pooling.js"></script>  
     <script type="text/javascript" src="js/object_pooling/return_obj_to_pool.js"></script>  
@@ -45,6 +45,7 @@
     <script type="text/javascript" src="js/boss/boss_main.js"></script>
     <script type="text/javascript" src="js/boss/boss_movements.js"></script>
     <script type="text/javascript" src="js/collision_detections/boss_vs_bazis.js"></script>
+    <script type="text/javascript" src="js/weapons/bazis_weapons_config.js"></script>
     <script type="text/javascript" src="js/weapons/a_bomb.js"></script>
     <script type="text/javascript" src="js/weapons/single_shot.js"></script>
     <script type="text/javascript" src="js/weapons/dual_shot.js"></script>

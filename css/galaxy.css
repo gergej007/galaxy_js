@@ -39,37 +39,6 @@ body {
     z-index: 200;
 }
 
-.lovedek {
-    position: absolute;
-    z-index: 5;
-    box-shadow: 2px 2px 7px 2px rgba(66, 208, 247, .6);
-    -webkit-box-shadow: 2px 2px 7px 2px rgba(66, 208, 247, .6);
-    width: 6px;
-    height: 10px;
-    border-radius: 2px;
-    background: rgb(66, 208, 247);
-}
-
-.hyper_lovedek {
-    position: absolute;
-    box-shadow: 2px 2px 8px 2px rgba(177, 255, 69, 0.653);
-    -webkit-box-shadow: 2px 2px 8px 2px rgba(177, 255, 69, 0.653);
-    width: 7px;
-    height: 15px;
-    border-radius: 2px;
-    background: rgb(124, 255, 64);
-}
-
-.lazer_lovedek {
-    position: absolute;
-    z-index: 150;
-    width:5px;
-    height: 20px;
-    background:rgb(218, 0, 0);
-    box-shadow: 2px 2px 4px rgba(255, 71, 20, 0.772);
-    -webkit-box-shadow: 2px 2px 4px rgba(255, 71, 20, 0.772);    
-    border-radius: 2px;
-}
 .tracking_lazer_lovedek {
     position: absolute;
     z-index: 300;   

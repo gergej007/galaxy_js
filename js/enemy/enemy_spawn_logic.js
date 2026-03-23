@@ -13,7 +13,9 @@
  *                           Rejects if the image fails to load.
  */
 async function configure_pooled_spacekraft( enemy_data) { 
-    const rnd_duration = Math.round(Math.random() * level_multiplier_speed) + level_seed_speed;
+    const {level_multiplier_speed, level_seed_speed, spacekraft_variance_multiplier, enemy_hp} = current_level_config;
+
+    const rnd_duration = Math.round(Math.random() * level_multiplier_speed) + (level_seed_speed * $(window).width());
     const rnd_width = Math.round(Math.random() * 86) + 120;
     const spacekraft_variance = Math.ceil(Math.random() * spacekraft_variance_multiplier);
 
@@ -23,14 +25,12 @@ async function configure_pooled_spacekraft( enemy_data) {
     
     enemy_data.id = enemy_id; 
     enemy_data.speed = rnd_duration;
+    enemy_data.max_hp = enemy_hp;
     enemy_data.hp = enemy_data.max_hp;      
     enemy_data.is_active = true;
     enemy_element.removeClass("locked");
-    // enemy_element.removeClass("moving_left moving_right locked");
-    /*enemy_element.find(".urhajo_img").remove();*/
-    // enemy_data.img_element.remove();
-
-    enemy_element.hide();
+                                                             // console.warn(enemy_data.hp);       
+    enemy_element.hide();   
 
     await new Promise((resolve) => {
             unified_image_loader(`enemy/urhajo${spacekraft_variance}.png`, (spacekraft_img)=>{
@@ -44,11 +44,11 @@ async function configure_pooled_spacekraft( enemy_data) {
                 enemy_element.css({
                     "width": rnd_width,
                     "height": new_height,
-                    "filter" : "none"
+                    "filter" : "none"                    
                 });          
                 spacekraft_img.show(); 
-                enemy_data.img_element = spacekraft_img;
-                
+                enemy_data.img_element = spacekraft_img;           
+                                                               
                 resolve();      
             });           
     });    
@@ -84,7 +84,6 @@ function setup_spacekraft_animation_behaviour( enemy_data, pozy_top, pozx, anim_
     
     spacekraft_shot(enemy_data); 
     
-    //enemy_element.addClass(moving_class);          // ********************** delete
     enemy_data.moving_direction = moving_class;
  
     enemy_element.animate({
@@ -178,6 +177,6 @@ function check_enemy_in_bounty_lane( enemy_element, pozy_top, move_pattern, boun
                 return true;
             }
         }
-    }
+    }   
     return false;
 }

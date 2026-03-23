@@ -1,4 +1,15 @@
-function a_bomb_launch() {  
+/**
+ * Initiates the launch sequence for an A-Bomb from the player's bazis.
+ * This function handles the creation and animation of the bomb projectile,
+ * deducting one A-bomb from the player's inventory, and scheduling its subsequent explosion.
+ *
+ * @returns {void}
+ */
+function a_bomb_launch() { 
+    
+    const { AUDIO_KEYS, BOMB_CLASS, LAUNCH_OFFSET_Y, DESTINATION_FACTOR_Y,
+            ANIMATION_DURATIONS, EASING, EXPLOSION_TIMEOUT_MS } = SECONDARY_WEAPONS_CONFIG.A_BOMB;
+
     weapons.flags.a_bomb = true;
      const bazis_rect = base_level_entities.bazis.rect;
 
@@ -8,13 +19,13 @@ function a_bomb_launch() {
     }
         game_data.counters.a_bomb--;
     
-        audio_play("#abomb1"); 
+        audio_play( AUDIO_KEYS[0] ); 
        
-        const a_bomb = $("<div class='bomba'></div>"); 
+        const a_bomb = $(`<div class=${BOMB_CLASS}></div>`); 
         
         const poz_x = bazis_rect.left + bazis_rect.width/2 + a_bomb.width();
-        const poz_y = bazis_rect.top +20;
-        const anim_poz_y = $(window).height() * 0.25;
+        const poz_y = bazis_rect.top + LAUNCH_OFFSET_Y;
+        const anim_poz_y = $(window).height() * DESTINATION_FACTOR_Y;
  
         a_bomb.css({
             "left": poz_x,  
@@ -26,7 +37,7 @@ function a_bomb_launch() {
         a_bomb.animate({
             "top": anim_poz_y, 
             "left": poz_x
-        }, 500, "linear",
+        }, ANIMATION_DURATIONS[0], EASING,
             function () {
                 $(this).remove();
             }
@@ -34,47 +45,69 @@ function a_bomb_launch() {
         setTimeout(function () 
         {
             a_bomb_explosion(poz_x);     
-        }, 550 );  
+        }, EXPLOSION_TIMEOUT_MS );  
 }
 
+/**
+ * Manages the visual and environmental reactions of an A-Bomb explosion.
+ * This function loads the explosion image, positions it, triggers visual animations,
+ * plays explosion audio, initiates game-state reactions, and handles the cleanup
+ * of the explosion visual. It leverages the A_BOMB configuration for all its parameters.
+ *
+ * @param {number} poz_x - The X-coordinate where the explosion should be centered.
+ *                         This is typically the landing spot of the A-bomb projectile.
+ * @returns {void}
+ */
 function a_bomb_explosion(poz_x) {
-    unified_image_loader("robban5.gif", (a_explosion_img)=> {
-        a_explosion_img.addClass("atombomba").appendTo($("body"))
+
+    const { EXPLOSION_IMG_SRC, EXPLOSION_IMG_CLASS, INITIAL_TOP_Y_FACTOR, BASE_STYLE, AUDIO_KEYS,       
+            EXP_REACTIOM_DELAYS, EXP_ANIM_FACTOR_X_Y, EXP_ANIM_FACTOR_Y, ANIMATION_PROPERTIES,
+            ANIMATION_DURATIONS, EASING } = SECONDARY_WEAPONS_CONFIG.A_BOMB;
+
+    unified_image_loader( EXPLOSION_IMG_SRC, (a_explosion_img)=> {
+        a_explosion_img.addClass(EXPLOSION_IMG_CLASS).appendTo($("body"))
                         .show()
                         .css({
-                            "top": $(window).height() * 0.18, 
-                            "left": poz_x - a_explosion_img.width() / 2,
-                            "border-radius": 10,
-                            "opacity": 0.95
+                            ...BASE_STYLE,
+                            "top": $(window).height() * INITIAL_TOP_Y_FACTOR, 
+                            "left": poz_x - a_explosion_img.width() / 2                           
                         });
 
-        base_level_a_bomb_explosion_reactions(500);
-        base_level_a_bomb_explosion_reactions(1200);
+        base_level_a_bomb_explosion_reactions( EXP_REACTIOM_DELAYS[0]);
+        base_level_a_bomb_explosion_reactions( EXP_REACTIOM_DELAYS[1]);
         if( game_data.game_states.boss_flag && boss_level_entities.boss.element.length > 0){
             boss_a_bomb_reaction();
         }
                     
-        audio_play("#abomb3");   
-        const anim_poz_x = poz_x - a_explosion_img.width() * 1.4;
-        const anim_poz_y = $(window).height() * 0.3 - a_explosion_img.height() * 1.4;                       
+        audio_play( AUDIO_KEYS[1] );   
+        const anim_poz_x = poz_x - a_explosion_img.width() * EXP_ANIM_FACTOR_X_Y;
+        const anim_poz_y = $(window).height() * EXP_ANIM_FACTOR_Y - a_explosion_img.height() * EXP_ANIM_FACTOR_X_Y;                       
         
-        a_explosion_img.animate({                           
+        a_explosion_img.animate({ 
+            ...ANIMATION_PROPERTIES,                          
             "left": anim_poz_x,
-            "top": anim_poz_y,
-            "width": 770,
-            "opacity": 0.92,
-            "border-radius": 120
-        }, 2700, "linear") 
+            "top": anim_poz_y            
+        }, ANIMATION_DURATIONS[1], EASING) 
         .animate({ 
             opacity: 0
-        }, 600, function() {            
+        }, ANIMATION_DURATIONS[2], function() {            
              $(this).remove(); 
              weapons.flags.a_bomb = false;  
         });
     });
 }
 
-
+/**
+ * Initiates various game reactions following an A-bomb explosion after a specified delay.
+ * These reactions include destroying all active enemy spacekrafts and potentially damaging
+ * the bounty container if it is present and active. The function checks for game state flags
+ * to ensure reactions only occur if the game is in a traffic-enabled state.
+ *
+ * It uses configuration values from `SECONDARY_WEAPONS_CONFIG.A_BOMB` for damage calculation.
+ *
+ * @param {number} delay - The delay in milliseconds before the explosion reactions are triggered.
+ * @returns {void}
+ */
 function base_level_a_bomb_explosion_reactions(delay) {   
     setTimeout(function () {  
         if( !game_data.game_states.traffic_flag){
@@ -85,23 +118,8 @@ function base_level_a_bomb_explosion_reactions(delay) {
                
                                                                             // Handle bounty container
         if( game_data.game_states.bounty_flag && $(base_level_entities.bounty.element).length > 0 ){
-            bounty_container_damage(20);
+            bounty_container_damage( SECONDARY_WEAPONS_CONFIG.A_BOMB.A_BOMB_DAMAGE );
         }
-                                                                             // Handle Boss               
-        // if ( game_data.game_states.boss_flag && boss_level_entities.boss.element.length > 0) 
-        //    {      
-               
-        //     score_dependent_fns();
-         
-        //     boss_level_entities.boss.hp -= 25;         //  Ezt itt át kell alakitani
-    
-        //     boss_a_bomb_reaction();
-                
-        //     update_progressbar(boss_level_entities.boss.hp);
-    
-        //     if (boss_level_entities.boss.hp <= 1) {
-        //         boss_dies();
-        //     }          
-        // }            
+                                                                  
     }, delay);
 }

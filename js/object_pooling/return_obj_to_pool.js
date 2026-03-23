@@ -6,8 +6,8 @@ function return_bazis_shot_to_pool(shot_data) {
     if (shot_data) {
         shot_data.is_active = false; 
         const shot_element = $(shot_data.element);
-        // Reset element's visual state
-        shot_element.stop(true, false); 
+        
+        shot_element.stop(true, true); 
         shot_element.hide();
         shot_data.rect = null;
         shot_element.css({         

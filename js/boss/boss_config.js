@@ -1,3 +1,5 @@
+
+
 const BOSS_BEHAVIOR_CONFIG = {
     MOVEMENT_PHASES : {
         MOVEMENT_1: { direction_1: "moving_right", direction_2: "moving_left", audio_key: "#boss_hang2", 

@@ -7,9 +7,9 @@ const boss_level_entities = {
 }
 
 const base_level_entities = {
-    bazis : { element : null, rect : null, img_element: null, lives : 3, hp : 99, max_hp : 99, damage : 25 },
-    bounty : { element : null, rect : null, type : "Bounty", direction : null, hp : 100, max_hp : 100, damage : 5 },
-    powerup : { element : null, rect : null, level : 0, duration : 6000 },
+    bazis : { element: null, rect: null, img_element: null, lives: 3, hp: 99, max_hp: 99, damage: 25 },
+    bounty : { element: null, rect: null, type: "Bounty", direction: null, hp: 100, max_hp: 100, damage: 5 },
+    powerup : { element: null, rect: null, level: 0, type: null,  duration: 6000 },
     enemy_ships : enemy_pool,
     bazis_shots : bazis_shot_pool,
     homing_missiles : homing_missile_pool,
@@ -18,15 +18,17 @@ const base_level_entities = {
 }
 
 const game_data = {
-    counters : { enemies : 0, killed : 0, score : 0, a_bomb : 3},    
-    game_states : { traffic_flag : true, boss_flag : false, exit_flag : false, dialog_flag : true, bounty_flag : false},
-    limits : { boss_limit : 1000, bounty_limit : 2000, next_limit : 5000, act_limit : 3000 },
-    levels : { act_level : 1 }
+    counters : { enemies: 0, killed: 0, score: 0, a_bomb: 3},    
+    game_states : { traffic_flag: true, boss_flag: false, exit_flag: false, dialog_flag: true, bounty_flag: false},
+    limits : { boss_limit: GAME_CONSTANTS.BOSS_LIMIT, 
+               bounty_limit: GAME_CONSTANTS.INITIAL_BOUNTY_LIMIT, 
+               act_limit: GAME_CONSTANTS.INITIAL_LEVEL_UP_SCORE },
+    levels : { act_level: 1 }
 } 
 
 const weapons = {
-    flags: { standard_shot : true, dual_fire_shot : false, single_lazer : false, dual_lazer : false,
-             homing_missile : false, tracking_lazer : false, god_mode : false, a_bomb : false
+    flags: { standard_shot: true, dual_fire_shot: false, single_lazer: false, dual_lazer: false,
+             homing_missile: false, tracking_lazer: false, god_mode: false, a_bomb: false
      }
 }
 
@@ -96,7 +98,6 @@ function update_base_entity_rects(){
      // Update enemy ships' rect
     base_level_entities.enemy_ships.forEach(enemy_data => {
         if (enemy_data.is_active) { 
-            // Ensure the element is still in the DOM and valid before getting its rect
             if (enemy_data.element && enemy_data.element.length > 0 && $.contains(document.body, enemy_data.element[0])) {
                 enemy_data.rect = enemy_data.element[0].getBoundingClientRect();
             } else {               

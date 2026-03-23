@@ -72,32 +72,32 @@ function initialize_generic_pool(pool, create_element_fn, initial_display, targe
 
 // --- Specific Initialization Functions (called once at game start or level change) ---
 
-// Call this once at game startup (e.g., from init_game.js)
-
-function initialize_all_pools(game_level) {
-    // Get target sizes based on gameLevel (you'd have getRequired... functions for each type)
-    const target_enemy_count = get_required_enemy_poolsize(game_level);
-    const target_bazis_shot_count = get_required_bazis_shot_poolsize(game_level);
-    const target_enemy_shot_count = get_required_enemy_shot_poolsize(game_level);
+function initialize_all_pools() {
+    
+    const current_game_level = game_data.levels.act_level;
+    const target_enemy_count = get_required_enemy_poolsize( current_game_level);
+    const target_bazis_shot_count = get_required_bazis_shot_poolsize( current_game_level);
+    const target_enemy_shot_count = get_required_enemy_shot_poolsize( current_game_level);
 
     initialize_generic_pool(
         enemy_pool,
         () => create_new_enemy_element(), 
         'none',
         target_enemy_count,
-        'Enemy', {img_element : null, damage : 25, speed : 0, moving_direction : null, hp : enemy_hp, max_hp : enemy_hp, id : 0}
+        'Enemy', {img_element : null, damage : 25, speed : 0, moving_direction : null, 
+                  hp : current_level_config.enemy_hp, max_hp : current_level_config.enemy_hp, id : 0}
     );
 
     initialize_generic_pool(
         bazis_shot_pool, () =>  create_new_bazis_shot_element(), 
-        'none', target_bazis_shot_count, 'Bazis Shot', { damage : 10} );
+        'none', target_bazis_shot_count, 'Bazis Shot', { damage: 10, enemies_hit_ids: new Set()} );
 
     initialize_generic_pool(
         enemy_shot_pool,
         () => create_new_enemy_shot_element(), 
         'none',
         target_enemy_shot_count,
-        'Enemy Shot', {damage : 10, shooter_id: 0 }
+        'Enemy Shot', { damage : 5, shooter_id: 0 }
     );
 
     const target_homing_missile_count = 4; // Adjust based on max concurrent missiles

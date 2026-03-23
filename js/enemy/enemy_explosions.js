@@ -9,7 +9,7 @@
 function explode_spacekraft( object_data )
 {       
     if (!object_data || !object_data.element || !object_data.type || !object_data.rect) {
-        console.warn(`explode_spacekraft called with invalid object_data (type: ${object_data?.type}, element: ${!!object_data?.element}, rect: ${!!object_data?.rect}). Cannot explode.`, object_data);
+        console.log(`explode_spacekraft called with invalid object_data (type: ${object_data?.type}, element: ${!!object_data?.element}, rect: ${!!object_data?.rect}). Cannot explode.`, object_data);
         if (object_data?.element) {
             object_data.element.remove(); 
         }

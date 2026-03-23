@@ -1,24 +1,24 @@
 /**
  * Orchestrates the firing of a single bazis shot (standard shot mode).
  * It uses the common bazis shot orchestrator to handle looping,
- * shot limits, and bazis presence checks, then calls `launch_bazis_single_shot`
+ * calculates initial position of projectile, then calls `launch_bazis_single_shot`
  * for the actual projectile launch.
  *
  * @returns {Promise<void>} A promise that resolves when the burst of shots (defined by bazis_shot_repeat) has completed.
  */
 
 async function single_fire_shooting() { 
-    await fire_bazis_shots_orchestrator(async (bazis_rect, _i) => { 
+    const { SHOT_WIDTH, INITIAL_TOP_OFFSET, SHOTS_PER_LAUNCH } = BAZIS_SHOTS_CONFIG.SINGLE_SHOT;
 
-        const animation_speed = parseInt(bazis_shot_speed * bazis_rect.top);
-        const shot_width = 6;
+    await fire_bazis_shots_orchestrator(async (bazis_rect, _i) => { 
+        const animation_speed = parseInt(current_level_config.bazis_shot_speed * bazis_rect.top);
+        const shot_width = SHOT_WIDTH;
         const initial_left = bazis_rect.left + (bazis_rect.width / 2 - shot_width / 2);
-        const initial_top = bazis_rect.top - 10; 
+        const initial_top = bazis_rect.top - INITIAL_TOP_OFFSET; 
        
         launch_bazis_single_shot(initial_left, initial_top, animation_speed);  
-}, 1);
+}, SHOTS_PER_LAUNCH);
 }
-
 
 /**
  * Launches standard bazis single shot from bazis_shots_pool.
@@ -41,26 +41,31 @@ function launch_bazis_single_shot( initial_left, initial_top, animation_speed) {
         return; 
     }
                       
-    const shot_element = shot_data.element;       
+    const shot_element = shot_data.element; 
+    const { CLASS, DAMAGE, TYPE, BASE_STYLE, ANIMATION_EASING, AUDIO_KEY } = BAZIS_SHOTS_CONFIG.SINGLE_SHOT;      
 
-    shot_element.removeClass("lazer_lovedek hyper_lovedek");
+    shot_element.removeClass(Object.values(BAZIS_SHOTS_CONFIG)
+                        .map(shotType => shotType.CLASS)
+                        .join(' '));
+    shot_element.addClass(CLASS);
    
     shot_element.rect = null;
-    shot_data.damage = 10;
-    shot_data.type = "single";
+    shot_data.damage = DAMAGE;
+    shot_data.type = TYPE;
     
     shot_element.css({
+        ...BASE_STYLE,
         "left": initial_left,
         "top": initial_top
     });
    
     shot_element.show(); 
 
-    audio_play("#loves1"); 
+    audio_play(AUDIO_KEY); 
 
     shot_element.animate({
         "top": 0 
-    }, animation_speed, "linear",
+    }, animation_speed, ANIMATION_EASING,
     function () {
         return_bazis_shot_to_pool( shot_data );        
     });

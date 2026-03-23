@@ -1,23 +1,23 @@
 /**
  * Orchestrates the firing of a dual bazis shot (standard shot mode).
  * It uses the common bazis shot orchestrator to handle looping,
- * shot limits, and bazis presence checks, then calls `launch_bazis_dual_shot`
+ * calculates initial position of projectile, then calls `launch_bazis_dual_shot`
  * for the actual projectile launch.
  *
  * @returns {Promise<void>} A promise that resolves when the burst of shots (defined by bazis_shot_repeat) has completed.
  */
-async function dual_fire_shooting() { 
+async function dual_fire_shooting() {     
+    const { OFFSET_X_FACTOR, INITIAL_TOP_OFFSET, SHOTS_PER_LAUNCH } = BAZIS_SHOTS_CONFIG.DUAL_FIRE_SHOT;
+    
     await fire_bazis_shots_orchestrator(async (bazis_rect, _i) => { 
-
-        const animation_speed = parseInt(bazis_shot_speed * bazis_rect.top);
-        const offset_x = bazis_rect.width * 0.24; 
-        const offset_y = bazis_rect.top - 10;       
+        const animation_speed = parseInt(current_level_config.bazis_shot_speed * bazis_rect.top);
+        const offset_x = bazis_rect.width *  OFFSET_X_FACTOR; 
+        const offset_y = bazis_rect.top - INITIAL_TOP_OFFSET;       
        
         launch_bazis_dual_shot(offset_x, offset_y, animation_speed, bazis_rect);  
-}, 2);
+}, SHOTS_PER_LAUNCH);
 }
 
-const HYPER_LOVEDEK_DAMAGE = 6;
 /**
  * Launches standard bazis dual shot from bazis_shots_pool.
  * This helper function retrieves two inactive projectiles from the pool,
@@ -34,6 +34,7 @@ const HYPER_LOVEDEK_DAMAGE = 6;
  */
 
 function launch_bazis_dual_shot( offset_x, offset_y, animation_speed, bazis_rect) {
+    
     for (let position_x = -1; position_x <= 1; position_x += 2) { 
         
         const dual_shot_data = get_bazis_shot_from_pool();
@@ -43,33 +44,38 @@ function launch_bazis_dual_shot( offset_x, offset_y, animation_speed, bazis_rect
             continue;
         }
         const dual_shot_element = dual_shot_data.element;
-        
-        dual_shot_element.removeClass("lazer_lovedek hyper_lovedek"); 
-        if( game_data.game_states.boss_flag ) {
-            dual_shot_element.addClass("hyper_lovedek");
-            dual_shot_data.damage = HYPER_LOVEDEK_DAMAGE;
-            dual_shot_data.type = "Hyper Shot";
-        }  
-        
-        
-        dual_shot_data.damage = 10;
-        dual_shot_data.type = "dual";
 
-        const shot_width = 6;         
+        let shot_config;
+        if (game_data.game_states.boss_flag) {
+            shot_config = BAZIS_SHOTS_CONFIG.HYPER_SHOT;
+        } else {
+            shot_config = BAZIS_SHOTS_CONFIG.DUAL_FIRE_SHOT;
+        }
+        
+        dual_shot_element.removeClass(Object.values(BAZIS_SHOTS_CONFIG)
+                        .map(shotType => shotType.CLASS)
+                        .join(' '));
+        dual_shot_element.addClass(shot_config.CLASS);                
+        
+        dual_shot_data.damage = shot_config.DAMAGE;
+        dual_shot_data.type = shot_config.TYPE;
+
+        const shot_width = shot_config.SHOT_WIDTH;         
         const offset_left = bazis_rect.left + (bazis_rect.width / 2) + (position_x * offset_x) - (shot_width / 2);
        
         dual_shot_element.css({
+            ...shot_config.BASE_STYLE,
             "left": offset_left,
             "top": offset_y
         });  
                                         
         dual_shot_element.show();                    
 
-        audio_play("#loves1");
+        audio_play(shot_config.AUDIO_KEY);
       
         dual_shot_element.animate({
             "top": 0
-        }, animation_speed, "linear",
+        }, animation_speed, shot_config.ANIMATION_EASING,
         function () {            
             return_bazis_shot_to_pool( dual_shot_data );
         });

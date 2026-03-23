@@ -44,8 +44,9 @@ async function boss_homing_shooting( number_of_shots, duration, audio_key, inter
     
                  audio_play(audio_key); 
     
-                 boss_shot_element.css(HOMING_SHOT_CONFIG.BASE_STYLE);
+                //  boss_shot_element.css(HOMING_SHOT_CONFIG.BASE_STYLE);
                  boss_shot_element.css({
+                    ...HOMING_SHOT_CONFIG.BASE_STYLE,
                     "left": shot_initial_x,
                     "top": shot_initial_y,
                     "display": "block",

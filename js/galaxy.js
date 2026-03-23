@@ -1,31 +1,46 @@
-/*
+
 $(document).on("keydown", function(e) {
-    if (e.keyCode === 116) { // F5 key
+    if (e.keyCode === 116) {                           // F5 key
         e.preventDefault(); 
         
         console.log("F5 pressed: Performing hard reset (bypassing cache if possible).");
         
-        // --- Option 1: Modern Browser Cache Bust ---
-        // This is usually the closest you can get to Shift+F5 programmatically.
-        // It appends a unique query parameter to the URL, forcing the browser to fetch new resources.
         const url = new URL(window.location.href);
-        url.searchParams.set('cache-buster', Date.now()); // Add a unique parameter
+        url.searchParams.set('cache-buster', Date.now()); 
         window.location.href = url.toString();        
     }
 });
-*/
 
-function get_required_enemy_poolsize(game_level) {
- return 20;
-}
 
-function get_required_bazis_shot_poolsize(game_level) {
-return 20;
-}
+// function get_required_enemy_poolsize(game_level) {                  // introduce pool config
+//  switch ( game_level){
+//     case 1: 
+//     case 2: return 15;
+//     case 3:
+//     case 4: return 30;
+//     case 5:
+//     case 6: 
+//     case 7: return 40;
+//     default: return 40;
+//  };
+// }
 
-function get_required_enemy_shot_poolsize(game_level) {
-return 20;
-}
+// function get_required_bazis_shot_poolsize(game_level) {
+//     return 25;
+// }
+
+// function get_required_enemy_shot_poolsize(game_level) {
+//     switch ( game_level){
+//         case 1: 
+//         case 2: return 20;
+//         case 3:
+//         case 4: return 45;
+//         case 5:
+//         case 6: 
+//         case 7: return 60;
+//         default: return 60;
+//      };
+// }
 
 primary_game_loop();
 
@@ -36,7 +51,7 @@ $(document).ready(
         create_bazis();        
         update_base_entity_rects();  bazis_key_binding();
         
-        game_level_change(game_data.levels.act_level);  
+        game_level_change(1);  
         initialize_all_pools(game_data.levels.act_level);                    
                                            
         update_right_display();
@@ -60,14 +75,14 @@ function bazis_reset() {
     audio_play("#impact3");
 }
 
-function boss_figyelo() {
-    game_data.game_states.traffic_flag = false;
-    stop_base_level_enemies();                                      // ----> EZ MI?
-    if (!game_data.game_states.boss_flag ) {
-        game_data.game_states.boss_flag = true;
-        initalize_boss_level();
-    }
-}
+// function boss_figyelo() {
+//     game_data.game_states.traffic_flag = false;
+//     stop_base_level_enemies();                                      // ----> EZ MI?
+//     if (!game_data.game_states.boss_flag ) {
+//         game_data.game_states.boss_flag = true;
+//         initalize_boss_level();
+//     }
+// }
 
 
 /**
@@ -106,71 +121,89 @@ function unified_image_loader(relative_src, on_ready) {
     });
 }
 
-// Globals
-// BAL FELSÓ KIJELZÖ UPDATE + ÚJ ÉLET HOZZÁADÁS + SZINTLÉPÉS + bounty controller
+
 function score_dependent_fns() {
+
     const player_score = game_data.counters.score;
-    const { boss_limit, next_limit } = game_data.limits;
+    const { act_limit, boss_limit, bounty_limit } = game_data.limits;
 
-    if (player_score >= game_data.limits.act_limit && game_data.game_states.traffic_flag){
-                
+    // --- 1. Level Up Logic ---
+    if (player_score >= act_limit && game_data.game_states.traffic_flag) {
+
+        if (game_data.levels.act_level >= GAME_CONSTANTS.MAX_GAME_LEVEL) {
+            
+            game_data.limits.act_limit = Infinity;
+            console.log("INFO: Max level reached. No further level-ups.");
+            
+            return; 
+        }
+
         game_data.levels.act_level++;
-       
-        game_data.limits.act_limit += next_limit; 
+        console.log(`Level Up! New Level: ${game_data.levels.act_level}`);
 
+        // Call game_level_change to load the new level's configuration and calculate its next act_limit
         game_level_change(game_data.levels.act_level);
+
         update_center_display("+ LEVEL UP +");
         base_level_entities.bazis.lives++;
-         // --- 2. Bounty Logic (Linked to Level Up after the first one) ---
-        // Every time we level up, we also trigger a bounty and push its limit forward
+
+        access_missed_weapons();
+
+        // --- 2. Bounty Logic (Linked to Level Up) ---
+        // This will now use the new bounty_score_threshold from the currentLevelConfig
         bounty_container_controller();
-        game_data.limits.bounty_limit = game_data.limits.act_limit; // Keep in sync
-        base_level_entities.powerup.level++;
+        base_level_entities.powerup.level++;      
     }
 
-    if (game_data.levels.act_level === 1 && player_score >= game_data.limits.bounty_limit) {
-        bounty_container_controller();
-       
-        game_data.limits.bounty_limit = 999999; 
-        base_level_entities.powerup.level++;
-    }
-
-      // --- 4. UI Updates ---
-    $(".eletek_keret").html(`HEALTH :&nbsp <span class='kijelzo_color'>${base_level_entities.bazis.hp}</span> &nbsp/&nbsp LIVES :&nbsp ${base_level_entities.bazis.lives}<span class='atomic_felirat'>: ${game_data.counters.a_bomb}</span>`);
+    // --- 3. First Bounty Trigger (if it's independent of level up for level 1) ---
     
+    if (game_data.levels.act_level === 1 && player_score >= bounty_limit) {
+        bounty_container_controller();
+        game_data.limits.bounty_limit = Infinity; // Use Infinity instead of a very large number for clarity
+        base_level_entities.powerup.level++;          
+    }
+
+    // --- 4. UI Updates ---
+    $(".eletek_keret").html(`HEALTH :&nbsp <span class='kijelzo_color'>${base_level_entities.bazis.hp}</span> &nbsp/&nbsp LIVES :&nbsp ${base_level_entities.bazis.lives}<span class='atomic_felirat'>: ${game_data.counters.a_bomb}</span>`);
+
     if ($(".atomic").length === 0) {
         $("<img src='kepek/atomic.png' class='atomic'>").appendTo($(".eletek_keret"));
     }
 
     // --- 5. Boss Logic ---
+    // Initalize Boss level
     if (player_score >= boss_limit) {
-        boss_figyelo();
+        // boss_figyelo();
+        game_data.game_states.traffic_flag = false;
+        stop_base_level_enemies();                                      
+        if (!game_data.game_states.boss_flag ) {
+          game_data.game_states.boss_flag = true;
+          initalize_boss_level();
+    }
         setTimeout(() => {
             explode_all_spacekrafts();
         }, 800);
     }
-}     
+}
 
 
 function add_score_n_hit()
 {   if( game_data.game_states.traffic_flag){
     game_data.counters.killed++;
 }
- 
-    game_data.counters.score += Math.ceil(Math.random() * talalat_score_multiplier) + talalat_score_seed;
+    const {hit_score_multiplier, hit_score_seed} = current_level_config;
+    game_data.counters.score += Math.ceil(Math.random() * hit_score_multiplier) + hit_score_seed;
     score_dependent_fns();   
     update_right_display();
 }
-
+/*
 function css_left(object){                   
     return parseInt($(object).css("left"));
 }
 
 function css_top(object){
     return parseInt($(object).css("top"));
-}
-
-
+}*/
 
 function create_background() {
 

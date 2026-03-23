@@ -1,14 +1,14 @@
 let lazer_shot_counter = 0; 
-const MAX_TRACKED_ENEMIES_PER_BURST = 6; 
+// const MAX_TRACKED_ENEMIES_PER_BURST = 6; 
 let tracking_lazer_timeout = null; 
-const TRACKING_LAZER_INTERVAL = 2500;  
+// const TRACKING_LAZER_INTERVAL = 2500;  
 /**
  * Main function for the Tracking Lazer weapon.
  * It checks if the weapon is active and then triggers the core tracking and killing logic.
  * It also manages the recursive call for the next tracking cycle.
  *
  * @returns {void}
- */
+ */                                            
 function tracking_lazer_scheduler() {    
     if (tracking_lazer_timeout) {
         clearTimeout(tracking_lazer_timeout);
@@ -25,7 +25,7 @@ function tracking_lazer_scheduler() {
             tracking_lazer_timeout = null; 
             console.log("Tracking Lazer deactivated.");
         }
-    }, TRACKING_LAZER_INTERVAL); 
+    }, SECONDARY_WEAPONS_CONFIG.TRACKING_LAZER.TRACKING_LAZER_INTERVAL); 
 }
 
 /**
@@ -39,6 +39,10 @@ function tracking_lazer_scheduler() {
 async function tracking_lazer_core_logic() {
     lazer_shot_counter = 0; 
 
+    const { MIN_ACTIVE_ENEMIES, MAX_TRACKED_ENEMIES_PER_BURST, AUDIO_KEY,        
+            ANIMATION_DURATION, ANIMATION_EASING, MS_BETWEEN_SHOTS
+        } = SECONDARY_WEAPONS_CONFIG.TRACKING_LAZER;
+
     const bazis_data = base_level_entities.bazis;
     const bazis_element = $(bazis_data.element); 
     const bazis_rect = bazis_data.rect;
@@ -51,7 +55,7 @@ async function tracking_lazer_core_logic() {
         return enemy_data.is_active && enemy_data.element && enemy_data.rect;
     });
 
-    if( active_enemy_data_objects.length < 4 ){
+    if( active_enemy_data_objects.length < MIN_ACTIVE_ENEMIES ){
         return;
     }
     const search_conditions = define_target_field_bounds( bazis_rect );
@@ -81,7 +85,7 @@ async function tracking_lazer_core_logic() {
                 continue;
             }
             const lazer_line = lazer_data.element;
-            audio_play("#track_lazer2");  
+            audio_play(AUDIO_KEY);  
             lazer_shot_counter++;   
 
             const line_properties = create_line_properties(enemy_element, bazis_element);
@@ -91,8 +95,8 @@ async function tracking_lazer_core_logic() {
                 "width": line_properties.width,
                 "height": line_properties.height,
                 "transform": line_properties.transform, 
-                "opacity": 0, // Start invisible
-                "display": "block" // Make it visible
+                "opacity": 0, 
+                "display": "block" 
             });
             lazer_line.appendTo($("body"));
 
@@ -100,7 +104,7 @@ async function tracking_lazer_core_logic() {
                 
                 lazer_line.animate({
                     "opacity": 1  
-                }, 50, "linear", 
+                }, ANIMATION_DURATION, ANIMATION_EASING, 
                     function () {
                         
                         explode_spacekraft( enemy_data ); 
@@ -110,19 +114,23 @@ async function tracking_lazer_core_logic() {
                         resolve(); 
                     });
             });           
-            await new Promise(resolve => setTimeout(resolve, 100)); 
+            await new Promise(resolve => setTimeout(resolve, MS_BETWEEN_SHOTS)); 
         }
     }
 }
 
 function define_target_field_bounds( bazis_rect){
-    const target_bound_top = $(window).height() * 0.17; 
-    const target_bound_bottom = $(window).height() * 0.84;
+
+    const { TOP_BOUND_FACTOR, BOTTOM_BOUND_FACTOR, RAW_HORIZONTAL_BOUND_FACTOR, TARGET_HORIZONTAL_BOUND_PX} 
+    = SECONDARY_WEAPONS_CONFIG.TRACKING_LAZER;
+
+    const target_bound_top = $(window).height() * TOP_BOUND_FACTOR; 
+    const target_bound_bottom = $(window).height() * BOTTOM_BOUND_FACTOR;
     const bazis_mid = bazis_rect.left + bazis_rect.width / 2;
-    const raw_left_bound = bazis_mid - $(window).width() * 0.40;
-    const raw_right_bound = bazis_mid + $(window).width() * 0.40;
-    const target_bound_left = Math.max(180, raw_left_bound);
-    const target_bound_right = Math.min($(window).width()-180, raw_right_bound);
+    const raw_left_bound = bazis_mid - $(window).width() * RAW_HORIZONTAL_BOUND_FACTOR;
+    const raw_right_bound = bazis_mid + $(window).width() * RAW_HORIZONTAL_BOUND_FACTOR;
+    const target_bound_left = Math.max( TARGET_HORIZONTAL_BOUND_PX, raw_left_bound);
+    const target_bound_right = Math.min($(window).width() - TARGET_HORIZONTAL_BOUND_PX, raw_right_bound);
 
     return  { 
         left_bound: target_bound_left,
@@ -153,6 +161,9 @@ function evaluate_target_field_bounds( enemy_rect, search_conditions ){
 }
 
 function create_line_properties(obj1, obj2) {
+
+    const { LINE_THICKNESS_PX, DEGREES_PER_RADIAN} = SECONDARY_WEAPONS_CONFIG.TRACKING_LAZER;
+
     const off1 = get_element_property(obj1);
     const off2 = get_element_property(obj2);
 
@@ -162,10 +173,10 @@ function create_line_properties(obj1, obj2) {
     const dy2 = off2.top + off1.height / 2;
 
     const length = Math.sqrt(((dx2 - dx1) * (dx2 - dx1)) + ((dy2 - dy1) * (dy2 - dy1)));
-    const line_thickness = 3;
+    const line_thickness = LINE_THICKNESS_PX;
     const cx = ((dx1 + dx2) / 2) - (length / 2);
     const cy = ((dy1 + dy2) / 2) - (line_thickness / 2);
-    const angle = parseInt(Math.atan2((dy1 - dy2), (dx1 - dx2)) * (180 / Math.PI));
+    const angle = parseInt(Math.atan2((dy1 - dy2), (dx1 - dx2)) * (DEGREES_PER_RADIAN / Math.PI));
 
     return {
         left: cx,

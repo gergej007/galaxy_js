@@ -5,7 +5,7 @@ function primary_game_loop(){
         bazis_enemy_collision_detection();
         bazis_shot_enemy_shot_collision_detection();
         bazis_shots_enemy_collision_detection();
-        if(game_data.levels.act_level < 3)
+        if(game_data.levels.act_level < 4)
             {
             enemy_shots_enemy_collision_detection();
         }

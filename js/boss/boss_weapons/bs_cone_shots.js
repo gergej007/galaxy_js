@@ -42,8 +42,9 @@ function boss_cone_shooting( shot_repeat, distance_between_shots, shot_duration,
         boss_shot_data.type = CONE_SHOT_CONFIG.TYPE;
         boss_shot_data.rect = null;  
             
-        boss_shot_element.css(CONE_SHOT_CONFIG.BASE_STYLE);
+        // boss_shot_element.css(CONE_SHOT_CONFIG.BASE_STYLE);
         boss_shot_element.css({
+            ...CONE_SHOT_CONFIG.BASE_STYLE,
             "left": initial_shot_x,
             "top": initial_shot_y,               
             "display": "block", 

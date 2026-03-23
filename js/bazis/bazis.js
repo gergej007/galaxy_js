@@ -15,8 +15,6 @@ function create_bazis()
         
        base_level_entities.bazis.img_element = bazis_img;
     });   
-        
-    // bazis_key_binding(bazis_frame);
 }
 
 function bazis_key_binding(){

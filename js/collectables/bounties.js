@@ -12,7 +12,7 @@ function bounty_container_controller()
     const new_element = get_bounty_container();
     bounty_data.element = new_element; 
     
-    const direction_pattern = window.direction_pattern || 1;      
+    const direction_pattern = current_level_config.direction_pattern || 1;      
 
     const bounty_direction = (direction_pattern === 1) ? "right" : "left";
     if( game_data.game_states.traffic_flag ){

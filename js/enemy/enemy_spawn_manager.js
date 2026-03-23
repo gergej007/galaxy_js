@@ -9,7 +9,7 @@ let spacekraft_spawn_timeout;
  * @param {number} move_pattern - The movement pattern to use for the next spawned enemy.
  * @returns {void}
  */
-function schedule_next_enemy_spawn_attempt(delay, move_pattern) {    
+function schedule_next_enemy_spawn_attempt(delay/*, move_pattern*/) {    
     if (spacekraft_spawn_timeout) {
         clearTimeout(spacekraft_spawn_timeout);
     }
@@ -18,7 +18,7 @@ function schedule_next_enemy_spawn_attempt(delay, move_pattern) {
         
         if (game_data.game_states.traffic_flag && !game_data.game_states.boss_flag) {
             
-            mobilize_spacekraft( direction_pattern );
+            mobilize_spacekraft( current_level_config.direction_pattern );
         } else {
            
             spacekraft_spawn_timeout = null; 
@@ -41,7 +41,7 @@ function schedule_next_enemy_spawn_attempt(delay, move_pattern) {
  * @returns {Promise<void>} A Promise that resolves when the current enemy mobilization attempt is complete.
  */
 async function mobilize_spacekraft(move_pattern) {   
-
+    const {level_multiplier_load, level_seed_load } = current_level_config;
     const rnd_load_time = (Math.random() * level_multiplier_load) + level_seed_load; 
 
     const enemy_data = get_enemy_from_pool();
@@ -49,7 +49,7 @@ async function mobilize_spacekraft(move_pattern) {
         console.log("Enemy pool exhausted, cannot mobilize spacekraft. Retrying spawn.");
         schedule_next_enemy_spawn_attempt(rnd_load_time, move_pattern);
         return;
-    }        
+    }                             
     
     try {
         await configure_pooled_spacekraft(enemy_data); // Await configuration
@@ -84,7 +84,7 @@ async function mobilize_spacekraft(move_pattern) {
         schedule_next_enemy_spawn_attempt(rnd_load_time, move_pattern);
         return_enemy_to_pool(enemy_data);
     }
-    schedule_next_enemy_spawn_attempt(rnd_load_time, move_pattern);    
+    schedule_next_enemy_spawn_attempt(rnd_load_time, move_pattern);           
 }
 
 let enemy_ship_Id = 0;

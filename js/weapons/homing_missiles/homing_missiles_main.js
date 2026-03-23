@@ -1,11 +1,13 @@
 let homing_missile_timeout;
 let missile_prep_timeout;
 
-const HOMING_MISSILE_INTERVAL = 2600;
+// const { CONTAINER_CLASS, IMG_SRC, IMG_CLASS} = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.IMAGE;
 
-function get_missile_element(){
-    return $("<div class='homing_missile'><img src='kepek/missile1.png' class='missile_img'></div>");
-}
+// function get_missile_element() {
+//     return $(`<div class="${CONTAINER_CLASS}"><img src="${IMG_SRC}" class="${IMG_CLASS}"></div>`);
+//        //$("<div class='homing_missile'><img src='kepek/missile1.png' class='missile_img'></div>");
+// }   // EZ KELL?
+
 
 /**
  * Evaluates the conditions required for homing missiles to be launched.
@@ -64,7 +66,7 @@ function schedule_next_missile_launch_attempt() {
         }        
         launch_missile_projectiles(); 
         schedule_next_missile_launch_attempt();
-    }, HOMING_MISSILE_INTERVAL); 
+    }, SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.MAIN.MISSILE_LAUNCH_INTERVAL); 
 }
 
 /**
@@ -75,7 +77,6 @@ function schedule_next_missile_launch_attempt() {
  * @returns {void}
  */
 function launch_missile_projectiles(){                        
-    // $(".homing_missile").remove();
 
     if( ! missile_launch_conditions_evaluation() ){        
         schedule_next_missile_launch_attempt(); 
@@ -88,13 +89,18 @@ function launch_missile_projectiles(){
         }       
         
         const bazis_rect = base_level_entities.bazis.rect;
+        const { WIDTH, OFFSET_X_FACTOR, PRE_LAUNCH_DISTANCE_X, PRE_LAUNCH_DISTANCE_Y,
+                PLACEMENT_START_VALUE, PLACEMENT_INCREMENT, PLACEMENT_END_VALUE,
+                LEFT_MISSILE_SIDE, RIGHT_MISSILE_SIDE,
+                ANIMATION_DURATION_1, ANIMATION_DURATION_2
+         } = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.MAIN
 
-        const missile_width = 9;    
-        const offset_x = bazis_rect.width * 0.40;  
-        const distance_x = 30;
-        const distance_y = 80;
+        const missile_width = WIDTH;    
+        const offset_x = bazis_rect.width * OFFSET_X_FACTOR;  
+        const distance_x = PRE_LAUNCH_DISTANCE_X;
+        const distance_y = PRE_LAUNCH_DISTANCE_Y;
     
-        for(let position_x =-1 ; position_x <= 2; position_x += 2){
+        for(let position_x = PLACEMENT_START_VALUE ; position_x <= PLACEMENT_INCREMENT; position_x += PLACEMENT_END_VALUE){
             const missile_initial_left = bazis_rect.left + (bazis_rect.width / 2) + (position_x * offset_x) - (missile_width / 2);
 
             const missile_data = get_homing_missile_from_pool();
@@ -102,17 +108,16 @@ function launch_missile_projectiles(){
                 console.warn("Homing Missile pool exhausted! Cannot launch all missiles.");
                 continue;
             }
-                const missile_element = $(missile_data.element);  console.log(missile_element.length);
+                const missile_element = $(missile_data.element);  
 
             let missile_parent_side;
 
             if( position_x === -1){
-                missile_parent_side = "left_missile";
+                missile_parent_side = LEFT_MISSILE_SIDE;
             }
             else if( position_x === 1){
-                missile_parent_side = "right_missile";
+                missile_parent_side = RIGHT_MISSILE_SIDE;
             }
-            // missile_projectile.addClass(new_missile_class); 
             missile_data.parent_side = missile_parent_side;       
            
             missile_element.css({
@@ -120,20 +125,20 @@ function launch_missile_projectiles(){
                 top  : bazis_rect.top  
             });
             missile_element.appendTo($("body"));  
-            missile_element.find('.missile_img').show();
+            missile_element.find(`.${SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.IMAGE.IMG_CLASS}`).show();
             missile_element.show(); 
             
             missile_element.animate({
                 "left" : missile_initial_left + ( position_x * distance_x )                    
-            }, 300)
+            }, ANIMATION_DURATION_1)
             .animate({
                 "top" : bazis_rect.top - distance_y
-            }, 250)
+            }, ANIMATION_DURATION_2)
             .promise()
             .done( ()=> {
                 missile_target_search( missile_data, bazis_rect);
             });
         } 
         missile_prep_timeout = null;                       
-   }, 1300);
+   }, SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.MAIN.LAUNCH_PREPARE_DELAY);
 }

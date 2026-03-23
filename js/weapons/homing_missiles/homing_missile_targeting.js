@@ -8,29 +8,25 @@
  * @param {object} missile_data - The data object representing the homing missile that is searching for a target.
  * @param {DOMRect} bazis_rect - The DOMRect object representing the current position and dimensions of the bazis.
  * @returns {void} This function does not return a value.
- */
+ */                                                                 
 function missile_target_search( missile_data, bazis_rect) {
     if( !missile_data ||! missile_data.element || !bazis_rect) {
         console.warn("missile_target_search called with invalid missile_data.");
         return;
     }
     const missile_element = missile_data.element;
+
+    const { HORIZONTAL_BOUND_FACTOR, BOTTOM_BOUND_PX, NO_TARGET_ANIM_TOP, NO_TARGET_ANIM_DURATION            
+        } = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.TARGETING;
   
     const mid_line = bazis_rect.left + bazis_rect.width / 2;
-    const target_left_bound = mid_line - $(window).width() * 0.35;
-    const target_right_bound = mid_line + $(window).width() * 0.35;
-    const target_bottom_bound = bazis_rect.top - 150;
+    const target_left_bound = mid_line - $(window).width() * HORIZONTAL_BOUND_FACTOR;
+    const target_right_bound = mid_line + $(window).width() * HORIZONTAL_BOUND_FACTOR;
+    const target_bottom_bound = bazis_rect.top - BOTTOM_BOUND_PX;
 
     const final_target_data_object = missile_target_lock({ missile_data, mid_line, target_left_bound, 
                                                            target_right_bound, target_bottom_bound  });
-   
-    // missile_target_lock(
-    //     missile_data,
-    //     current_mid_line,
-    //     target_left_bound,
-    //     target_right_bound,
-    //     target_bottom_bound
-    // );
+      
 
     const final_targeted_enemy_element = final_target_data_object ? $(final_target_data_object.element) : null; 
 
@@ -40,10 +36,10 @@ function missile_target_search( missile_data, bazis_rect) {
     } else 
           {               
         missile_element.animate({
-            "top": -30           
-        }, 1000, function(){ 
+            "top": NO_TARGET_ANIM_TOP           
+        }, NO_TARGET_ANIM_DURATION, function(){ 
             return_homing_missile_to_pool(missile_data);
-            weapons.flags.homing_missile=true; 
+            weapons.flags.homing_missile = true; 
         });
     }
 }
@@ -62,21 +58,20 @@ function missile_target_search( missile_data, bazis_rect) {
  */       
 function missile_target_lock( {missile_data, mid_line, target_left_bound, target_right_bound, target_bottom_bound} ) {
      
-    const horizontal_fade = 50;
-    
+    const { HORIZONTAL_TARGETING_DEAD_ZONE, RIGHT_MISSILE_SIDE, LEFT_MISSILE_SIDE} = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.TARGETING;
     let search_conditions;  
     
-    if(missile_data.parent_side === "right_missile"){
+    if(missile_data.parent_side === RIGHT_MISSILE_SIDE){
         search_conditions = {
-            left_bound :  mid_line - horizontal_fade,
+            left_bound :  mid_line - HORIZONTAL_TARGETING_DEAD_ZONE,
             right_bound : target_right_bound ,
             bottom_bound : target_bottom_bound 
         };
     }
-    else if(missile_data.parent_side === "left_missile") {
+    else if(missile_data.parent_side === LEFT_MISSILE_SIDE) {
         search_conditions = {
             left_bound : target_left_bound ,
-            right_bound : mid_line + horizontal_fade,                 
+            right_bound : mid_line + HORIZONTAL_TARGETING_DEAD_ZONE,                 
             bottom_bound : target_bottom_bound
         };                                               
     }         
@@ -112,6 +107,7 @@ function target_selector( targeting_conditions ) {
    
     let found_enemy_data = null;        
     
+    const locked_target_class = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.TARGETING.TARGET_LOCKED_CLASS;
     const all_enemy_data_objects = base_level_entities.enemy_ships;        
     
     for (let i = 0; i < all_enemy_data_objects.length; i++) {    
@@ -128,10 +124,10 @@ function target_selector( targeting_conditions ) {
                enemy_rect.left >= targeting_conditions.left_bound
             && enemy_rect.right <= targeting_conditions.right_bound         
             && enemy_rect.bottom < targeting_conditions.bottom_bound
-            && !enemy_element.hasClass("locked")            
+            && !enemy_element.hasClass(locked_target_class)            
         ) {           
             found_enemy_data = enemy_data;  
-            enemy_element.addClass("locked");         
+            enemy_element.addClass(locked_target_class);         
             break; 
         }
     }
@@ -147,10 +143,10 @@ function target_selector( targeting_conditions ) {
 
             const enemy_element = $(enemy_data.element);
 
-            if (!enemy_element.hasClass("locked")) {
+            if (!enemy_element.hasClass(locked_target_class)) {
                
                 found_enemy_data = enemy_data;
-                enemy_element.addClass("locked");             
+                enemy_element.addClass(locked_target_class);             
                 break; 
             }
         }

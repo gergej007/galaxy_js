@@ -32,11 +32,12 @@ function kezdo_panel(score) {
                     if (e.keyCode == 32 && game_data.game_states.dialog_flag && !game_data.game_states.exit_flag) {    //space - start game
                         kezdo_panel_keret.dialog("close");                        
                        
-                        if (score <= game_data.limits.boss_limit) {
+                        //   if (game_data.counters.score <= GAME_CONSTANTS.GLOBAL_BOSS_SCORE_LIMIT) {
+                          if (!game_data.game_states.boss_flag) {
                             game_data.game_states.traffic_flag = true; 
                               
-                            schedule_next_enemy_spawn_attempt(100, direction_pattern);                               
-                        }                            
+                            schedule_next_enemy_spawn_attempt(100, current_level_config.direction_pattern); 
+                          }                            
                     }
                 }
             );

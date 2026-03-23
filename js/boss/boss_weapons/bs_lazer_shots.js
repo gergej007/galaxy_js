@@ -55,8 +55,9 @@ async function boss_lazer_shooting(shot_repeat, anim_speed, audio_key, interval_
             let direction_correction = boss_data.direction === "moving_right" ? LAZER_CONFIG.DIRECTION_CORRECTION * $(window).width()
                                                    : -LAZER_CONFIG.DIRECTION_CORRECTION * $(window).width();
 
-            lazer_element.css(LAZER_CONFIG.BASE_STYLE);
+            // lazer_element.css(LAZER_CONFIG.BASE_STYLE);
             lazer_element.css({
+                ...LAZER_CONFIG.BASE_STYLE,
                 "left": lazer_initial_x + direction_correction,
                 "top": lazer_initial_y,                    
                 "opacity": 0, 
