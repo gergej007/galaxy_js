@@ -9,7 +9,7 @@ function return_bazis_shot_to_pool(shot_data) {
         
         shot_element.stop(true, true); 
         shot_element.hide();
-        shot_data.rect = null;
+        shot_data.rect = { top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 };
         shot_element.css({         
             "left" : 0, 
             "top" : 0,
@@ -35,11 +35,12 @@ function return_enemy_to_pool(enemy_data) {
         enemy_element = $(enemy_data.element);
         enemy_element.hide();
         enemy_element.css({
-            "left": 0,
+            "left": -120,
             "top": 0,
             "opacity": 1,
             "transform": "none",
-            "filter" : "none" 
+            "filter" : "none",
+            "transition": "none" 
         });
         if (enemy_data.img_element && enemy_data.img_element.length > 0) {
             enemy_data.img_element.remove();
@@ -49,7 +50,7 @@ function return_enemy_to_pool(enemy_data) {
         enemy_data.hp = 0; 
         enemy_data.speed = 0;
         enemy_data.moving_direction = null;
-        enemy_data.rect = null;
+        enemy_data.rect = { top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 };
         enemy_data.id = 0;        
     }
 }
@@ -66,14 +67,14 @@ function return_enemy_shot_to_pool(enemy_shot_data) {
         const enemy_shot_element = $(enemy_shot_data.element);
         enemy_shot_element.stop(true, false); 
         enemy_shot_element.hide();
-        enemy_shot_data.rect = null;
+        enemy_shot_data.rect = { top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 };
         enemy_shot_element.css({            
             "left" : 0, 
             "top" : 0,
             "opacity" : 1 
         });
                 
-        enemy_shot_element.removeClass("counter_tuz_var0 counter_tuz_var1 counter_tuz_var2 counter_tuz_var3"); // Add other variant classes if they exist
+        enemy_shot_element.removeClass("counter_tuz_var0 counter_tuz_var1 counter_tuz_var2 counter_tuz_var3"); 
     } else {        
         console.warn("Attempted to return an enemy shot not found in the pool!");
         enemy_shot_element.remove(); 
@@ -102,7 +103,7 @@ function return_homing_missile_to_pool(missile_data) {
 
         // Reset data properties
         missile_data.parent_side = null;
-        missile_data.rect = null;        
+        missile_data.rect = { top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 };        
     }
 }
 
@@ -126,7 +127,8 @@ function return_tracking_lazer_to_pool(lazer_data) {
             "display": "none",
             "transform" : "none"
         });
-        lazer_data.is_active = false;                
+        lazer_data.is_active = false; 
+        lazer_data.rect = { top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 };               
     }
 }
 
@@ -145,7 +147,7 @@ function return_boss_shot_to_pool(boss_shot_data) {
         }
         boss_shot_element.stop(true, false); 
         boss_shot_element.hide();
-        boss_shot_data.rect = null;
+        boss_shot_data.rect = { top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 };
         boss_shot_data.speed = 0;
         boss_shot_element.removeAttr('style');
         boss_shot_element.css({            

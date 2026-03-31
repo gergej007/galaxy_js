@@ -43,7 +43,7 @@ function initialize_generic_pool(pool, create_element_fn, initial_display, targe
             const entity_data = {
                 element: dom_element,
                 is_active: false,
-                rect: null,
+                rect: { top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 },
                 type: type 
             };
             

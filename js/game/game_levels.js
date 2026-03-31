@@ -10,7 +10,7 @@ function game_level_change(game_level) {
               return; 
           }
 
-    const new_config = GAME_LEVELS[game_level];
+       const new_config = GAME_LEVELS[game_level];
 
     if (!new_config) {
         console.error(`Configuration for level ${game_level} not found!`);
@@ -19,6 +19,7 @@ function game_level_change(game_level) {
     }
 
     current_level_config = { ...new_config };      // Create a shallow copy
+         
 
     if (game_level === 1) {                        // When setting up initial state for level 1
         game_data.limits.act_limit = GAME_CONSTANTS.INITIAL_LEVEL_UP_SCORE;

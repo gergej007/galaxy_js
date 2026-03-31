@@ -12,6 +12,8 @@
  */
 function enemy_damage( enemy_data, damage) {
 
+    const { CSS_FILTER_TIMEOUT_MS, ENEMY_DAMAGED_FILTER} = DAMAGE_N_EXPLOSION;
+
     if (!enemy_data || !enemy_data.is_active) return;    
 
     enemy_data.hp -= damage;   
@@ -23,11 +25,11 @@ function enemy_damage( enemy_data, damage) {
 
     const elem = $(enemy_data.element);
         
-    elem.css({ filter: "brightness(0.5) sepia(1) hue-rotate(-50deg) saturate(5)" });
+    elem.css({ filter:  ENEMY_DAMAGED_FILTER});
       
     setTimeout(() => {
         if (enemy_data.is_active) {
             elem.css({ filter: "none" });
         }
-    }, 80);    
+    }, CSS_FILTER_TIMEOUT_MS);    
 }

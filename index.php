@@ -18,10 +18,13 @@
     <script type="text/javascript" src="js/object_pooling/return_obj_to_pool.js"></script>  
     <script type="text/javascript" src="js/object_pooling/get_obj_from_pool.js"></script>  
     <script type="text/javascript" src="js/game/game_elements.js"></script>  
+    <script type="text/javascript" src="js/unified_helpers.js"></script>  
+
     <script type="text/javascript" src="js/bazis/bazis.js"></script>
     <script type="text/javascript" src="js/bazis/bazis_damage.js"></script>
     <script type="text/javascript" src="js/collision_detections/collision_util.js"></script>
     <script type="text/javascript" src="js/collision_detections/bazis_vs_enemy.js"></script>
+    <script type="text/javascript" src="js/enemy/enemy_config.js"></script>
     <script type="text/javascript" src="js/enemy/enemy_spawn_manager.js"></script>
     <script type="text/javascript" src="js/enemy/enemy_spawn_logic.js"></script>
     <script type="text/javascript" src="js/enemy/enemy_shot.js"></script>
@@ -57,6 +60,7 @@
     <script type="text/javascript" src="js/weapons/homing_missiles/homing_missile_targeting.js"></script>
     <script type="text/javascript" src="js/weapons/homing_missiles/homing_missile_impact.js"></script>
     <script type="text/javascript" src="js/weapons/homing_missiles/homing_missiles_main.js"></script>
+    <script type="text/javascript" src="js/collectables/bounty_config.js"></script>
     <script type="text/javascript" src="js/collectables/bounty_util.js"></script>
     <script type="text/javascript" src="js/collectables/bounties.js"></script>
     <script type="text/javascript" src="js/collectables/hp_indicator.js"></script>

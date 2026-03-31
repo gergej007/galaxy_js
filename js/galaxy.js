@@ -196,14 +196,9 @@ function add_score_n_hit()
     score_dependent_fns();   
     update_right_display();
 }
-/*
-function css_left(object){                   
-    return parseInt($(object).css("left"));
-}
 
-function css_top(object){
-    return parseInt($(object).css("top"));
-}*/
+
+
 
 function create_background() {
 
