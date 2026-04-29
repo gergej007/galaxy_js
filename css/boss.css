@@ -12,90 +12,44 @@
     left: 0;
     top: 0;
 }
-/* .boss_tuz_1{
-    position: absolute;
-    box-shadow: 0px -1px 1px 2px rgba(79, 245, 245, 0.982);
-    z-index: 220;
-    width: 10px;
-    height: 10px;
-    border-radius: 3px;
-    background: rgb(221, 109, 255);
-} */
-/* .boss_tuz_2{
-    position: absolute;
-    box-shadow: 0px -1px 1px 2px rgba(79, 232, 252, 0.954);
-    z-index: 220;
-    width: 3px;
-    height: 28px;
-    border-radius: 3px;
-    background: rgb(25, 94, 232);
-} */
-/* .boss_tuz_3{
-    position: absolute;
-    box-shadow: 0px -1px 1px 2px rgba(254, 93, 57, 0.954);
-    z-index: 220;
-    width: 8px;
-    height: 8px;
-    border-radius: 4px;
-    background: rgb(223, 36, 2);
-} */
-/* .bs_lazer_lovedek{
-    position: absolute;
-    z-index: 300;
-    width:7px;
-    height: 20px;
-    background:rgb(218, 0, 0);
-    box-shadow: 2px 2px 4px rgba(255, 71, 20, 0.772);
-    border-radius: 2px;
-} */
-/* .celzott_bs_loves{
-    position: absolute;
-    box-shadow: 0px -1px 1px 2px rgba(209, 253, 255, 0.954);
-    z-index: 220;
-    width: 10px;
-    height: 10px;
-    border-radius: 4px;
-    background: rgb(38, 255, 248);
-} */
 
 .bs_loves_explosion{
+    mix-blend-mode: screen;
     width : 5px;
     height : 5px;
     position : absolute;
     z-index: 300;
 }
 .blue_robbanas{
+    mix-blend-mode: screen;
     position: absolute;
-    width:  10px;
-    height: 10px;
+    width:  5px;
+    height: 5px;
     border-radius: 15px;
     z-index: 300;
 }
 .villam1{
+    mix-blend-mode: screen;
     width: 150px;
     position: absolute;
     z-index: 10;
     border-radius: 50px;
 }
 .villam2{
-    position: absolute;
-    width: 500px;  
-    border-radius: 130px;
-    z-index: 20;
-}
-
-.villam3{
+    mix-blend-mode: screen;
     position: absolute;
     width: 200px;  
-    border-radius: 150px;
-    z-index: 50;
+    border-radius: 130px;
+    z-index: 20;
 }
 
 .robbanas_y , .robbanas_x{
     position: absolute;
     z-index: 220;
 }
-.robbanas_x{  
+.robbanas_x{ 
+    mix-blend-mode: screen;
+    filter: contrast(1.1) saturate(1.2) brightness(1.1); 
     height : 250;
     border-radius: 80;
     border-radius: 30px;    

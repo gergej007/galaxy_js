@@ -5,13 +5,13 @@
  *
  * @returns {void}
  */
-function a_bomb_launch() { 
+function a_bomb_launch() {    
     
     const { AUDIO_KEYS, BOMB_CLASS, LAUNCH_OFFSET_Y, DESTINATION_FACTOR_Y,
             ANIMATION_DURATIONS, EASING, EXPLOSION_TIMEOUT_MS } = SECONDARY_WEAPONS_CONFIG.A_BOMB;
 
     weapons.flags.a_bomb = true;
-     const bazis_rect = base_level_entities.bazis.rect;
+    const bazis_rect = base_level_entities.bazis.rect;
 
     if( !bazis_rect || game_data.counters.a_bomb === 0){
         console.log("A-bomb launch disabled!");
@@ -62,7 +62,7 @@ function a_bomb_explosion(poz_x) {
 
     const { EXPLOSION_IMG_SRC, EXPLOSION_IMG_CLASS, INITIAL_TOP_Y_FACTOR, BASE_STYLE, AUDIO_KEYS,       
             EXP_REACTIOM_DELAYS, EXP_ANIM_FACTOR_X_Y, EXP_ANIM_FACTOR_Y, ANIMATION_PROPERTIES,
-            ANIMATION_DURATIONS, EASING } = SECONDARY_WEAPONS_CONFIG.A_BOMB;
+            ANIMATION_DURATIONS, EASING, SCREEN_SHAKE_DELAY, SCREEN_SHAKE_DURATION } = SECONDARY_WEAPONS_CONFIG.A_BOMB;
 
     unified_image_loader( EXPLOSION_IMG_SRC, (a_explosion_img)=> {
         a_explosion_img.addClass(EXPLOSION_IMG_CLASS).appendTo($("body"))
@@ -78,8 +78,10 @@ function a_bomb_explosion(poz_x) {
         if( game_data.game_states.boss_flag && boss_level_entities.boss.element.length > 0){
             boss_a_bomb_reaction();
         }
-                    
-        audio_play( AUDIO_KEYS[1] );   
+
+        trigger_screen_shake(SCREEN_SHAKE_DELAY, SCREEN_SHAKE_DURATION);         
+        audio_play( AUDIO_KEYS[1] );  
+
         const anim_poz_x = poz_x - a_explosion_img.width() * EXP_ANIM_FACTOR_X_Y;
         const anim_poz_y = $(window).height() * EXP_ANIM_FACTOR_Y - a_explosion_img.height() * EXP_ANIM_FACTOR_X_Y;                       
         
@@ -122,4 +124,23 @@ function base_level_a_bomb_explosion_reactions(delay) {
         }
                                                                   
     }, delay);
+}
+
+/**
+ * Triggers a screen shake effect for a specified duration.
+ * @param {number} delay - Initial delay of effect in milliseconds.
+ * @param {number} duration - How long the shake lasts in milliseconds.
+ */
+function trigger_screen_shake( delay, duration) {
+    setTimeout(() => {        
+    const SHAKE_CLASS = SECONDARY_WEAPONS_CONFIG.A_BOMB.SHAKE_ACTIVE_CLASS;
+    const $container = $("body"); 
+    
+    $container.addClass(SHAKE_CLASS);
+    
+    setTimeout(() => {
+        $container.removeClass(SHAKE_CLASS);
+        $container.css("transform", ""); 
+    }, duration);
+   }, delay); 
 }

@@ -8,11 +8,13 @@
     <link rel="stylesheet" type="text/css" href="jquery/jquery-ui-1.9.1.custom.css">
     <link rel="stylesheet" type="text/css" href="css/galaxy.css">
     <link rel="stylesheet" type="text/css" href="css/boss.css">
+    <link rel="stylesheet" type="text/css" href="css/screen.css">
     <script type="text/javascript" src="jquery/jquery-1.8.2.js"></script>
     <script type="text/javascript" src="jquery/jquery-ui-1.9.1.custom.js"></script>
     
     <script type="text/javascript" src="js/game/game_config.js"></script>
     <script type="text/javascript" src="js/game/game_levels.js"></script>
+    <script type="text/javascript" src="js/object_pooling/pool_config.js"></script>  
     <script type="text/javascript" src="js/object_pooling/create_pooled_elements.js"></script>  
     <script type="text/javascript" src="js/object_pooling/object_pooling.js"></script>  
     <script type="text/javascript" src="js/object_pooling/return_obj_to_pool.js"></script>  
@@ -20,8 +22,12 @@
     <script type="text/javascript" src="js/game/game_elements.js"></script>  
     <script type="text/javascript" src="js/unified_helpers.js"></script>  
 
+    <script type="text/javascript" src="js/bazis/bazis_config.js"></script>
+    <script type="text/javascript" src="js/bazis/input_handlers.js"></script>
+    <script type="text/javascript" src="js/bazis/key_actions.js"></script>
     <script type="text/javascript" src="js/bazis/bazis.js"></script>
     <script type="text/javascript" src="js/bazis/bazis_damage.js"></script>
+    <script type="text/javascript" src="js/collision_detections/collision_config.js"></script>
     <script type="text/javascript" src="js/collision_detections/collision_util.js"></script>
     <script type="text/javascript" src="js/collision_detections/bazis_vs_enemy.js"></script>
     <script type="text/javascript" src="js/enemy/enemy_config.js"></script>
@@ -62,7 +68,8 @@
     <script type="text/javascript" src="js/weapons/homing_missiles/homing_missiles_main.js"></script>
     <script type="text/javascript" src="js/collectables/bounty_config.js"></script>
     <script type="text/javascript" src="js/collectables/bounty_util.js"></script>
-    <script type="text/javascript" src="js/collectables/bounties.js"></script>
+    <script type="text/javascript" src="js/collectables/bounty_main.js"></script>
+    <script type="text/javascript" src="js/collectables/bounty_damage.js"></script>
     <script type="text/javascript" src="js/collectables/hp_indicator.js"></script>
     <script type="text/javascript" src="js/collectables/spawn_powerup.js"></script>
     <script type="text/javascript" src="js/collectables/powerup_selector.js"></script>

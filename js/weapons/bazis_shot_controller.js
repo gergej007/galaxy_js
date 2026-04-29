@@ -11,18 +11,19 @@
  */
 function bazis_primary_shot_type_controller() {
     const active_weapon_type = get_active_primary_weapon_type();
+    const { DUAL_LAZER, SINGLE_LAZER, DUAL_FIRE, STANDARD_SHOT } = PRIMARY_WEAPON_TYPES;
 
     switch (active_weapon_type) {
-        case 'dual_lazer':
+        case DUAL_LAZER:
             dual_lazer_shooting();
             break;
-        case 'single_lazer':
+        case SINGLE_LAZER:
             single_lazer_shooting();
             break;
-        case 'dual_fire':                             
+        case DUAL_FIRE:                             
             dual_fire_shooting();
             break;
-        case 'standard_shot':
+        case STANDARD_SHOT:
             single_fire_shooting();
             break;
         case 'none':
@@ -38,20 +39,21 @@ function bazis_primary_shot_type_controller() {
  * @returns {string} The string identifier of the active primary weapon (e.g., 'dual_lazer'), or 'none' if no primary weapon is active.
  */
 function get_active_primary_weapon_type() {
+    const { DUAL_LAZER, SINGLE_LAZER, DUAL_FIRE, STANDARD_SHOT, NONE } = PRIMARY_WEAPON_TYPES;
     if (weapons.flags.dual_lazer) {
-        return 'dual_lazer';
+        return DUAL_LAZER;
     }
     if (weapons.flags.single_lazer) {
-        return 'single_lazer';
+        return SINGLE_LAZER;
     }
     
     if (weapons.flags.dual_fire_shot || game_data.game_states.boss_flag) {
-        return 'dual_fire';                                    
+        return DUAL_FIRE;                                    
     }
     if (weapons.flags.standard_shot) {
-        return 'standard_shot';
+        return STANDARD_SHOT;
     }
-    return 'none'; // No primary weapon active
+    return NONE; // No primary weapon active
 }
  
 
@@ -66,7 +68,7 @@ function get_active_primary_weapon_type() {
 async function fire_bazis_shots_orchestrator(launch_specific_shot_callback, shots_per_launch) {
    
     const bazis = base_level_entities.bazis;
-    if (!bazis.element || $(bazis.element).length === 0) {
+    if (!is_entity_valid(base_level_entities.bazis)) {
         console.warn("Bazis element not found for shooting.");
         return;                                                              
     }
@@ -80,7 +82,8 @@ async function fire_bazis_shots_orchestrator(launch_specific_shot_callback, shot
 
     // 3. Active Shots Count and Limit Check (adjusted for shots_per_burst)
     const MAX_ACTIVE_BAZIS_SHOTS = current_level_config.max_shots_ammount;     // From game_config.js
-    const active_bazis_shots_count = bazis_shot_pool.filter(shot_data => shot_data.is_active).length;
+    const { bazis_shot_pool } = pool_state.pools;
+    const active_bazis_shots_count = bazis_shot_pool.filter(shot => shot.is_active).length;
 
     // Check if enough slots are available for the next burst
     if (active_bazis_shots_count + shots_per_launch > MAX_ACTIVE_BAZIS_SHOTS) {
@@ -97,4 +100,20 @@ async function fire_bazis_shots_orchestrator(launch_specific_shot_callback, shot
 
         await timeout(current_level_config.bazis_shot_timeout); 
     }
+}
+
+/**
+ * Calculates the horizontal offset based on the player's current movement.
+ * Returns a positive offset if moving right, negative if left, and 0 if stationary.
+ * 
+ * @returns {number} The calculated pixel offset.
+ */
+function get_player_movement_offset() {
+    const { MOTION_DISTANCE_PX } = BAZIS_CONFIG.ACTIONS;
+    
+    let move_multiplier = 0;
+    if (keys_pressed["ArrowRight"]) move_multiplier = 1;
+    else if (keys_pressed["ArrowLeft"]) move_multiplier = -1;
+
+    return move_multiplier * MOTION_DISTANCE_PX;
 }

@@ -60,7 +60,7 @@ async function mobilize_spacekraft(move_pattern) {
     const { level_multiplier_load, level_seed_load } = current_level_config;
     const rnd_load_time = (Math.random() * level_multiplier_load) + level_seed_load; 
     
-    const enemy_data = get_enemy_from_pool();
+    const enemy_data = get_from_pool(POOL_KEYS.ENEMY);
     if (!enemy_data) {
         schedule_next_enemy_spawn_attempt(rnd_load_time);
         return;
@@ -85,7 +85,7 @@ async function mobilize_spacekraft(move_pattern) {
     }    
     // Provide safe zone for Bounty
     if ( game_data.game_states.bounty_flag ) {
-        if ( check_enemy_in_bounty_lane(enemy_data.element, enemy_data.rect.top, current_move_pattern, base_level_entities.bounty/*$(base_level_entities.bounty.element), base_level_entities.bounty.rect*/)) {
+        if ( check_enemy_in_bounty_lane(enemy_data.element, enemy_data.rect.top, current_move_pattern, base_level_entities.bounty)) {
             return_enemy_to_pool(enemy_data); 
             schedule_next_enemy_spawn_attempt(rnd_load_time);
             return;

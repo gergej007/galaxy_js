@@ -1,98 +1,32 @@
-function get_bazis_shot_from_pool() {
-    for (let i = 0; i < bazis_shot_pool.length; i++) {
-        
-        const index = (next_bazis_shot_index + i) % bazis_shot_pool.length;
-        if (!bazis_shot_pool[index].is_active) {
-            bazis_shot_pool[index].is_active = true;  
-            next_bazis_shot_index = (index + 1) % bazis_shot_pool.length; // Advance pointer
-
-            return bazis_shot_pool[index]; 
-        }
-    }
-    console.warn("Bazis shot pool exhausted! Cannot fire more shots.");
-    return null; 
-}
-
 /**
- * Retrieves an inactive enemy from the pool.
- * @returns {object|null} An enemy data object from the pool, or null if pool exhausted.
- */
-function get_enemy_from_pool(){
-    for (let i = 0; i < enemy_pool.length; i++) {
-        const index = (next_enemy_index + i) % enemy_pool.length;
-        if (!enemy_pool[index].is_active) {
-            enemy_pool[index].is_active = true;
-            next_enemy_index = ( index + 1) % enemy_pool.length;
-
-            return enemy_pool[index];
-        }
+ * Retrieves the next available object from a specific pool using a Round-Robin search.
+ * 
+ * @function get_from_pool
+ * @param {string} pool_key - The key identifying the pool in pool_state (e.g., 'enemy_pool').
+ * @returns {Object|null} The entity data object if one is available; otherwise, null.
+ * 
+ * @description
+ * 1. Locates the pool and its corresponding tracking index.
+ * 2. Iterates through the pool starting from the last used position.
+ * 3. If an inactive object is found, marks it as active, updates the index, and returns it.
+ */                                                    
+function get_from_pool(pool_key) {
+    if (!pool_state.pools[pool_key]) {
+        console.error(`Error: Pool key "${pool_key}" does not exist in pool_state.`);
+        return null;
     }
-    console.log("Enemy pool exhausted! Cannot load more enemies.");
-    return null;
-}
+    const pool = pool_state.pools[pool_key];
+    const indices = pool_state.indices;
 
-function get_enemy_shot_from_pool() {
-    for (let i = 0; i < enemy_shot_pool.length; i++) {
+    for (let i = 0; i < pool.length; i++) {
+        const index = (indices[pool_key] + i) % pool.length;
         
-        const index = (next_enemy_shot_index + i) % enemy_shot_pool.length;
-        if (!enemy_shot_pool[index].is_active) {
-            enemy_shot_pool[index].is_active = true;  
-            next_enemy_shot_index = (index + 1) % enemy_shot_pool.length; // Advance pointer
-
-            return enemy_shot_pool[index]; // Return the jQuery element
+        if (!pool[index].is_active) {
+            pool[index].is_active = true;
+            indices[pool_key] = (index + 1) % pool.length; 
+            return pool[index];
         }
-    }
-    console.warn("Enemy shot pool exhausted! Cannot fire more shots.");
-    return null; 
-}
-
-/**
- * Retrieves an inactive homing missile from the pool.
- * @returns {object|null} A missile data object from the pool, or null if pool exhausted.
- */
-function get_homing_missile_from_pool() {
-    for (let i = 0; i < homing_missile_pool.length; i++) {
-        const index = (next_homing_missile_index + i) % homing_missile_pool.length;
-        if (!homing_missile_pool[index].is_active) {
-            homing_missile_pool[index].is_active = true;
-            next_homing_missile_index = (index + 1) % homing_missile_pool.length;
-
-            return homing_missile_pool[index]; 
-        }
-    }
-    console.warn("Homing missile pool exhausted! Cannot launch more missiles.");
+    }   
+    console.warn(`${pool_key} exhausted!`);
     return null;
-}
-
-/**
- * Retrieves an inactive lazer beam from the pool.
- * @returns {object|null} A lazer data object from the pool, or null if pool exhausted.
- */
-function get_tracking_lazer_from_pool() {
-    for (let i = 0; i < tracking_lazer_pool.length; i++) {
-        const index = (next_tracking_lazer_index + i) % tracking_lazer_pool.length;
-        if (!tracking_lazer_pool[index].is_active) {
-            tracking_lazer_pool[index].is_active = true;
-            next_tracking_lazer_index = (index + 1) % tracking_lazer_pool.length;
-
-            return tracking_lazer_pool[index]; 
-        }
-    }
-    console.warn("Tracking lazer pool exhausted! Cannot emit more lazer beam.");
-    return null;
-}
-
-function get_boss_shot_from_pool() {
-    for (let i = 0; i < boss_shot_pool.length; i++) {
-        
-        const index = (next_boss_shot_index + i) % boss_shot_pool.length;
-        if (!boss_shot_pool[index].is_active) {
-            boss_shot_pool[index].is_active = true;  
-            next_boss_shot_index = (index + 1) % boss_shot_pool.length; 
-
-            return boss_shot_pool[index]; 
-        }
-    }
-    console.warn("Boss shot pool exhausted! Cannot fire more shots.");
-    return null; 
 }

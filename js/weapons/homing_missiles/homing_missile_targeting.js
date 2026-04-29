@@ -9,20 +9,21 @@
  * @param {DOMRect} bazis_rect - The DOMRect object representing the current position and dimensions of the bazis.
  * @returns {void} This function does not return a value.
  */                                                                 
-function missile_target_search( missile_data, bazis_rect) {
-    if( !missile_data ||! missile_data.element || !bazis_rect) {
+function missile_target_search( missile_data) {
+    if( !is_entity_valid(missile_data) ) {
         console.warn("missile_target_search called with invalid missile_data.");
         return;
     }
     const missile_element = missile_data.element;
+    const missile_rect = missile_data.rect;
 
     const { HORIZONTAL_BOUND_FACTOR, BOTTOM_BOUND_PX, NO_TARGET_ANIM_TOP, NO_TARGET_ANIM_DURATION            
         } = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.TARGETING;
   
-    const mid_line = bazis_rect.left + bazis_rect.width / 2;
+    const mid_line = missile_rect.left + missile_rect.width / 2;
     const target_left_bound = mid_line - $(window).width() * HORIZONTAL_BOUND_FACTOR;
     const target_right_bound = mid_line + $(window).width() * HORIZONTAL_BOUND_FACTOR;
-    const target_bottom_bound = bazis_rect.top - BOTTOM_BOUND_PX;
+    const target_bottom_bound = missile_rect.top - BOTTOM_BOUND_PX;
 
     const final_target_data_object = missile_target_lock({ missile_data, mid_line, target_left_bound, 
                                                            target_right_bound, target_bottom_bound  });
@@ -113,7 +114,7 @@ function target_selector( targeting_conditions ) {
     for (let i = 0; i < all_enemy_data_objects.length; i++) {    
             const enemy_data = all_enemy_data_objects[i];        
         
-        if (!enemy_data.is_active || !enemy_data.element || !enemy_data.rect ) {
+        if (!enemy_data.is_active || !is_entity_valid(enemy_data) ) {
             continue; 
         }
 
@@ -137,7 +138,7 @@ function target_selector( targeting_conditions ) {
         for (let i = 0; i < all_enemy_data_objects.length; i++) {
             const enemy_data = all_enemy_data_objects[i];
            
-            if (!enemy_data.is_active || !enemy_data.element || !enemy_data.rect ) {
+            if (!enemy_data.is_active || !is_entity_valid(enemy_data) ) {
                 continue; 
             }
 

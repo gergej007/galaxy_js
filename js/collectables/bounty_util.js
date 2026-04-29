@@ -30,23 +30,41 @@ function reset_bounty_data(bounty_data) {
  * based on its visual width and movement direction.
  * 
  * @param {object} bounty_data - The global bounty data object.
- * @param {string} bnty_container_direction - "left" or "right".
- * @returns {object} { css_xpoz, anim_xpoz }
+ * @returns {object} { initial_x_poz, anim_x_poz }
  */
-function get_bounty_movement_data( bounty_data, bnty_container_direction ) {
-   let css_xpoz;
-   let anim_xpoz;     
+function calculate_container_x( bounty_data) {
+   const { RIGHT_DIRECTION, LEFT_DIRECTION} = BOUNTY_CONTAINER_CONFIG;   
+   let initial_x_poz;
+   let anim_x_poz;
+   const win_width = $(window).width();     
 
-    if(bnty_container_direction == "right"){                      // direction right
-        css_xpoz  = -bounty_data.element.width();
-        anim_xpoz = $(window).width() ;       
-        bounty_data.direction = "right";      
+    if(bounty_data.direction === RIGHT_DIRECTION){                      // direction right
+        initial_x_poz  = -bounty_data.element.width();
+        anim_x_poz = win_width;       
     }
-    else if(bnty_container_direction == "left"){                  // direction left
-        css_xpoz  = $(window).width();
-        anim_xpoz = -bounty_data.element.width();        
-        bounty_data.direction = "left";
+    else if(bounty_data.direction === LEFT_DIRECTION){                  // direction left
+        initial_x_poz  = win_width;
+        anim_x_poz = -bounty_data.element.width();        
     }
 
-    return { css_xpoz : css_xpoz, anim_xpoz : anim_xpoz }
+    return { initial_x_poz, anim_x_poz }
+}
+
+/**
+ * Calculates a randomized vertical (Y) coordinate for the bounty container.
+ * 
+ * The calculation uses a multiplier and a seed value from the configuration to 
+ * define a specific "spawn band" relative to the window height. This ensures 
+ * the container appears within a predictable vertical range while maintaining 
+ * variability.
+ * 
+ * @function calculate_container_y
+ * @returns {number} The randomized Y-coordinate in pixels.
+ */
+function calculate_container_y(){
+    const { RND_POZ_Y_MULTIPLIER_FACTOR, RND_POZ_Y_MULTIPLIER_SEED} = BOUNTY_CONTAINER_CONFIG;
+    const win_height = $(window).height();
+
+    const rnd_y_poz = Math.round(Math.random() * (win_height *RND_POZ_Y_MULTIPLIER_FACTOR)+ win_height * RND_POZ_Y_MULTIPLIER_SEED);
+    return rnd_y_poz;
 }

@@ -1,9 +1,12 @@
 function hp_indicator_handler() {
-    const hp_indicator_container = $(".bnty_hp_indicator");
+    const { LOW_TRESHOLD, CRITICAL_TRESHOLD, LOW_HEALTH_CLASS, CRITICAL_HEALTH_CLASS} = HP_INDICATOR_CONFIG;
+    const hp_indicator_container = base_level_entities.hp_indicator.element;
+    if (!hp_indicator_container) return;
+
     const current_hp = base_level_entities.bounty.hp;
     const max_hp =  base_level_entities.bounty.max_hp; 
     
-    const hp_fill = hp_indicator_container.find(".bnty_hp_fill");     
+    const hp_fill = base_level_entities.hp_indicator.fill;     
     
     const hp_percentage = (current_hp / max_hp) * 100;
     
@@ -11,11 +14,11 @@ function hp_indicator_handler() {
         "width": hp_percentage + '%'
     });
 
-    hp_fill.removeClass('low-health critical-health'); 
-    if (hp_percentage <= 25) {
-        hp_fill.addClass('critical-health'); 
-    } else if (hp_percentage <= 50) {
-        hp_fill.addClass('low-health'); 
+    hp_fill.removeClass(`${LOW_HEALTH_CLASS} ${CRITICAL_HEALTH_CLASS}`); 
+    if (hp_percentage <= CRITICAL_TRESHOLD) {
+        hp_fill.addClass(CRITICAL_HEALTH_CLASS); 
+    } else if (hp_percentage <= LOW_TRESHOLD) {
+        hp_fill.addClass(LOW_HEALTH_CLASS); 
     } else {
         // Default green 
     }
@@ -26,18 +29,21 @@ function hp_indicator_handler() {
         const bounty_data = base_level_entities.bounty;
         if (!bounty_data || bounty_data.rect === null) {
             return; 
-        }         
+        } 
+        
+        base_level_entities.hp_indicator.element = null;
+        base_level_entities.hp_indicator.fill = null;
 
         spawn_actual_powerup(bounty_data );       
         explode_spacekraft( bounty_data );
     }
 }
 
-function get_hp_indicator(){                 
-    const local_hp_indicator = $(              
-        "<div class = 'bnty_hp_indicator'>" +      
-        "<div class='bnty_hp_fill'></div>"+
-        "</div>"
-    );   
-    return local_hp_indicator;
+function get_hp_indicator(){     
+    const { WRAPPER_CLASS, FILL_CLASS} = HP_INDICATOR_CONFIG;            
+   
+    const hp_indicator_frame = $(`<div class = ${WRAPPER_CLASS}><div class=${FILL_CLASS}></div></div>`); 
+    base_level_entities.hp_indicator.element = hp_indicator_frame; 
+    base_level_entities.hp_indicator.fill = hp_indicator_frame.find(`.${FILL_CLASS}`);
+    return hp_indicator_frame;
 }

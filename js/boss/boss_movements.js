@@ -34,7 +34,7 @@ async function boss_phase_scheduler(boss_data) {
     // --- Determine the current phase plan from the sequence ---
     // If all phases completed, loop back to the start
     if (current_boss_phase_index >= PHASE_SEQUENCE.length) {
-        current_boss_phase_index = 0; // Reset index to loop the phase sequence
+        current_boss_phase_index = 0; 
     }
     const current_phase_plan = PHASE_SEQUENCE[current_boss_phase_index]; 
     // e.g., { type: "boss_movement_1", config_key: "MOVEMENT_1", attacks_config_key: "PHASE_1" }
@@ -119,6 +119,7 @@ function execute_boss_movement(boss_data, movement_config, function_name, get_ta
             "left": target_pos.x,
             "top": target_pos.y
         }, movement_config.duration_ms, "linear", function () {
+            boss_data.direction = null;
             // Update boss's bounding rectangle after animation
             boss_data.rect = boss_data.element[0].getBoundingClientRect();
             resolve_movement_phase(); // Resolve the Promise here!
@@ -135,20 +136,14 @@ function execute_boss_movement(boss_data, movement_config, function_name, get_ta
  * @returns {Promise<void>} A promise that resolves when the movement animation for this phase completes.
  */
 function boss_movement_1(boss_data, movement_config) {
+    boss_data.direction = movement_config.direction_2  || null;
     const get_target_position = (boss_element) => {
         const anim_poz_x = $(window).width() / 2 - boss_element.width() / 2;
         const anim_poz_y = movement_config.offset_y;
         return { x: anim_poz_x, y: anim_poz_y };
-    };
+    };   
 
-    const pre_animation_setup = (boss_element) => {
-        // Set direction here if it's meant to be set when movement *starts*
-        if (movement_config.direction_2) {
-            boss_data.direction = movement_config.direction_2;
-        }
-    };
-
-    return execute_boss_movement(boss_data, movement_config, "boss_movement_1", get_target_position, pre_animation_setup);
+    return execute_boss_movement(boss_data, movement_config, "boss_movement_1", get_target_position/*, pre_animation_setup*/);
 }
 
 /**
@@ -160,13 +155,14 @@ function boss_movement_1(boss_data, movement_config) {
  * @returns {Promise<void>} A promise that resolves when the movement animation for this phase completes.
  */
 function boss_movement_2(boss_data, movement_config) {
+    boss_data.direction = movement_config.direction_2  || null;
     const get_target_position = (boss_element) => {
         const anim_poz_x = movement_config.final_x_poz;
         const anim_poz_y = movement_config.final_y_poz;
         return { x: anim_poz_x, y: anim_poz_y };
-    };
+    };   
 
-    return execute_boss_movement(boss_data, movement_config, "boss_movement_2", get_target_position);
+    return execute_boss_movement(boss_data, movement_config, "boss_movement_2", get_target_position/*, pre_animation_setup*/);
 }
 
 /**
@@ -178,21 +174,14 @@ function boss_movement_2(boss_data, movement_config) {
  * @returns {Promise<void>} A promise that resolves when the movement animation for this phase completes.
  */
 function boss_movement_3(boss_data, movement_config) {
+    boss_data.direction = movement_config.direction_1  || null;
     const get_target_position = (boss_element) => {
         const anim_poz_x = $(window).width() / 2 - boss_element.width() / 2;
         const anim_poz_y = movement_config.offset_y;
         return { x: anim_poz_x, y: anim_poz_y };
-    };
+    };   
 
-    const pre_animation_setup = (boss_element) => {
-        // Apply internal direction change (if any)
-        if (boss_data.direction === movement_config.direction_1) {
-            boss_data.direction = null; 
-        }
-        boss_data.direction = movement_config.direction_1;
-    };
-
-    return execute_boss_movement(boss_data, movement_config, "boss_movement_3", get_target_position, pre_animation_setup);
+    return execute_boss_movement(boss_data, movement_config, "boss_movement_3", get_target_position/*, pre_animation_setup*/);
 }
 
 /**
@@ -204,156 +193,19 @@ function boss_movement_3(boss_data, movement_config) {
  * @returns {Promise<void>} A promise that resolves when the movement animation for this phase completes.
  */
 function boss_movement_4(boss_data, movement_config) {
+    boss_data.direction = movement_config.direction_1  || null;
+    if (movement_config.direction_1) {
+        boss_data.direction = movement_config.direction_1; 
+    }
     const get_target_position = (boss_element) => {
         const anim_poz_x = $(window).width() - boss_element.width() - movement_config.anim_offset_x;
         const anim_poz_y = movement_config.anim_ofset_y;
         return { x: anim_poz_x, y: anim_poz_y };
     };
-
-    return execute_boss_movement(boss_data, movement_config, "boss_movement_4", get_target_position);
+    
+    return execute_boss_movement(boss_data, movement_config, "boss_movement_4", get_target_position /*,pre_animation_setup*/);
 }
 
-// /**
-//  * Initiates and manages the first boss movement phase.
-//  * This function handles the boss's animation to a target position and
-//  *
-//  * @param {object} boss_data - The boss data object.
-//  * @param {object} movement_config - The configuration object for this specific movement phase.
-//  * @returns {Promise<void>} A promise that resolves when the movement animation for this phase completes.
-//  */
-// function boss_movement_1(boss_data, movement_config) {
-//     return new Promise(resolve_movement_phase => { 
-//         const boss_element = validate_boss_for_movement(boss_data, "boss_movement_1");
-//         if (boss_element === null) {
-          
-//             resolve_movement_phase(); // Resolve immediately if validation fails
-//             return;
-//         }     
-       
-//         audio_play(movement_config.audio_key); 
-
-//         // --- Phase 1 Movement: Move to Center (after timeout_ms delay) ---
-//         const anim_poz_x = $(window).width() / 2 - boss_element.width() / 2;
-//         const anim_poz_y = movement_config.offset_y;       
-
-//             boss_element.animate({
-//                 "left": anim_poz_x,
-//                 "top": anim_poz_y
-//             }, movement_config.duration_ms, "linear", function () {
-//                 boss_data.movement_timeout_id = null; // Clear ID on completion
-//                 resolve_movement_phase(); // Movement animation for this phase is done.
-//             });
-//             // Set direction here if it's meant to be set when movement *starts*
-//             boss_data.direction = movement_config.direction_2;
-//     });
-// }
-
-// /**
-//  * Manages the second phase of boss movement.
-//  * The boss moves to a specific screen position (e.g., top-left corner),
-//  * potentially after an initial delay, and resolves its promise when movement completes.
-//  *
-//  * @param {object} boss_data - The data object for the boss.
-//  * @param {object} movement_config - The configuration object for this specific movement phase (e.g., MOVEMENT_2).
-//  * @returns {Promise<void>} A promise that resolves when the movement animation for this phase completes.
-//  */
-// function boss_movement_2(boss_data, movement_config) {
-//     return new Promise(resolve_movement_phase => { 
-//         const boss_element = validate_boss_for_movement(boss_data, "boss_movement_2");
-//         if (boss_element === null) {
-          
-//             resolve_movement_phase(); // Resolve immediately if validation fails
-//             return;
-//         }       
-
-//             audio_play(movement_config.audio_key); 
-
-//             boss_element.animate({
-//                 "left": movement_config.final_x_poz, // Use config value (30)
-//                 "top": movement_config.final_y_poz   // Use config value (30)
-//             }, movement_config.duration_ms, "linear", function () { // Use config duration (2500)
-//                 boss_data.movement_timeout_id = null; // Clear ID on completion
-//                 resolve_movement_phase(); // Resolve the Promise here! The movement is done.
-//             });
-//     });
-// }
-
-// /**
-//  * Manages the third phase of boss movement.
-//  * The boss performs a sequence of attacks, then moves to a central position
-//  * after an initial delay, and resolves its promise upon movement completion.
-//  *
-//  * @param {object} boss_data - The data object for the boss.
-//  * @param {object} movement_config - The configuration object for this specific movement phase (e.g., MOVEMENT_3).
-//  * @returns {Promise<void>} A promise that resolves when the movement animation for this phase completes.
-//  */
-// function boss_movement_3(boss_data, movement_config) {
-//     return new Promise(resolve_movement_phase => {
-//         const boss_element = validate_boss_for_movement(boss_data, "boss_movement_3");
-//         if (boss_element === null) {
-          
-//             resolve_movement_phase(); // Resolve immediately if validation fails
-//             return;
-//         }
-     
-//         audio_play(movement_config.audio_key); // Use audio_key from config
-      
-//         if (boss_data.direction === movement_config.direction_1) { // e.g., "moving_right"
-//             boss_data.direction = null;
-//         }
-
-//         // Calculate target position using config (if final_x/y_poz are percentages or offsets, adjust here)
-//         const anim_poz_x = $(window).width() / 2 - boss_element.width() / 2; // Central horizontal
-//         const anim_poz_y = movement_config.offset_y; // e.g., 90
-
-//             boss_element.animate({
-//                 "left": anim_poz_x,
-//                 "top": anim_poz_y
-//             }, movement_config.duration_ms, "linear", function () { // Use duration_ms from config
-//                 // This callback fires when the animation for THIS movement completes.
-//                 boss_data.rect = boss_data.element[0].getBoundingClientRect(); // Update rect
-//                 boss_data.movement_timeout_id = null; // Clear ID on completion
-//                 resolve_movement_phase(); // Resolve the Promise here! The movement is done.
-//             });
-//             // Set direction here if it's meant to be set when movement *starts*
-//             boss_data.direction = movement_config.direction_1; 
-//     });
-// }
-
-// /**
-//  * Manages the fourth phase of boss movement.
-//  * This phase typically moves the boss to a final corner or side position,
-//  * potentially after an initial delay, and resolves its promise upon movement completion.
-//  *
-//  * @param {object} boss_data - The boss data object.
-//  * @param {object} movement_config - The configuration object for this specific movement phase (e.g., MOVEMENT_4).
-//  * @returns {Promise<void>} A promise that resolves when the movement animation for this phase completes.
-//  */
-// function boss_movement_4(boss_data, movement_config) {
-//     return new Promise(resolve_movement_phase => { 
-//         const boss_element = validate_boss_for_movement(boss_data, "boss_movement_4");
-//         if (boss_element === null) {           
-//             resolve_movement_phase(); // Resolve immediately if validation fails
-//             return;
-//         }
-     
-//         audio_play(movement_config.audio_key); 
-       
-//         const anim_poz_x = $(window).width() - boss_element.width() - movement_config.anim_offset_x; // Use anim_offset_x (30)
-//         const anim_poz_y = movement_config.anim_ofset_y; // Use anim_ofset_y (40)
-
-//             boss_element.animate({
-//                 "top": anim_poz_y,
-//                 "left": anim_poz_x
-//             }, movement_config.duration_ms, "linear", // Use duration_ms from config (2500)
-//                 function () {
-//                     // This callback fires when the animation for THIS movement completes.
-//                     boss_data.rect = boss_data.element[0].getBoundingClientRect(); // Update rect
-//                     boss_data.movement_timeout_id = null; // Clear ID on completion
-//                     resolve_movement_phase(); // Resolve the Promise here! The movement is done.
-//                 });
-//     });
-// }
 
 /**
  * Validates the boss data and returns the boss element if valid.

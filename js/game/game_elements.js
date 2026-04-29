@@ -1,20 +1,22 @@
 const boss_level_entities = {
     asteroid : { element: null, img_element: null, current_image_src: '', rect: null,
-                direction: null, damage :10, type :'Asteroid' },
+                direction: null, damage :5, type :'Asteroid' },
     boss : { element: null, img_element: null, rect: null, hp: 1000, damage: 20 , 
-            direction: null, attack_timeout_ids: [] },   
-    boss_shots : boss_shot_pool 
+             direction: null, attack_timeout_ids: [] },   
+    boss_shots : pool_state.pools.boss_shot_pool 
 }
 
 const base_level_entities = {
-    bazis : { element: null, rect: null, img_element: null, lives: 3, hp: 99, max_hp: 99, damage: 25 },
-    bounty : { element: null, rect: null, type: "Bounty", direction: null, hp: 100, max_hp: 100, damage: 5 },
-    powerup : { element: null, rect: null, level: 0, type: null,  duration: 6000 },
-    enemy_ships : enemy_pool,
-    bazis_shots : bazis_shot_pool,
-    homing_missiles : homing_missile_pool,
-    tracking_lazers : tracking_lazer_pool,
-    enemy_shots : enemy_shot_pool
+    bazis : { element: null, rect: null, img_element: null, lives: 3, hp: 99, max_hp: 99, damage: 25, 
+              is_exploding: false, is_colliding: false},
+    bounty : { element: null, rect: null, type: 'Bounty', direction: null, hp: 100, max_hp: 100, damage: 5 },
+    hp_indicator: { element: null, fill: null},
+    powerup : { element: null, rect: null, level: 0, type: null, timer: null },
+    enemy_ships : pool_state.pools.enemy_pool,
+    bazis_shots : pool_state.pools.bazis_shot_pool,
+    homing_missiles : pool_state.pools.homing_missile_pool,
+    tracking_lazers : pool_state.pools.tracking_lazer_pool,
+    enemy_shots : pool_state.pools.enemy_shot_pool
 }
 
 const game_data = {
@@ -28,7 +30,7 @@ const game_data = {
 
 const weapons = {
     flags: { standard_shot: true, dual_fire_shot: false, single_lazer: false, dual_lazer: false,
-             homing_missile: false, tracking_lazer: false, god_mode: false, a_bomb: false
+             homing_missile: false, tracking_lazer: false, god_mode: false, a_bomb: false, emp_timeout: 0
      }
 }
 
@@ -48,35 +50,25 @@ const weapons = {
         if (boss_shot_data.is_active) {
             if (boss_shot_data.element && boss_shot_data.element.length > 0 && $.contains(document.body, boss_shot_data.element[0])) {
                 boss_shot_data.rect = boss_shot_data.element[0].getBoundingClientRect();
-            } else {
-                boss_shot_data.rect = null;      
-                boss_shot_data.is_active = false;
-                }
-            }
-            else boss_shot_data.rect = null; 
-        });  
-}
+            } 
+        }          
+    });  
+    }
 
 function update_base_entity_rects(){
       // Update bazis' rect
     const bazis = base_level_entities.bazis;         
        if( bazis.element) {
            bazis.rect = base_level_entities.bazis.element[0].getBoundingClientRect();
-       } else {
-        bazis.rect = null;
-       }
+       } 
     
       // Update bazis shots' rects    
     base_level_entities.bazis_shots.forEach(shot_data => {
         if (shot_data.is_active) {         
             if (shot_data.element && shot_data.element.length > 0 && $.contains(document.body, shot_data.element[0])) {
             shot_data.rect = shot_data.element[0].getBoundingClientRect();
-        } else {
-            shot_data.rect = null;      // Clear rect for inactive shots
-            shot_data.is_active = false;
-            }
         }
-        else shot_data.rect = null; 
+    }        
     });
 
     // Update homing missiles' rects
@@ -84,14 +76,7 @@ function update_base_entity_rects(){
         if(missile_data.is_active){
             if (missile_data.element && missile_data.element.length > 0 && $.contains(document.body, missile_data.element[0])) {
                 missile_data.rect = missile_data.element[0].getBoundingClientRect();
-            }
-            else {
-                missile_data.is_active = false;
-                missile_data.rect = null;
-            }
-        }
-        else{
-            missile_data.rect = null; 
+            }        
         }
     });
 
@@ -100,11 +85,8 @@ function update_base_entity_rects(){
         if (enemy_data.is_active) { 
             if (enemy_data.element && enemy_data.element.length > 0 && $.contains(document.body, enemy_data.element[0])) {
                 enemy_data.rect = enemy_data.element[0].getBoundingClientRect();
-            } else {               
-                enemy_data.is_active = false;
-                enemy_data.rect = null;                           
-            }
-        } else enemy_data.rect = null;         
+            }                        
+        }              
     });
    
         // Update enemy shot's rect
@@ -112,27 +94,19 @@ function update_base_entity_rects(){
         if (enemy_shot_data.is_active) {
             if (enemy_shot_data.element && enemy_shot_data.element.length > 0 && $.contains(document.body, enemy_shot_data.element[0])) {
                 enemy_shot_data.rect = enemy_shot_data.element[0].getBoundingClientRect();
-            } else {
-                enemy_shot_data.rect = null;      
-                enemy_shot_data.is_active = false;
-                }
-            }
-            else enemy_shot_data.rect = null; 
+            } 
+        }         
         });       
 
       // Update bounty container's rect
-      const bounty = base_level_entities.bounty;                           // eztmajd még
+      const bounty = base_level_entities.bounty;                           
     if (bounty.element &&  bounty.element.length > 0 && $.contains(document.body, bounty.element[0])) {   
         bounty.rect = bounty.element[0].getBoundingClientRect();
-    } else {
-        bounty.rect = null;
-    }
+    } 
    
       // Update powerup's rect
       const powerup = base_level_entities.powerup;
       if (powerup.element && powerup.element.length > 0 && $.contains(document.body, powerup.element[0])) {
           powerup.rect = powerup.element[0].getBoundingClientRect();
-      } else {
-          powerup.rect = null; 
       }
 }

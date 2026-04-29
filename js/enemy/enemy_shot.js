@@ -60,7 +60,7 @@ function spacekraft_shot( enemy_data) {
 
     const target_coords = { bazis_target_x, bazis_target_y};
 
-    const enemy_shot_data = get_enemy_shot_from_pool();
+    const enemy_shot_data = get_from_pool(POOL_KEYS.ENEMY_SHOT);
     if( !enemy_shot_data) {
         console.log("enemy shot dropped due to invalid shot data!");
         return;
@@ -116,7 +116,7 @@ function check_no_fire_zones( bazis_data, enemy_data) {
     const {bottom: enemy_bottom ,left: enemy_left, width: enemy_width} = enemy_data.rect;
     const {height: bazis_height} = bazis_data.rect;
 
-    const is_vertically_clear = (enemy_bottom < $(window).height() -( bazis_height + VERTICAL_SAFE_ZONE_OFFSET_PX));
+    const is_vertically_clear = (enemy_bottom < $(window).height() - ( bazis_height + VERTICAL_SAFE_ZONE_OFFSET_PX));
     const is_horizontally_in_range =
     (enemy_data.moving_direction === RIGHT_DIRECTION && enemy_left > -enemy_width 
      && enemy_left < $(window).width() - VERTICAL_SCREEN_EDGE_SAFE_PX) 

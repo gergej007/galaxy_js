@@ -259,14 +259,15 @@ function check_spawn_proximity_conflict(proposed_enemy_data) {
  * @param {object} bounty_data - The object data representing the bounty container.
  * @returns {boolean} True if the enemy is in the bounty lane and meets removal criteria, false otherwise.
  */
-function check_enemy_in_bounty_lane( enemy_element, pozy_top, move_pattern, bounty_data/*bounty_element, bounty_rect*/) {
+function check_enemy_in_bounty_lane( enemy_element, pozy_top, move_pattern, bounty_data) {
     if (!bounty_data || !bounty_data.element || bounty_data.element.length === 0) {
         return false;
     } 
 
     const {BOUNTY_SAFE_ZONE_X_FACTOR} = ENEMY_SPAWN_CONFIG;
     
-    if (game_data.game_states.bounty_flag && bounty_data.element.is(':visible') && bounty_data.rect) {
+    if (game_data.game_states.bounty_flag && bounty_data.rect 
+        && (bounty_data.element.is(':visible') || base_level_entities.powerup?.element?.is(':visible') )) {
         if (pozy_top + enemy_element.height() >= bounty_data.rect.top) {
             if ((move_pattern == 1 && bounty_data.rect.left < $(window).width() * BOUNTY_SAFE_ZONE_X_FACTOR)
                  || (move_pattern > 1 )) {

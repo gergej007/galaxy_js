@@ -12,7 +12,16 @@ const LAZER_SHOT_STYLE = { "position": "absolute", "z-index": 150,
             "-webkit-box-shadow": "2px 2px 4px rgba(255, 71, 20, 0.772)",
             "border-radius": "2px",
             "background": "rgb(218, 0, 0)",
-            "display": "block", "opacity": 1 };            
+            "display": "block", "opacity": 1 };  
+            
+            
+const PRIMARY_WEAPON_TYPES = {
+    DUAL_LAZER: 'dual_lazer',
+    SINGLE_LAZER: 'single_lazer',
+    DUAL_FIRE: 'dual_fire',
+    STANDARD_SHOT: 'standard_shot',
+    NONE: 'none'
+};            
 
 const BAZIS_SHOTS_CONFIG = {           // --- Primary weapon system config ---
     SINGLE_SHOT: {
@@ -74,6 +83,7 @@ const BAZIS_SHOTS_CONFIG = {           // --- Primary weapon system config ---
         ANIMATION_EASING: 'linear',
         BASE_STYLE: { ...LAZER_SHOT_STYLE },
         SHOTS_PER_LAUNCH: 1,
+        MOVING_SPAWN_MULTIPLIER: 4,
         AUDIO_KEY: "#r_lazer4"
     },
     DUAL_LAZER_SHOT: {
@@ -90,6 +100,7 @@ const BAZIS_SHOTS_CONFIG = {           // --- Primary weapon system config ---
         ANIMATION_EASING: 'linear',
         BASE_STYLE: { ...LAZER_SHOT_STYLE }, 
         SHOTS_PER_LAUNCH: 2,
+        MOVING_SPAWN_MULTIPLIER: 4,
         AUDIO_KEY: "#r_lazer3"
     }    
 };
@@ -105,6 +116,7 @@ const SECONDARY_WEAPONS_CONFIG = {                 // --- Secondary weapon syste
                                                      // main
             MISSILE_LAUNCH_INTERVAL: 2600,     
             WIDTH: 9,
+            HEIGHT: 80,
             OFFSET_X_FACTOR: 0.40,
             PRE_LAUNCH_DISTANCE_X: 30,
             PRE_LAUNCH_DISTANCE_Y: 80,
@@ -118,8 +130,8 @@ const SECONDARY_WEAPONS_CONFIG = {                 // --- Secondary weapon syste
             LAUNCH_PREPARE_DELAY: 1300,
         },                                           // targeting
         TARGETING: {
-            HORIZONTAL_BOUND_FACTOR: 0.35,
-            BOTTOM_BOUND_PX: 150,
+            HORIZONTAL_BOUND_FACTOR: 0.30,
+            BOTTOM_BOUND_PX: 100,
             NO_TARGET_ANIM_TOP: -30,
             NO_TARGET_ANIM_DURATION: 1000,
             HORIZONTAL_TARGETING_DEAD_ZONE: 50,
@@ -147,12 +159,13 @@ const SECONDARY_WEAPONS_CONFIG = {                 // --- Secondary weapon syste
         ANIMATION_DURATION: 50,
         ANIMATION_EASING: 'linear',
         MS_BETWEEN_SHOTS: 100,
-
+      
         TOP_BOUND_FACTOR: 0.17,
         BOTTOM_BOUND_FACTOR: 0.84,
         RAW_HORIZONTAL_BOUND_FACTOR: 0.40,
         TARGET_HORIZONTAL_BOUND_PX: 180,
 
+        MOVING_SPAWN_MULTIPLIER: 2.8,
         LINE_THICKNESS_PX: 3,
         DEGREES_PER_RADIAN: 180
     },
@@ -162,18 +175,22 @@ const SECONDARY_WEAPONS_CONFIG = {                 // --- Secondary weapon syste
         BOMB_CLASS: 'bomba',
         LAUNCH_OFFSET_Y: 20,
         DESTINATION_FACTOR_Y: 0.25,
-        ANIMATION_DURATIONS: [ 500, 2700, 600],
+        ANIMATION_DURATIONS: [ 500, 3900, 500],
         EXPLOSION_TIMEOUT_MS: 550,
 
         EXPLOSION_IMG_SRC: 'robban5.gif',
         EXPLOSION_IMG_CLASS: 'atombomba',
         INITIAL_TOP_Y_FACTOR: 0.18,
-        BASE_STYLE: { "border-radius": 10, "opacity": 0.95},
+        BASE_STYLE: { "border-radius": 10, "opacity": 1},
         EXP_REACTIOM_DELAYS: [500, 1200],
         EXP_ANIM_FACTOR_X_Y: 1.4,
         EXP_ANIM_FACTOR_Y: 0.3,
         ANIMATION_PROPERTIES: { "width": 770, "opacity": 0, "border-radius": 120 },
-        EASING: 'linear'        
+        EASING: 'linear',
+        
+        SCREEN_SHAKE_DELAY: 500,
+        SCREEN_SHAKE_DURATION: 800,
+        SHAKE_ACTIVE_CLASS: 'shake-active'
     },
     GOD_MODE: {
         DURATION_MS: 60000, 

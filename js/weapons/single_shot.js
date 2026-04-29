@@ -11,12 +11,15 @@ async function single_fire_shooting() {
     const { SHOT_WIDTH, INITIAL_TOP_OFFSET, SHOTS_PER_LAUNCH } = BAZIS_SHOTS_CONFIG.SINGLE_SHOT;
 
     await fire_bazis_shots_orchestrator(async (bazis_rect, _i) => { 
-        const animation_speed = parseInt(current_level_config.bazis_shot_speed * bazis_rect.top);
+        const { top, left, width } = bazis_rect;
+        const animation_speed = parseInt(current_level_config.bazis_shot_speed * top);
         const shot_width = SHOT_WIDTH;
-        const initial_left = bazis_rect.left + (bazis_rect.width / 2 - shot_width / 2);
-        const initial_top = bazis_rect.top - INITIAL_TOP_OFFSET; 
+        const initial_top = top - INITIAL_TOP_OFFSET; 
+        let initial_left = left + (width / 2 - shot_width / 2);
+        // Predictive Offset Compensation
+        initial_left += get_player_movement_offset();
        
-        launch_bazis_single_shot(initial_left, initial_top, animation_speed);  
+        launch_bazis_single_shot({initial_left, initial_top, animation_speed});  
 }, SHOTS_PER_LAUNCH);
 }
 
@@ -27,14 +30,12 @@ async function single_fire_shooting() {
  * sets its initial position, plays firing audio, and initiates its animation
  * towards the screen's top edge. Upon animation completion, the projectile
  * is returned to the pool for reuse.
- * @param {number} initial_left  CSS left coordinate of projectile according to Bazis horizontal middle.
- * @param {number} initial_top  CSS top starting coordinate of projectile according to Bazis vertical top.
- * @param {number} animation_speed Duration of projectile animation. From start point to screen top edge.
+ * @param {Object} options - Shooting configuration.
  * @returns {void} This function does not return a value.
  */
 
-function launch_bazis_single_shot( initial_left, initial_top, animation_speed) {
-    const shot_data = get_bazis_shot_from_pool();  
+function launch_bazis_single_shot( {initial_left, initial_top, animation_speed}) {
+    const shot_data = get_from_pool(POOL_KEYS.BAZIS_SHOT);  
 
     if (!shot_data) {                  
         console.warn("Bazis shot pool empty !!.");
@@ -43,23 +44,20 @@ function launch_bazis_single_shot( initial_left, initial_top, animation_speed) {
                       
     const shot_element = shot_data.element; 
     const { CLASS, DAMAGE, TYPE, BASE_STYLE, ANIMATION_EASING, AUDIO_KEY } = BAZIS_SHOTS_CONFIG.SINGLE_SHOT;      
-
-    shot_element.removeClass(Object.values(BAZIS_SHOTS_CONFIG)
-                        .map(shotType => shotType.CLASS)
-                        .join(' '));
-    shot_element.addClass(CLASS);
    
-    shot_element.rect = null;
-    shot_data.damage = DAMAGE;
-    shot_data.type = TYPE;
-    
+    shot_element.attr('class', '');
+    shot_element.addClass(CLASS);
+
     shot_element.css({
         ...BASE_STYLE,
         "left": initial_left,
         "top": initial_top
     });
    
-    shot_element.show(); 
+    shot_data.damage = DAMAGE;
+    shot_data.type = TYPE;    
+
+    shot_element.show();
 
     audio_play(AUDIO_KEY); 
 

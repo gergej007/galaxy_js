@@ -5,7 +5,7 @@ const ENEMY_SPAWN_CONFIG = {
     ELEM_DEFAULT_WIDTH: 100,
     ELEM_DEFAULT_HEIGHT: 60,
     LANE_PADDING_PX: 5,
-    RESET_STYLE: { "transition": "none", "display": "block", "left": "-999px" },
+    RESET_STYLE: { "transition": "none", "display": "block", "left": "-999px", "transform":"none", "filter":"none" },
 
     ELEM_WIDTH_MULTIPLIER: 86,            // Spawning logic
     ELEM_WIDTH_SEED: 110,

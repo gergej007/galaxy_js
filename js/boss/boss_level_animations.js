@@ -1,10 +1,9 @@
-function boss_exit() {       // POOLING
+function boss_exit() {       
 
     const boss_data = boss_level_entities.boss;
-    const distance_x = -200;
-    const anim_duration = 1400;
+    const {DISTANCE_Y, ANIM_DURTION} = ANIMATION_CONFIG.BOSS_EXIT;
 
-    if (!boss_data.element || boss_data.element.length === 0) {
+    if (!is_entity_valid(boss_data)) {
         return;
     }
     const boss_element = $(boss_data.element);
@@ -18,21 +17,14 @@ function boss_exit() {       // POOLING
         });
 
     boss_element.animate({
-        "top": distance_x
-    }, anim_duration, function () {
+        "top": DISTANCE_Y
+    }, ANIM_DURTION, function () {
         $(this).hide();
         boss_data.element = null;
         boss_data.rect = null;
     });
 }
 
-
-const A_BOMB_REACTION_CONFIG = {
-    ANIM_INITIAL_DELAY: 800, ANIM_COUNTER: 3, ANIM_INTERVAL: 190,
-    ANIM_DURATION_1: 140, ANIM_DURATION_2: 100, ANIM_DURATION_HIDE: 50,
-    LIGHTNING_INITIAL_WIDTH: 200, LIGHTNING_FINAL_WIDTH: 380,
-    ANIM_X_RELATIVE: 45, ANIM_Y_RELATIVE: 20, A_BOMB_DAMAGE_FOR_BOSS: 25
-};
 
 /**
 * Triggers a visual reaction animation (e.g., lightning flashes) on the boss
@@ -47,9 +39,9 @@ function boss_a_bomb_reaction() {
         return;
     }
 
-    const { ANIM_INITIAL_DELAY, ANIM_COUNTER, ANIM_INTERVAL, ANIM_DURATION_1, ANIM_DURATION_2, ANIM_DURATION_HIDE,
+    const { IMG_SRC, IMG_CLASS, ANIM_OPACITY, ANIM_INITIAL_DELAY, ANIM_COUNTER, ANIM_INTERVAL, ANIM_DURATION_1, ANIM_DURATION_2, ANIM_DURATION_HIDE,
         LIGHTNING_INITIAL_WIDTH, LIGHTNING_FINAL_WIDTH, ANIM_X_RELATIVE, ANIM_Y_RELATIVE, A_BOMB_DAMAGE_FOR_BOSS
-    } = A_BOMB_REACTION_CONFIG;
+    } =ANIMATION_CONFIG.A_BOMB_REACTION_CONFIG;
 
     for (let i = 0; i < ANIM_COUNTER; i++) {
         const timeout_delay = ANIM_INITIAL_DELAY + (i * ANIM_INTERVAL);
@@ -59,9 +51,9 @@ function boss_a_bomb_reaction() {
             if (boss_element === null) {
                 return;
             }
-            unified_image_loader("villam1.gif", (lightning_effect) => {
+            unified_image_loader(IMG_SRC, (lightning_effect) => {
                 lightning_effect.appendTo(boss_element)
-                    .addClass("villam2")
+                    .addClass(IMG_CLASS)
                     .show()
                     .css({
                         "left": 0,
@@ -71,12 +63,12 @@ function boss_a_bomb_reaction() {
 
                 lightning_effect.animate({
                     "width": LIGHTNING_FINAL_WIDTH,
-                    "left": -ANIM_X_RELATIVE,
-                    "top": -ANIM_Y_RELATIVE
+                    "left": - ANIM_X_RELATIVE,
+                    "top": - ANIM_Y_RELATIVE
                 }, ANIM_DURATION_1)
                     .animate({
                         "width": LIGHTNING_FINAL_WIDTH,
-                        "opacity": 0.5
+                        "opacity":ANIM_OPACITY
                     }, ANIM_DURATION_2, function () {
                         $(this).hide(ANIM_DURATION_HIDE, function () {
                             $(this).remove();
@@ -91,8 +83,8 @@ function boss_a_bomb_reaction() {
 
 
 function shots_explosion_lightning(pos_x, pos_y) {
-    const img_dimension = 35;
-    const anim_duration = 250;
+    
+    const { ANIM_SIZE_PX, ANIM_DURATION} = ANIMATION_CONFIG.SHOTS_EXPLOSION;
     unified_image_loader('electric2.png', (shot_explosion_img) => {
         shot_explosion_img.addClass('bs_loves_explosion')
             .appendTo($("body"))
@@ -103,26 +95,14 @@ function shots_explosion_lightning(pos_x, pos_y) {
             });
 
         shot_explosion_img.animate({
-            "width": img_dimension,
-            "height": img_dimension
-        }, anim_duration, function () {
+            "width": ANIM_SIZE_PX,
+            "height": ANIM_SIZE_PX
+        }, ANIM_DURATION, function () {
             $(this).remove();
         });
     });
 }
 
-FIREWORKS_CONFIG = {
-    IMAGE_SRC: 'fireworks1.gif',
-    CLASS: 'tuzijatek',
-    ANIM_DURATION: 4000,
-    HIDE_DURATION: 500,
-    FINAL_WIDTH: 620,
-    // Positioning percentages relative to window dimensions
-    LEFT_FIREWORK_OFFSET_X_PERCENT: 0.05, // 5% from left window edge
-    RIGHT_FIREWORK_OFFSET_X_PERCENT: 0.95, // 5% from right window edge
-    Y_OFFSET_PERCENT: 0.50, // 50% from top window edge (center)
-    // RIGHT_FIREWORK_WIDTH_REFERENCE: 1 // Placeholder, to use actual width later
-};
 /**
  * Triggers a dual fireworks display on screen, signifying a victory
  * after defeating the boss.
@@ -132,11 +112,11 @@ FIREWORKS_CONFIG = {
  */
 function final_fireworks() {
     const {
-        IMAGE_SRC, CLASS, ANIM_DURATION, HIDE_DURATION, FINAL_WIDTH,
+        IMAGE_SRC, CLASS, ANIM_DURATION, HIDE_DURATION, FINAL_WIDTH, AUDIO_KEY,
         LEFT_FIREWORK_OFFSET_X_PERCENT, RIGHT_FIREWORK_OFFSET_X_PERCENT, Y_OFFSET_PERCENT
-    } = FIREWORKS_CONFIG;
+    } = ANIMATION_CONFIG.FIREWORKS;
 
-    audio_play("#robbanas8");
+    audio_play(AUDIO_KEY);
 
     const create_and_animate_firework = (x_offset_percent, is_right_side) => {
 
@@ -173,43 +153,31 @@ function final_fireworks() {
     create_and_animate_firework(RIGHT_FIREWORK_OFFSET_X_PERCENT, true);
 }
 
-function initial_lightning_effect()                       // Boss incoming lightning
-{
-    const timeout = 1200;
+function initial_lightning_effect() {                      // Boss incoming lightning
+    
+    const {DURATION, IMG_SRC,IMG_CLASS,IMG_WIDTH} = ANIMATION_CONFIG.INITIAL_LIGHTNING;
     const boss_data = boss_level_entities.boss;
-    const boss_element = boss_data.element;
-    if (!boss_data || boss_element.length === 0) {
+    if (!is_entity_valid(boss_data)) {
         return;
     }
-    unified_image_loader('villam1.gif', (incoming_lightning_img) => {
-        incoming_lightning_img.addClass('villam2')
+    const boss_element = boss_data.element;
+
+    unified_image_loader(IMG_SRC, (incoming_lightning_img) => {
+        incoming_lightning_img.addClass(IMG_CLASS)
             .appendTo(boss_element)
             .show()
             .css({
+                "width": IMG_WIDTH,
                 "left": 0,
                 "top": 0
             });
-        incoming_lightning_img.hide(timeout);
+        incoming_lightning_img.hide(DURATION);
         setTimeout(() => {
             incoming_lightning_img.remove();
-        }, timeout);
+        }, DURATION);
     });
 }
 
-
-const BAZIS_EXIT_CONFIG = {
-    EXIT_DELAY: 3000,
-    FINAL_DELAY: 4700,
-    // Horizontal duration rules
-    HORIZONTAL_DURATION_THRESHOLD_PERCENT: 0.25,
-    HORIZONTAL_DURATION_LONG: 1250,
-    HORIZONTAL_DURATION_SHORT: 900,
-
-    // Vertical duration rules
-    VERTICAL_DURATION_THRESHOLD_PERCENT: 0.75,
-    VERTICAL_DURATION_LONG: 1350,
-    VERTICAL_DURATION_SHORT: 900,
-};
 
 /**
  * Initiates the Bazis's exit sequence from the screen, in the case of victory.
@@ -223,64 +191,37 @@ const BAZIS_EXIT_CONFIG = {
 function bazis_exit() {
     game_data.game_states.exit_flag = true;
 
-    const { EXIT_DELAY, FINAL_DELAY,
-        HORIZONTAL_DURATION_THRESHOLD_PERCENT,
-        HORIZONTAL_DURATION_LONG,
-        HORIZONTAL_DURATION_SHORT,
-        VERTICAL_DURATION_THRESHOLD_PERCENT,
-        VERTICAL_DURATION_LONG,
-        VERTICAL_DURATION_SHORT,
-    } = BAZIS_EXIT_CONFIG;
-
-    const initial_bazis_data = validate_bazis_presence();
-    if (!initial_bazis_data) {
-        return;
-    }
-    const bazis_element = initial_bazis_data.element;
+    const { EXIT_DELAY, FINAL_DELAY,       
+        ANIM_EASING, AUDIO_KEY
+    } = ANIMATION_CONFIG.BAZIS_EXIT;
+      
 
     setTimeout(function () {
-        const bazis_data = validate_bazis_presence();
-        if (!bazis_data) {
+        const bazis_data = base_level_entities.bazis;
+        if (!is_entity_valid(bazis_data)) {
             console.warn("Bazis disappeared before exit animation could start.");
             return;
         }
-
+        const bazis_element = bazis_data.element;
         const bazis_rect = bazis_data.rect;
 
-        let horizontal_duration;
-        let vertical_duration;
-        const window_width = $(window).width();
-        const window_height = $(window).height();
-
-        // Calculate destination_x (always center)
-        const destination_x = parseInt((window_width / 2) - (bazis_rect.width / 2));
-
-        // --- Determine horizontal duration based on config rules ---
-        if (bazis_rect.left < window_width * HORIZONTAL_DURATION_THRESHOLD_PERCENT ||
-            bazis_rect.left > window_width * (1 - HORIZONTAL_DURATION_THRESHOLD_PERCENT)) {
-            horizontal_duration = HORIZONTAL_DURATION_LONG;
-        } else {
-            horizontal_duration = HORIZONTAL_DURATION_SHORT;
-        }
-
-        // --- Determine vertical duration based on config rules ---
-        if (bazis_rect.top > window_height * VERTICAL_DURATION_THRESHOLD_PERCENT) {
-            vertical_duration = VERTICAL_DURATION_LONG;
-        } else {
-            vertical_duration = VERTICAL_DURATION_SHORT;
-        }
-
-        // Animation Chain (Horizontal + Vertical) ---
+        const { horizontal_duration, vertical_duration } = get_bazis_exit_durations(
+            bazis_data.rect,            
+            ANIMATION_CONFIG.BAZIS_EXIT
+        );
+       
+        const destination_x = ($(window).width() / 2) - (bazis_rect.width / 2);
+      
         bazis_element.animate({
             "left": destination_x
-        }, horizontal_duration, "linear")
+        }, horizontal_duration, ANIM_EASING)
             .queue(function (next) {
-                audio_play("#exit1");
+                audio_play(AUDIO_KEY);
                 next();
             })
             .animate({
                 top: -bazis_rect.height
-            }, vertical_duration, "linear", function () {
+            }, vertical_duration, ANIM_EASING, function () {
 
                 $(this).remove();
                 base_level_entities.bazis.element = null;
@@ -292,4 +233,32 @@ function bazis_exit() {
         () => {
             show_scores_table();
         }, FINAL_DELAY);
+}
+
+/**
+ * Calculates dynamic durations for the exit animation based on screen position.
+ * @returns {Object} An object containing horizontal_duration and vertical_duration.
+ */
+function get_bazis_exit_durations(bazis_rect, config) {
+    let horizontal_duration;
+    let vertical_duration;
+    const window_width = $(window).width();
+    const window_height = $(window).height();
+
+    // Determine horizontal duration
+    if (bazis_rect.left < window_width * config.HORIZONTAL_DURATION_THRESHOLD_PERCENT ||
+        bazis_rect.left > window_width * (1 - config.HORIZONTAL_DURATION_THRESHOLD_PERCENT)) {
+        horizontal_duration = config.HORIZONTAL_DURATION_LONG;
+    } else {
+        horizontal_duration = config.HORIZONTAL_DURATION_SHORT;
+    }
+
+    // Determine vertical duration
+    if (bazis_rect.top > window_height * config.VERTICAL_DURATION_THRESHOLD_PERCENT) {
+        vertical_duration = config.VERTICAL_DURATION_LONG;
+    } else {
+        vertical_duration = config.VERTICAL_DURATION_SHORT;
+    }
+
+    return { horizontal_duration, vertical_duration };
 }

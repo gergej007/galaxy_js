@@ -25,13 +25,14 @@ function kezdo_panel(score) {
         close:function(){
             game_data.game_states.dialog_flag=false;            
             $("#progress_keret").html("");
+            
            }    
     });   
        $(document).keydown(
                 function (e) {
                     if (e.keyCode == 32 && game_data.game_states.dialog_flag && !game_data.game_states.exit_flag) {    //space - start game
                         kezdo_panel_keret.dialog("close");                        
-                       
+                        play_bg_music("#track2");
                         //   if (game_data.counters.score <= GAME_CONSTANTS.GLOBAL_BOSS_SCORE_LIMIT) {
                           if (!game_data.game_states.boss_flag) {
                             game_data.game_states.traffic_flag = true; 

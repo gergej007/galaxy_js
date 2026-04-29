@@ -10,11 +10,12 @@ async function dual_fire_shooting() {
     const { OFFSET_X_FACTOR, INITIAL_TOP_OFFSET, SHOTS_PER_LAUNCH } = BAZIS_SHOTS_CONFIG.DUAL_FIRE_SHOT;
     
     await fire_bazis_shots_orchestrator(async (bazis_rect, _i) => { 
-        const animation_speed = parseInt(current_level_config.bazis_shot_speed * bazis_rect.top);
-        const offset_x = bazis_rect.width *  OFFSET_X_FACTOR; 
-        const offset_y = bazis_rect.top - INITIAL_TOP_OFFSET;       
+        const { top, width } = bazis_rect;
+        const animation_speed = parseInt(current_level_config.bazis_shot_speed * top);
+        const offset_x = width *  OFFSET_X_FACTOR; 
+        const offset_y = top - INITIAL_TOP_OFFSET;       
        
-        launch_bazis_dual_shot(offset_x, offset_y, animation_speed, bazis_rect);  
+        launch_bazis_dual_shot({offset_x, offset_y, animation_speed, bazis_rect});  
 }, SHOTS_PER_LAUNCH);
 }
 
@@ -26,18 +27,15 @@ async function dual_fire_shooting() {
  * sets class hyper_lovedek on projectile if Boss enemy comes in.
  * towards the screen's top edge. Upon animation completion, the projectiles
  * are returned to the pool for reuse.
- * @param {number} initial_left  CSS left coordinate of projectile according to Bazis horizontal middle.
- * @param {number} initial_top  CSS top starting coordinate of projectile according to Bazis vertical top.
- * @param {number} animation_speed Duration of projectile animation. From start point to screen top edge.
- * @param {object} bazis_rect - The DOMRect object of the bazis element, used for dynamic calculations
+ * @param {Object} options - Shooting configuration.
  * @returns {void} This function does not return a value.
  */
 
-function launch_bazis_dual_shot( offset_x, offset_y, animation_speed, bazis_rect) {
+function launch_bazis_dual_shot( {offset_x, offset_y, animation_speed, bazis_rect}) {
     
     for (let position_x = -1; position_x <= 1; position_x += 2) { 
         
-        const dual_shot_data = get_bazis_shot_from_pool();
+        const dual_shot_data = get_from_pool(POOL_KEYS.BAZIS_SHOT);
         
         if (!dual_shot_data) {           
             console.warn("Bazis shot pool empty !");           
@@ -50,22 +48,21 @@ function launch_bazis_dual_shot( offset_x, offset_y, animation_speed, bazis_rect
             shot_config = BAZIS_SHOTS_CONFIG.HYPER_SHOT;
         } else {
             shot_config = BAZIS_SHOTS_CONFIG.DUAL_FIRE_SHOT;
-        }
-        
-        dual_shot_element.removeClass(Object.values(BAZIS_SHOTS_CONFIG)
-                        .map(shotType => shotType.CLASS)
-                        .join(' '));
+        }        
+       
+        dual_shot_element.attr('class','');
         dual_shot_element.addClass(shot_config.CLASS);                
         
         dual_shot_data.damage = shot_config.DAMAGE;
         dual_shot_data.type = shot_config.TYPE;
 
         const shot_width = shot_config.SHOT_WIDTH;         
-        const offset_left = bazis_rect.left + (bazis_rect.width / 2) + (position_x * offset_x) - (shot_width / 2);
-       
+        let initial_left = bazis_rect.left + (bazis_rect.width / 2) + (position_x * offset_x) - (shot_width / 2);
+        initial_left += get_player_movement_offset();
+
         dual_shot_element.css({
             ...shot_config.BASE_STYLE,
-            "left": offset_left,
+            "left": initial_left,
             "top": offset_y
         });  
                                         

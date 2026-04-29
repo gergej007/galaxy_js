@@ -11,11 +11,12 @@ async function dual_lazer_shooting() {
     const{ OFFSET_X_FACTOR, INITIAL_TOP_OFFSET, SHOTS_PER_LAUNCH } = BAZIS_SHOTS_CONFIG.DUAL_LAZER_SHOT;
     await fire_bazis_shots_orchestrator(async (bazis_rect, _i) => { 
        
-        const offset_x = bazis_rect.width * OFFSET_X_FACTOR;             
-        const offset_y = bazis_rect.top - INITIAL_TOP_OFFSET;     
-        const lazer_length = bazis_rect.top; 
+        const { top, width} = bazis_rect;
+        const offset_x = width * OFFSET_X_FACTOR;             
+        const offset_y = top - INITIAL_TOP_OFFSET;     
+        const lazer_length = top; 
                
-        launch_bazis_dual_lazer_shot(bazis_rect, offset_x, offset_y, lazer_length);   
+        launch_bazis_dual_lazer_shot({bazis_rect, offset_x, offset_y, lazer_length});   
     }, SHOTS_PER_LAUNCH);
 }
 
@@ -26,22 +27,19 @@ async function dual_lazer_shooting() {
  * sets initial positions, plays firing audio, and initiates the animation 
  * towards the screen's top edge. Upon animation completion, the projectiles
  * are returned to the pool for reuse.
- * @param {object} bazis_rect - The DOMRect object of the bazis element, used for dynamic calculations
- * @param {number} offset_x  CSS left coordinate of projectile according to Bazis horizontal middle.
- * @param {number} offset_y  CSS top starting coordinate of projectile according to Bazis vertical top.
- * @param {number} lazer_length initial maximum length of lazer beam derived from bazis_rect.top.
+ * @param {Object} options - Shooting configuration.
  * @returns {void} This function does not return a value.
  */
 
-function launch_bazis_dual_lazer_shot( bazis_rect, offset_x, offset_y, lazer_length) {
+function launch_bazis_dual_lazer_shot( {bazis_rect, offset_x, offset_y, lazer_length}) {
 
     const { CLASS, DAMAGE, TYPE, SHOT_WIDTH, ANIMATION_DURATIONS, ANIMATION_TARGET_HEIGHT_OFFSET,
             ANIMATION_SECOND_STAGE_TOP_OFFSET, ANIMATION_SECOND_STAGE_HEIGHT_FACTOR, ANIMATION_EASING,
-            BASE_STYLE, AUDIO_KEY } = BAZIS_SHOTS_CONFIG.DUAL_LAZER_SHOT;
+            BASE_STYLE, AUDIO_KEY , MOVING_SPAWN_MULTIPLIER} = BAZIS_SHOTS_CONFIG.DUAL_LAZER_SHOT;
                                                                                
     for (let position_x = -1; position_x <= 1; position_x += 2) {      
 
-        const shot_data = get_bazis_shot_from_pool();
+        const shot_data = get_from_pool(POOL_KEYS.BAZIS_SHOT);
         
         if (!shot_data) {           
             console.warn("Bazis shot pool empty !!");           
@@ -50,20 +48,18 @@ function launch_bazis_dual_lazer_shot( bazis_rect, offset_x, offset_y, lazer_len
 
         const shot_element = shot_data.element;        
                
-        shot_element.removeClass(Object.values(BAZIS_SHOTS_CONFIG)
-                        .map(shotType => shotType.CLASS)
-                        .join(' '));
+        shot_element.attr('class', '');
         shot_element.addClass(CLASS);
-        shot_element.rect = null;
         shot_data.damage = DAMAGE;
         shot_data.type = TYPE;
 
         const shot_width = SHOT_WIDTH;         
-        const offset_left = bazis_rect.left + (bazis_rect.width / 2) + (position_x * offset_x) - (shot_width / 2);
+        let initial_left = bazis_rect.left + (bazis_rect.width / 2) + (position_x * offset_x) - (shot_width / 2);
+        initial_left += get_player_movement_offset() * MOVING_SPAWN_MULTIPLIER;
 
         shot_element.css({
             ...BASE_STYLE,
-            "left": offset_left,
+            "left": initial_left,
             "top": offset_y,
             "height" : 0
         }); 

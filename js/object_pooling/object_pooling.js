@@ -1,19 +1,22 @@
 // --- Global Pools for Object Pooling ---
-
-const enemy_pool = [];        
-const bazis_shot_pool = [];    
-const enemy_shot_pool = [];  
-const homing_missile_pool = []; 
-const tracking_lazer_pool = []; 
-const boss_shot_pool = [];
-
-// Keep track of the next available item in each pool
-let next_enemy_index = 0;
-let next_bazis_shot_index = 0;
-let next_enemy_shot_index = 0;
-let next_homing_missile_index = 0;
-let next_tracking_lazer_index = 0;
-let next_boss_shot_index = 0;
+const pool_state = {
+    pools: {
+        enemy_pool: [],
+        bazis_shot_pool: [],
+        enemy_shot_pool: [],
+        homing_missile_pool: [],
+        tracking_lazer_pool: [],
+        boss_shot_pool: []
+    },
+    indices: {
+        enemy_pool: 0,
+        bazis_shot_pool: 0,
+        enemy_shot_pool: 0,
+        homing_missile_pool: 0,
+        tracking_lazer_pool: 0,
+        boss_shot_pool: 0
+    }
+};
 
 /**
  * Initializes or resizes a generic pool of game objects.
@@ -26,6 +29,10 @@ let next_boss_shot_index = 0;
  */
 function initialize_generic_pool(pool, create_element_fn, initial_display, target_pool_size,
                                  type = 'generic', initial_properties = {}) {
+                                    if (!pool) {
+                                        console.error(`Initialization failed: The pool for ${type} is undefined!`);
+                                        return;
+                                    }                                
     const current_pool_size = pool.length;
 
     if (target_pool_size > current_pool_size) {
@@ -43,7 +50,7 @@ function initialize_generic_pool(pool, create_element_fn, initial_display, targe
             const entity_data = {
                 element: dom_element,
                 is_active: false,
-                rect: { top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 },
+                rect: { ...POOL_STYLES.ZERO_RECT },
                 type: type 
             };
             
@@ -70,72 +77,89 @@ function initialize_generic_pool(pool, create_element_fn, initial_display, targe
     return pool;
 }
 
-// --- Specific Initialization Functions (called once at game start or level change) ---
 
 function initialize_all_pools() {
-    
+    const {ENEMY_DAMAGE, BAZIS_SHOT_DAMAGE, ENEMY_SHOT_DAMAGE, TRACK_LAZER_DAMAGE, BOSS_SHOT_DAMAGE} = DEFAULT_VALUES;
+    const {ENEMY, BAZIS_SHOT, ENEMY_SHOT, HOMING_MISSILE, TRACKING_LAZER, BOSS_SHOT} = ENTITY_TYPES;
+
     const current_game_level = game_data.levels.act_level;
     const target_enemy_count = get_required_enemy_poolsize( current_game_level);
     const target_bazis_shot_count = get_required_bazis_shot_poolsize( current_game_level);
     const target_enemy_shot_count = get_required_enemy_shot_poolsize( current_game_level);
+    const target_homing_missile_count = POOL_LIMITS.H_MISSILE_COUNT;
+    const tracking_lazer_count = POOL_LIMITS.TRACK_LAZER_COUNT;
+    const boss_shot_count = POOL_LIMITS.BOSS_SHOT_COUNT;
 
     initialize_generic_pool(
-        enemy_pool,
+        pool_state.pools.enemy_pool,
         () => create_new_enemy_element(), 
         'none',
         target_enemy_count,
-        'Enemy', {img_element : null, damage : 25, speed : 0, moving_direction : null, 
-                  hp : current_level_config.enemy_hp, max_hp : current_level_config.enemy_hp, id : 0}
-    );
+        ENEMY, 
+        {img_element : null, damage : ENEMY_DAMAGE, speed : 0, moving_direction : null, 
+         hp : current_level_config.enemy_hp, max_hp : current_level_config.enemy_hp, id : 0} );
 
     initialize_generic_pool(
-        bazis_shot_pool, () =>  create_new_bazis_shot_element(), 
-        'none', target_bazis_shot_count, 'Bazis Shot', { damage: 10, enemies_hit_ids: new Set()} );
+        pool_state.pools.bazis_shot_pool, 
+        () =>  create_new_bazis_shot_element(), 
+        'none', 
+        target_bazis_shot_count, 
+        BAZIS_SHOT, 
+        { damage: BAZIS_SHOT_DAMAGE, enemies_hit_ids: new Set()} );
 
     initialize_generic_pool(
-        enemy_shot_pool,
+        pool_state.pools.enemy_shot_pool,
         () => create_new_enemy_shot_element(), 
         'none',
         target_enemy_shot_count,
-        'Enemy Shot', { damage : 5, shooter_id: 0 }
-    );
-
-    const target_homing_missile_count = 4; // Adjust based on max concurrent missiles
+        ENEMY_SHOT, 
+        { damage : ENEMY_SHOT_DAMAGE, shooter_id: 0 } );
 
     initialize_generic_pool(
-        homing_missile_pool,
+        pool_state.pools.homing_missile_pool,
         ()=> create_new_homing_missile_element(),
         'none', 
         target_homing_missile_count,
-        'Homing Missile',
-        { parent_side : null } // Initial properties for missile data
+        HOMING_MISSILE,
+        { parent_side : null } 
     );
 
-    const tracking_lazer_count = 10;
-
     initialize_generic_pool(
-        tracking_lazer_pool,
+        pool_state.pools.tracking_lazer_pool,
         ()=> create_new_tracking_lazer_element(),
         'none',
         tracking_lazer_count,
-        'Tracking Lazer'
+        TRACKING_LAZER,
+        { damage: TRACK_LAZER_DAMAGE}
     );
 
-    const boss_shot_count = 20;
     initialize_generic_pool(
-        boss_shot_pool,
+        pool_state.pools.boss_shot_pool,
         ()=> create_new_boss_shot_element(),
         'none',
         boss_shot_count,
-        'Boss Shot',
-        { damage : 10, speed : 0}
+        BOSS_SHOT,
+        { damage : BOSS_SHOT_DAMAGE, speed : 0}
     );
+
+    reset_all_pool_indices();   
+}
+
+/**
+ * Resets all pool tracking indices to zero.
+ * Useful after level changes or pool resizing.
+ */
+function reset_all_pool_indices() {
+    const indices = pool_state.indices;
+
+    if (!indices) {
+        console.warn("Could not reset indices: pool_state.indices is missing.");
+        return;
+    }
     
-    // Reset indexes after all pools are initialized/resized
-    next_enemy_index = 0;
-    next_bazis_shot_index = 0;
-    next_enemy_shot_index = 0;
-    next_homing_missile_index = 0;
-    next_tracking_lazer_index = 0;
-    next_boss_shot_index = 0;
+    Object.keys(indices).forEach(key => {
+        indices[key] = 0;
+    });
+    
+    console.log("All pool indices reset to 0.");
 }

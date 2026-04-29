@@ -1,10 +1,27 @@
+html, body {
+    min-width: 1200px;
+    min-height: 750px;    
+    min-height: 100%;
+    height: 100%;
+    overflow: hidden; 
+    margin: 0;
+    padding: 0;
+}
+
 body {
-    min-width: 1060px;
-    background: black;
+    /* background: rgb(1, 1, 25); */
+    background: #030000;
+    background: linear-gradient(180deg,rgba(3, 0, 0, 1) 0%, rgba(0, 0, 3, 1) 48%, rgba(1, 1, 18, 1) 73%, rgba(2, 2, 26, 1) 100%);
     margin: 0;
     padding: 0;
     overflow: hidden;
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+.star {
+    mix-blend-mode: screen;
+    position: absolute;
+    z-index: 10;
 }
 
 .urhajo {
@@ -26,7 +43,7 @@ body {
     height: 70px;
     width:65px;  
     position: absolute;
-    bottom: 0;
+    bottom: 0; 
     z-index: 200;  
 }    
 .bazis_img {   
@@ -52,6 +69,7 @@ body {
     position: absolute;
     z-index: 300;
     height: 80px;
+    width: 10px;
     background: rgba(0,0,0,0);
 }
 .missile_img { 
@@ -81,6 +99,7 @@ body {
 }
 
 .robbanas {
+    mix-blend-mode: screen;
     position: absolute;
     z-index: 50;
 }
@@ -110,7 +129,8 @@ body {
     -webkit-box-shadow: 0px -3px 10px 3px rgba(255, 219, 120, 0.8);
     background: rgb(255, 172, 38);
     width: 7px;
-    height: 7px;   position: absolute;
+    height: 7px;   
+    position: absolute;
 }
 
 .counter_tuz_var1 {
@@ -118,7 +138,8 @@ body {
     -webkit-box-shadow:  0px -3px 10px 3px rgba(250, 243, 144, 0.8);
     background: rgb(248, 255, 41);
     width: 7px;
-    height: 13px;        position: absolute !important;
+    height: 13px;        
+    position: absolute !important;
 }
 
 .counter_tuz_var2 {
@@ -126,7 +147,8 @@ body {
     -webkit-box-shadow: 0px -3px 10px 3px rgba(181, 254, 226, 0.8);
     background: rgb(22, 255, 193);
     width: 7px;
-    height: 13px;          position: absolute;
+    height: 13px;          
+    position: absolute;
 }
 
 .counter_tuz_var3 {
@@ -134,7 +156,8 @@ body {
     -webkit-box-shadow: 0px -2px 10px 3px rgba(142, 180, 254, 0.8);
     background: rgb(107, 142, 255);
     width: 6px;
-    height: 24px;           position: absolute;
+    height: 24px;           
+    position: absolute;
 }
 
 .bomba {
@@ -149,6 +172,8 @@ body {
 }
 
 .atombomba {
+    mix-blend-mode: screen;
+    filter: contrast(1.1) saturate(1.2) brightness(1.1);
     position: absolute;
     z-index: 256;
     width: 256px;

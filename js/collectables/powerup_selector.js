@@ -1,83 +1,73 @@
+/**
+ * Selects the appropriate power-up data based on the current power-up level.
+ * @returns {Object} The image source and type for the selected power-up.
+ */
 function select_actual_powerup() {                                                 
-                                               //  Update this using type instead of id. 
-    let powerup_img_src;
-    let powerup_img_id;
-    switch(base_level_entities.powerup.level)
-    {
-        case 1 : powerup_img_src = 'bounties/a_bomb1.png'; powerup_img_id = 'a_bomb';
-                break;
-        case 2 : powerup_img_src = 'bounties/dual_fire1.png'; powerup_img_id = 'dual_fire';     
-                break;
-        case 3 : powerup_img_src = 'bounties/h_missiles1.png'; powerup_img_id = 'h_missiles';   
-                break; 
-        case 4 : powerup_img_src = 'bounties/lazer1.png'; powerup_img_id =  'lazer';     
-                break;     
-        case 5 : powerup_img_src = 'bounties/tracking_lazer1.png'; powerup_img_id = 'tracking_lazer';     
-                break;  
-        case 6 : powerup_img_src = 'bounties/twin_lazer1.png'; powerup_img_id = 'twin_lazer';     
-                break;   
-        case 7 : powerup_img_src = 'bounties/shield1.png'; powerup_img_id = 'shield';     
-                break;         
-        default : powerup_img_src = 'bounties/a_bomb1.png'; powerup_img_id = 'a_bomb';     
-                break;                                  
-    }                                                           
-    return { powerup_img_src : powerup_img_src, powerup_img_id : powerup_img_id };   
-}
-
-function pick_up_powerup(powerup)
-{    
-    audio_play("#bounty1");        
-    
-    switch(powerup.attr("id"))
-    {
-        case "a_bomb" : game_data.counters.a_bomb++;
-                        score_dependent_fns();
-                        update_center_display("A-BOMB COLLECTED !");                        
-                        break;
-
-        case "dual_fire" : weapons.flags.standard_shot = false;
-                           weapons.flags.dual_fire_shot = true;
-                           update_center_display("DUAL-FIRE MODE ACTIVE !");                       
-                           break;
-
-        case "h_missiles" : weapons.flags.homing_missile = true; 
-                            schedule_next_missile_launch_attempt();  
-                            update_center_display("HOMING-MISSILES MOUNTED !");                           
-                            break;
-
-        case "lazer" : weapons.flags.dual_fire_shot = false;
-                       weapons.flags.single_lazer = true;  
-                       update_center_display("LAZER EQUIPPED !");               
-                       break;  
-                       
-        case "tracking_lazer" : weapons.flags.homing_missile = false;
-                                clearTimeout(homing_missile_timeout); 
-                                weapons.flags.tracking_lazer = true;
-                                tracking_lazer_scheduler(); 
-                                update_center_display("TRACKING-LAZER EQUIPPED !");                             
-                                break; 
-
-        case "twin_lazer" : weapons.flags.single_lazer = false;
-                            weapons.flags.dual_fire_shot = false;
-                            weapons.flags.dual_lazer = true; 
-                            update_center_display("TWIN-LAZER MOUNTED !");                          
-                            break; 
-
-        case "shield" : bazis_invulnerability = true;  
-                        update_center_display("SHIELD FOR 60 SEC !");        
-                        god_mode();                                         
-                        break; 
-
-        default : game_data.counters.a_bomb++;
-                  score_dependent_fns();                  
-                  update_center_display("A-BOMB COLLECTED !");                   
-                  break;             
+        const level = base_level_entities.powerup.level;
+        
+        const data = POWERUP_REGISTRY[level] || POWERUP_REGISTRY[1];
+                                                                   
+        return { 
+            powerup_img_src: data.src, 
+            type: data.type 
+        };   
     }
-                                                                                                                       
-    powerup.remove();    
-    base_level_entities.powerup.element = null;
-    base_level_entities.powerup.rect = null;
 
-    game_data.game_states.bounty_flag = false; 
-    clearTimeout(powerup_animation_duration);
-}
+/**
+ * Processes the effects of collecting a power-up and cleans up the entity.
+ * Uses a data-driven action map for better scalability.
+ * @param {Object} powerup_data - The power-up data object from base_level_entities.
+ */
+    function pick_up_powerup(powerup_data) {    
+        audio_play(POWERUP_SPAWN_CONFIG.AUDIO_KEY);        
+        
+        const powerup_actions = {
+            a_bomb() {
+                game_data.counters.a_bomb++;
+                score_dependent_fns();
+                update_center_display("A-BOMB COLLECTED !");
+            },
+            dual_fire() {
+                weapons.flags.standard_shot = false;
+                weapons.flags.dual_fire_shot = true;
+                update_center_display("DUAL-FIRE MODE ACTIVE !");
+            },
+            h_missiles() {
+                weapons.flags.homing_missile = true; 
+                schedule_next_missile_launch_attempt();  
+                update_center_display("HOMING-MISSILES MOUNTED !");
+            },
+            lazer() {
+                weapons.flags.dual_fire_shot = false;
+                weapons.flags.single_lazer = true;  
+                update_center_display("LAZER EQUIPPED !");
+            },
+            tracking_lazer() {
+                weapons.flags.homing_missile = false;
+                clearTimeout(homing_missile_timeout); 
+                weapons.flags.tracking_lazer = true;
+                tracking_lazer_scheduler(); 
+                update_center_display("TRACKING-LAZER EQUIPPED !");
+            },
+            twin_lazer(){
+                weapons.flags.single_lazer = false;
+                weapons.flags.dual_fire_shot = false;
+                weapons.flags.dual_lazer = true; 
+                update_center_display("TWIN-LAZER MOUNTED !");
+            },
+            shield() {
+                bazis_invulnerability = true;  
+                update_center_display(`SHIELD FOR ${POWERUP_SPAWN_CONFIG.PRESENCE_DURATION} SEC !`/*"SHIELD FOR 60 SEC !"*/);        
+                god_mode();
+            }
+        };
+    
+        const action = powerup_actions[powerup_data.type];
+    
+    if (action) {
+        action();
+    } else {
+        powerup_actions.a_bomb();
+    }        
+        reset_powerup_data(powerup_data);             
+    }    

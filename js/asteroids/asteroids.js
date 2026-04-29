@@ -101,7 +101,8 @@ async function animate_asteroid() {
 
     let current_asteroid_container;
     try {
-        if (!asteroid_data.element || asteroid_data.element.length === 0) {
+        // if (!asteroid_data.element || asteroid_data.element.length === 0) {
+        if ((asteroid_data.element?.length ?? 0) === 0) {
             // First time: setup the container and initial image
             current_asteroid_container = await setup_asteroid_async();
             // Store reference to the container's img_element now
@@ -169,9 +170,11 @@ function asteroid_params(asteroid_element){
     const { rnd_duration_seed, rnd_duration_multiplier, rnd_pozy_seed, 
         rnd_pozy_multiplier, rnd_width_seed, rnd_width_multiplier, rotation_0_deg, rotation_180_deg}
         =ASTEROID_CONFIG.ANIMATION_CONFIG;
-    const rnd_duration = Math.round( Math.random() * rnd_duration_multiplier)+ $(window).width() * rnd_duration_seed;
+    const win_width = $(window).width();
+    const win_height = $(window).height();    
+    const rnd_duration = Math.round( Math.random() * rnd_duration_multiplier)+ win_width * rnd_duration_seed;
     const direction_selection = Math.round( Math.random());
-    const rnd_pozy = Math.round(Math.random() * ($(window).height()*rnd_pozy_multiplier) + $(window).height() * rnd_pozy_seed);
+    const rnd_pozy = Math.round(Math.random() * (win_height * rnd_pozy_multiplier) + win_height * rnd_pozy_seed);
     const rnd_width = Math.round(Math.random() * rnd_width_multiplier) + rnd_width_seed;
 
     let pars = {

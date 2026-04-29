@@ -8,12 +8,13 @@ const BOSS_SETUP_CONFIG= {
     AUDIO_KEY: '#boss_hang4',
     INITIAL_ANIM_DURATION_MS: 2500, 
     INITIAL_ANIM_OFFSET_X: -40,
-    INITIAL_ANIM_POS_Y: 40
+    INITIAL_ANIM_POS_Y: 40,
+    BG_AUDIO_KEY: "#track1"
 };
 
 function initalize_boss_level() {     
 
-    main_title_track();     
+    play_bg_music(BOSS_SETUP_CONFIG.BG_AUDIO_KEY);    
     
     progress_bar_setup();
 
@@ -25,10 +26,11 @@ function initalize_boss_level() {
     weapons.dual_fire_shot = true;
 
     setTimeout(function () {
-        if( base_level_entities.enemy_ships.element && $(base_level_entities.enemy_ships.element).length > 0){
-
+        const active_enemies = base_level_entities.enemy_ships.filter(ship => ship.is_active);
+        if (active_enemies.length > 0) {
             explode_all_spacekrafts();
         }
+       
     }, BOSS_SETUP_CONFIG.LEVEL_DELAY_MS);
 }
 

@@ -28,16 +28,6 @@ function boss_damage(bazis_shot_data, boss_data, damage_value){
 }
 
 
-const IMPACT_VISUALS_CONFIG = { IMAGE_SRC: 'robban2.png', CLASS: 'robbanas_y',    
-      INITIAL_WIDTH: 15, FINAL_WIDTH: 50, ANIM_DURATION: 250,   
-      ZONE_PERCENTAGES: { SIDE_WIDTH_PERCENT: 0.25 // Sides are boss.width * 0.25
-    },
-    // Vertical offsets based on zone type
-    ALIGNMENT: { Y_OUTER: 68, Y_MIDDLE: 50 },
-    SAFE_EDGE_ZONE : 12,
-    // --- Horizontal Following for Animation (based on window width) ---
-    HORIZONTAL_FOLLOW_RATE_WINDOW_WIDTH_PERCENT: 0.04 // 5% of window width as slide amount
-}  
 /**
  * Displays a visual impact explosion on the boss at the point of projectile hit.
  * The position and alignment of the explosion are adjusted based on specific
@@ -52,8 +42,7 @@ const IMPACT_VISUALS_CONFIG = { IMAGE_SRC: 'robban2.png', CLASS: 'robbanas_y',
 function show_boss_damage(bazis_shot_data, boss_data) {
     impact_player();
 
-    if (!bazis_shot_data || !bazis_shot_data.element || bazis_shot_data.element.length === 0 ||
-        !boss_data || !boss_data.element || boss_data.element.length === 0 || !bazis_shot_data.rect) {
+    if (!is_entity_valid(bazis_shot_data) || !is_entity_valid(boss_data)) {
        
         console.warn("Invalid projectile or Boss data! Damage animation cancelled!");
         return;
@@ -61,7 +50,8 @@ function show_boss_damage(bazis_shot_data, boss_data) {
 
     const {
         IMAGE_SRC, CLASS, INITIAL_WIDTH, FINAL_WIDTH, ANIM_DURATION,
-        ZONE_PERCENTAGES, ALIGNMENT, SAFE_EDGE_ZONE, HORIZONTAL_FOLLOW_RATE_WINDOW_WIDTH_PERCENT
+        ZONE_PERCENTAGES, ALIGNMENT, SAFE_EDGE_ZONE, HORIZONTAL_FOLLOW_RATE_WINDOW_WIDTH_PERCENT,
+        EDGE_CORRECTION
     } = IMPACT_VISUALS_CONFIG;
    
     let impact_x = bazis_shot_data.rect.left; 
@@ -90,18 +80,15 @@ function show_boss_damage(bazis_shot_data, boss_data) {
     } else {
         // Middle Zone
         impact_y -= ALIGNMENT.Y_MIDDLE;
-    }
+    }  
     
-    const EDGE_CORRECTION_THRESHOLD_PERCENT = 0.1; 
-    const EDGE_CORRECTION_AMOUNT_X = 15; 
-    const EDGE_CORRECTION_AMOUNT_Y = 10; 
 
-    if (impact_x >= boss_x && impact_x <= boss_x + (boss_width * EDGE_CORRECTION_THRESHOLD_PERCENT)) { 
-        impact_x += EDGE_CORRECTION_AMOUNT_X;
-        impact_y -= EDGE_CORRECTION_AMOUNT_Y;
-    } else if (impact_x <= boss_x + boss_width && impact_x >= boss_x + boss_width - (boss_width * EDGE_CORRECTION_THRESHOLD_PERCENT)) { // Right 5%
-        impact_x -= EDGE_CORRECTION_AMOUNT_X;
-        impact_y -= EDGE_CORRECTION_AMOUNT_Y;
+    if (impact_x >= boss_x && impact_x <= boss_x + (boss_width * EDGE_CORRECTION.THRESHOLD_PERCENT)) { 
+        impact_x += EDGE_CORRECTION.AMOUNT_X;
+        impact_y -= EDGE_CORRECTION.AMOUNT_Y;
+    } else if (impact_x <= boss_x + boss_width && impact_x >= boss_x + boss_width - (boss_width * EDGE_CORRECTION.THRESHOLD_PERCENT)) { // Right 5%
+        impact_x -= EDGE_CORRECTION.AMOUNT_X;
+        impact_y -= EDGE_CORRECTION.AMOUNT_Y;
     }  
 
     unified_image_loader(IMAGE_SRC, (boss_hit_explosion_img) => {
@@ -135,7 +122,7 @@ function show_boss_damage(bazis_shot_data, boss_data) {
     });
 }  
 
-const BOSS_DIES_CONFIG = { ANIM_DURATION : 500, BOSS_KILLED_SCORE : 15000, DELAY_AUDIO : 1700};
+
 /**
  * Initiates the boss's death sequence when its HP falls below 1.
  * This function performs several critical actions to transition the game state
@@ -150,20 +137,22 @@ const BOSS_DIES_CONFIG = { ANIM_DURATION : 500, BOSS_KILLED_SCORE : 15000, DELAY
  *
  * @returns {void}
  */
-function boss_dies() 
-{  
-    weapons.flags.god_mode = true;
+function boss_dies() {  
+    weapons.flags.god_mode = true;    
 
-    const {ANIM_DURATION, BOSS_KILLED_SCORE, DELAY_AUDIO} = BOSS_DIES_CONFIG;
+    const {ANIM_DURATION, BOSS_KILLED_SCORE, DELAY_AUDIO, SCREEN_SHAKE_DURATION, AUDIO_KEYS, LAZER_SOUND} 
+          = BOSS_DIES_CONFIG;
 
+    audio_stop(LAZER_SOUND);
     const boss_data = boss_level_entities.boss;
+    if(!is_entity_valid(boss_data)) return;
+
     const boss_element = validate_boss_for_movement(boss_data, "boss_dies");
     const boss_rect = boss_level_entities.boss.rect;
-    if (boss_element === null) { 
-        return; }
-
+    
     boss_dies_main_explosion(boss_rect);
     boss_dies_side_explosion(boss_rect);
+    trigger_screen_shake(0,SCREEN_SHAKE_DURATION);
 
     game_data.game_states.boss_flag = false;  
 
@@ -190,12 +179,12 @@ function boss_dies()
     bazis_exit();
 
     const asteroid_data = boss_level_entities.asteroid;
-    if( asteroid_data && asteroid_data.element.length > 0 && asteroid_data.rect != null){
+    if( is_entity_valid(asteroid_data )){
        explode_spacekraft(asteroid_data);                                                             
     }
  
-    audio_play("#robbanas7");
+    audio_play(AUDIO_KEYS[0]);
     setTimeout(function(){
-        audio_play("#powerdwn1");
+        audio_play(AUDIO_KEYS[1]);
     },DELAY_AUDIO);
 }   

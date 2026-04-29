@@ -1,7 +1,5 @@
 let lazer_shot_counter = 0; 
-// const MAX_TRACKED_ENEMIES_PER_BURST = 6; 
 let tracking_lazer_timeout = null; 
-// const TRACKING_LAZER_INTERVAL = 2500;  
 /**
  * Main function for the Tracking Lazer weapon.
  * It checks if the weapon is active and then triggers the core tracking and killing logic.
@@ -46,7 +44,7 @@ async function tracking_lazer_core_logic() {
     const bazis_data = base_level_entities.bazis;
     const bazis_element = $(bazis_data.element); 
     const bazis_rect = bazis_data.rect;
-    if ( !bazis_data || !bazis_rect || bazis_element.length === 0) {
+    if ( !is_entity_valid(bazis_data)) {
         console.log("Bazis not found in DOM for tracking lazer.");
         return; 
     }
@@ -69,7 +67,7 @@ async function tracking_lazer_core_logic() {
 
         const enemy_data = active_enemy_data_objects[i];
         
-        if (!enemy_data.element || !enemy_data.rect ) {
+        if (!is_entity_valid(enemy_data)) {
             continue; 
         }
 
@@ -79,7 +77,7 @@ async function tracking_lazer_core_logic() {
         if( evaluate_target_field_bounds( enemy_rect, search_conditions))
             {           
             
-            const lazer_data = get_tracking_lazer_from_pool();
+            const lazer_data = get_from_pool(POOL_KEYS.TRACKING_LAZER);
             if (!lazer_data) {
                 // If pool exhausted, skip this lazer shot but continue trying for others
                 continue;
@@ -162,14 +160,14 @@ function evaluate_target_field_bounds( enemy_rect, search_conditions ){
 
 function create_line_properties(obj1, obj2) {
 
-    const { LINE_THICKNESS_PX, DEGREES_PER_RADIAN} = SECONDARY_WEAPONS_CONFIG.TRACKING_LAZER;
+    const { LINE_THICKNESS_PX, DEGREES_PER_RADIAN, MOVING_SPAWN_MULTIPLIER} = SECONDARY_WEAPONS_CONFIG.TRACKING_LAZER;
 
     const off1 = get_element_property(obj1);
     const off2 = get_element_property(obj2);
 
     const dx1 = off1.left + off1.width / 2;
     const dy1 = off1.top + off1.height / 2;
-    const dx2 = off2.left + off2.width / 2;
+    const dx2 = off2.left + off2.width / 2 + (get_player_movement_offset() * MOVING_SPAWN_MULTIPLIER);
     const dy2 = off2.top + off1.height / 2;
 
     const length = Math.sqrt(((dx2 - dx1) * (dx2 - dx1)) + ((dy2 - dy1) * (dy2 - dy1)));

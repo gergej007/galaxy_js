@@ -1,11 +1,18 @@
-function primary_game_loop(){  
+/**
+ * Main game loop using requestAnimationFrame.
+ * @param {DOMHighResTimeStamp} timestamp - Automatically provided by the browser.
+ */
+function primary_game_loop(timestamp){ 
+    const dt = calculate_delta_time(timestamp); 
+    process_player_input(dt);
+    
     if(game_data.game_states.traffic_flag){
         update_base_entity_rects();
         bazis_enemy_shots_collision_detection();
         bazis_enemy_collision_detection();
         bazis_shot_enemy_shot_collision_detection();
         bazis_shots_enemy_collision_detection();
-        if(game_data.levels.act_level < 4)
+        if(game_data.levels.act_level < GAME_CONSTANTS.ENEMY_AI_LEVEL)
             {
             enemy_shots_enemy_collision_detection();
         }
@@ -32,6 +39,5 @@ function primary_game_loop(){
         update_base_entity_rects();   
     }
              
-    window.requestAnimationFrame(primary_game_loop);
-   
+    window.requestAnimationFrame(primary_game_loop);   
 }

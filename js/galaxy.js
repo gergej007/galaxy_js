@@ -1,6 +1,24 @@
+let resize_timer;
+
+$(window).on('resize', function() {
+    clearTimeout(resize_timer);
+    resize_timer = setTimeout(function() {
+        create_background();
+
+        const $active_dialog = $(".ui-dialog-content:visible");
+        if ($active_dialog.length > 0) {
+            // jQuery UI way to re-center
+            $active_dialog.dialog("option", "position", { 
+                my: "center", 
+                at: "center", 
+                of: window 
+            });
+        }
+    }, 250); 
+});
 
 $(document).on("keydown", function(e) {
-    if (e.keyCode === 116) {                           // F5 key
+    if (e.key === "F5") {                           // F5 key
         e.preventDefault(); 
         
         console.log("F5 pressed: Performing hard reset (bypassing cache if possible).");
@@ -12,36 +30,6 @@ $(document).on("keydown", function(e) {
 });
 
 
-// function get_required_enemy_poolsize(game_level) {                  // introduce pool config
-//  switch ( game_level){
-//     case 1: 
-//     case 2: return 15;
-//     case 3:
-//     case 4: return 30;
-//     case 5:
-//     case 6: 
-//     case 7: return 40;
-//     default: return 40;
-//  };
-// }
-
-// function get_required_bazis_shot_poolsize(game_level) {
-//     return 25;
-// }
-
-// function get_required_enemy_shot_poolsize(game_level) {
-//     switch ( game_level){
-//         case 1: 
-//         case 2: return 20;
-//         case 3:
-//         case 4: return 45;
-//         case 5:
-//         case 6: 
-//         case 7: return 60;
-//         default: return 60;
-//      };
-// }
-
 primary_game_loop();
 
 $(document).ready(
@@ -49,40 +37,42 @@ $(document).ready(
         kezdo_panel(game_data.counters.score);
         create_background();      
         create_bazis();        
-        update_base_entity_rects();  bazis_key_binding();
+        update_base_entity_rects();  
+        bazis_key_binding();
         
         game_level_change(1);  
         initialize_all_pools(game_data.levels.act_level);                    
                                            
         update_right_display();
-        score_dependent_fns();          
+        score_dependent_fns();  
     }
 );
 
 function bazis_reset() {
-    game_data.game_states.exit_flag = true;   
-    const bazis_element = $(base_level_entities.bazis.element);
-    bazis_element.hide();
+    game_data.game_states.exit_flag = true; 
+    const bazis_data = base_level_entities.bazis;  
+    const bazis_element = bazis_data.element;
 
+    bazis_element.stop(true, true)
+    .css({
+        "top": "",
+        "left": ""
+    });
+
+    bazis_element.css("visibility", "hidden");
     bazis_element.css({
         "left": $(window).width() / 2 - 32,
         "top": $(window).height() - bazis_element.height()
     });
+  
     setTimeout(function () { 
-        bazis_element.show();
+        
+        bazis_element.css("visibility", "visible");
+        bazis_data.is_exploding = false;
         game_data.game_states.exit_flag = false;
      }, 1000);
     audio_play("#impact3");
 }
-
-// function boss_figyelo() {
-//     game_data.game_states.traffic_flag = false;
-//     stop_base_level_enemies();                                      // ----> EZ MI?
-//     if (!game_data.game_states.boss_flag ) {
-//         game_data.game_states.boss_flag = true;
-//         initalize_boss_level();
-//     }
-// }
 
 
 /**
@@ -198,45 +188,46 @@ function add_score_n_hit()
 }
 
 
-
-
 function create_background() {
+    $(".star").remove();
 
-    unified_image_loader( "csillag.gif", (one_star_img)=> {
-        one_star_img.addClass("star");
+    const cols = 6;
+    const rows = 6;
+    
+    const win_w = $(window).width();
+    const win_h = $(window).height();
+    
+    const cell_width = win_w / cols;
+    const cell_height = win_h / rows;
 
-        const original_width = one_star_img[0].naturalWidth;
-        const original_height = one_star_img[0].naturalHeight;
+    function place_star(col, row) {
+        unified_image_loader("csillag.gif", (one_star_img) => {
+            one_star_img.addClass("star");
 
-        if (original_width === 0) return;
+            const original_width = one_star_img[0].naturalWidth || 50;
+            const original_height = one_star_img[0].naturalHeight || 50;
 
-        const height = Math.round(Math.random() * 50) + 20;
-        const width = (original_width / original_height) * height;
-        const pozx = Math.round(Math.random() * $(window).width()) - width - 15;
-        const pozy = Math.round(Math.random() * ($(window).height() - 100)) + height;
+            const img_height = Math.round(Math.random() * 50) + 20; 
+            const img_width = (original_width / original_height) * img_height;
 
-        one_star_img.css({
-            "position" : "absolute",
-            "top": pozy,
-            "height": height,
-            "left": pozx,
-            "height": height,
-            "width": width
+            const pozx = (col * cell_width) + (Math.random() * (cell_width - img_width));
+            const pozy = (row * cell_height) + (Math.random() * (cell_height - img_height));
+
+            one_star_img.css({                
+                "top": Math.max(0, pozy),
+                "left": Math.max(0, pozx),
+                "height": img_height,
+                "width": img_width
+            });
+            one_star_img.appendTo($("body")).show();
         });
-        one_star_img.appendTo($("body")).show();
+    }
 
-        if ($(".star").length < 36) {
-            setTimeout(function () {
-                create_background();
-            }, 100);
+    // 2. Loop through the 6x6 grid
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            
+            place_star(c, r);
         }
-    });
-   
-    $(document).keydown(
-        function(e){
-           if(e.keyCode == 122){            // Toggle  full screen
-            $(".star").remove();
-            create_background();
-           }     
-        });    
+    } 
 }

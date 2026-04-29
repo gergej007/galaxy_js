@@ -8,64 +8,75 @@
  * @returns {void}
  */                                                                   
 function kill_target_obj( missile_data, target_enemy_data ) { 
-    const { NO_TARGET_ANIM_TOP, NO_TARGET_ANIM_DURATION, TARGET_LOCKED_CLASS} = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.TARGETING;
-    const { ANIMATION_EASING, AUDIO_KEY, IGNITION_IMG_SRC, IGNITION_IMG_CLASS,
-            VERTICAL_IMPACT_OFFSET_PX
-    } = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.IMPACT;    
-    
-    if (!missile_data || !missile_data.element || !target_enemy_data 
-        || !target_enemy_data.element || !target_enemy_data.rect) {
+    const { AUDIO_KEY, IGNITION_IMG_SRC, IGNITION_IMG_CLASS, VERTICAL_IMPACT_OFFSET_PX } 
+          = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.IMPACT;   
+
+    if (!missile_data?.element?.length) return; 
+
+    unified_image_loader( IGNITION_IMG_SRC, (ignition_img)=>{
+        ignition_img.addClass( IGNITION_IMG_CLASS)
+        .appendTo(missile_data.element)
+        .show();
+    });
+
+    audio_play(AUDIO_KEY);
+
+    if( !is_entity_valid(target_enemy_data))    
+        {
         console.log("kill_target_obj called with invalid missile or target data. Missile flys off-screen.");
        
-        
-
-        if( missile_data && missile_data.element){
-
-            $(missile_data.element).animate({
-                "top": NO_TARGET_ANIM_TOP
-            }, NO_TARGET_ANIM_DURATION, ANIMATION_EASING, function(){
-                return_homing_missile_to_pool( missile_data); 
-            });
-        } 
+        if (missile_data?.element) animate_missile_off_screen(missile_data);
         return;
-    }
-
-    const missile_element = missile_data.element;
-    const target_element = target_enemy_data.element;
+    }    
 
     const { left: target_left, top: target_top, height: target_height, width: target_width } = target_enemy_data.rect;
    
-    audio_play(AUDIO_KEY); 
-    
-    unified_image_loader( IGNITION_IMG_SRC, (ignition_img)=>{
-        ignition_img.addClass( IGNITION_IMG_CLASS).show()
-        .appendTo(missile_element);
-    });
-
     const targeting_values = get_missile_speed_lead_point( missile_data, target_enemy_data );
-                            
-    setTimeout(() => {
-        
-        if (target_enemy_data && target_element.length > 0 && $.contains(document.body, target_element[0])) {
-            explode_spacekraft( target_enemy_data); 
-            add_score_n_hit();
-        }
-    }, targeting_values.missile_speed_value);      
 
-    const final_poz_x = target_left + (target_width / 2) + targeting_values.lead_point;
-    const final_poz_y = target_top + target_height - VERTICAL_IMPACT_OFFSET_PX;
+    const final_pos = {
+        x: target_left + (target_width / 2) + targeting_values.lead_point,
+        y: target_top + target_height - VERTICAL_IMPACT_OFFSET_PX
+    };
     
-    missile_element.animate({
-        "left": final_poz_x,  
-        "top": final_poz_y    
-    }, targeting_values.missile_speed_value, ANIMATION_EASING, 
-    function () { 
-        if( target_enemy_data.is_active) {
-        target_element.removeClass(TARGET_LOCKED_CLASS);           
+    animate_missile_attack(missile_data, target_enemy_data, final_pos, targeting_values.missile_speed_value);
+}
+
+/**
+ * Animates the missile toward a specific target and handles the impact logic.
+ */
+function animate_missile_attack(missile_data, target_enemy_data, final_pos, speed) {
+    const { TARGET_LOCKED_CLASS } = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.TARGETING;
+    const { ANIMATION_EASING } = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.IMPACT;
+
+    $(missile_data.element).animate({
+        "left": final_pos.x,
+        "top": final_pos.y
+    }, speed, ANIMATION_EASING, function() {
+        // Impact Logic
+        if (target_enemy_data?.is_active) {
+            $(target_enemy_data.element).removeClass(TARGET_LOCKED_CLASS);
+            explode_spacekraft(target_enemy_data);
+            add_score_n_hit();
+            return_homing_missile_to_pool(missile_data);
+        } else {
+            // Target was already destroyed 
+            explode_spacekraft(missile_data);
+        }
+    });
+}
+
+/**
+ * Animates a missile to fly off-screen if its target is lost.
+ */
+function animate_missile_off_screen(missile_data) {
+    const { NO_TARGET_ANIM_TOP, NO_TARGET_ANIM_DURATION } = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.TARGETING;
+    const { ANIMATION_EASING } = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.IMPACT;
+
+    $(missile_data.element).animate({
+        "top": NO_TARGET_ANIM_TOP
+    }, NO_TARGET_ANIM_DURATION, ANIMATION_EASING, function() {
         return_homing_missile_to_pool(missile_data);
-       }  
-       else explode_spacekraft( missile_data);
-    });  
+    });
 }
 
 

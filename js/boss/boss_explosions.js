@@ -1,12 +1,3 @@
-const MAIN_EXPLOSION_CONFIG = { IMAGE_SRC : 'robban5.gif',IMAGE_CLASS: 'robbanas_x', HORIZONTAL_CORRECTION : 100, VERTICAL_CORRECTION : 80, HEIGHT : 250,
-                                FINAL_HEIGHT : 650, FINAL_RADIUS : 90, FINAL_HORIZONTAL_CORRECTION : 100,
-                                FINAL_VERTICAL_CORRECTION : 200, ANIM_DURATION : 2800, HIDE_DURATION : 500
-                              };
-const SIDE_EXPLOSION_CONFIG = { IMAGE_SRC : 'robban.gif', IMAGE_CLASS: 'robbanas_z',
-                                HORIZONTAL_START_PERCENT : 0.1, HORIZONTAL_END_PERCENT : 0.9, VERTICAL_OFFSET_PERCENT : 0.25,
-                                WIDTH : 50, FINAL_WIDTH : 180, VERTICAL_CORRECTION : 100, ANIM_DURATION : 1200
-                              };                       
-
 /**
  * Triggers a main, central explosion effect when Boss dies.
  * This function typically orchestrates a single, large explosion
@@ -23,7 +14,7 @@ function boss_dies_main_explosion(boss_rect) {
     }
 
     const {IMAGE_SRC, IMAGE_CLASS,
-           ANIM_DURATION, HIDE_DURATION ,                             /* Animation timings*/   
+           ANIM_DURATION, HIDE_DURATION ,ANIM_EASING,                  /* Animation timings*/   
            HORIZONTAL_CORRECTION, VERTICAL_CORRECTION, HEIGHT,       /* Initial positioning corrections*/
            FINAL_HEIGHT, FINAL_RADIUS,                              /* Final dimensions*/
            FINAL_HORIZONTAL_CORRECTION, FINAL_VERTICAL_CORRECTION  /* Final positioning corrections*/      
@@ -46,7 +37,7 @@ function boss_dies_main_explosion(boss_rect) {
             "border-radius": FINAL_RADIUS,
             "top": boss_y - FINAL_VERTICAL_CORRECTION,
             "left": boss_x - FINAL_HORIZONTAL_CORRECTION
-        }, ANIM_DURATION, "linear") 
+        }, ANIM_DURATION, ANIM_EASING) 
             .animate({"opacity": 0}, 
             function () {
                 $(this).hide(HIDE_DURATION, function(){

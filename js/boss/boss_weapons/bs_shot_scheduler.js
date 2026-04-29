@@ -12,7 +12,7 @@ function schedule_boss_attacks(boss_data, attack_plans_array) {
 
     attack_plans_array.forEach(plan => {
       
-        const timeoutId = setTimeout(() => {
+        const timeout_id = setTimeout(() => {
             
             if (!game_data.game_states.boss_flag || !boss_data) {
                 console.log("Boss deactivated during attack delay, cancelling fire.");
@@ -27,13 +27,13 @@ function schedule_boss_attacks(boss_data, attack_plans_array) {
                     boss_homing_shooting(plan.shots, plan.speed, plan.audio, plan.interval_ms, plan.type_key);
                 break;
                 case 'lazer_shots' : 
-                    boss_lazer_shooting(plan.shots, plan.speed, plan.audio,plan.interval_ms, plan.type_key);
+                    boss_lazer_shooting(plan.shots, plan.speed, plan.audio, plan.interval_ms, plan.type_key);
                 break;
                 default:
                     console.warn(`Unknown boss attack plan type: ${plan.type}`);
             }           
         }, plan.delay_ms);
 
-        boss_data.attack_timeout_ids.push(timeoutId); // Store ID for potential clearing
+        boss_data.attack_timeout_ids.push(timeout_id); // Store ID for potential clearing
     });
 }      
