@@ -16,9 +16,7 @@ function handle_bomb_input() {
  * Processes the player's fire command.
  * Manages weapon limits and state checks before triggering a shot.
  */
-function handle_fire_input() {
-    // if( weapons.flags.single_lazer ) { 
-    //     max_shots_ammount = 8; }     
+function handle_fire_input() {      
         
     if (game_data.game_states.exit_flag || game_data.game_states.dialog_flag) {
         return;

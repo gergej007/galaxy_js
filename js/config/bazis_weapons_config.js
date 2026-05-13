@@ -189,8 +189,7 @@ const SECONDARY_WEAPONS_CONFIG = {                 // --- Secondary weapon syste
         EASING: 'linear',
         
         SCREEN_SHAKE_DELAY: 500,
-        SCREEN_SHAKE_DURATION: 800,
-        SHAKE_ACTIVE_CLASS: 'shake-active'
+        SCREEN_SHAKE_DURATION: 800        
     },
     GOD_MODE: {
         DURATION_MS: 60000, 

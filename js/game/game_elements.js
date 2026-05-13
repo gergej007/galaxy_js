@@ -19,6 +19,18 @@ const base_level_entities = {
     enemy_shots : pool_state.pools.enemy_shot_pool
 }
 
+const displays = {
+    left_display: { element: null, selector: UI_CONFIG.HUD.LEFT.SELECTOR},
+    right_display: { element:null, selector: UI_CONFIG.HUD.RIGHT.SELECTOR},
+    center_display: { element: null, selector: UI_CONFIG.HUD.CENTER.PROGRESS_BAR.SELECTOR, is_animating: false },
+    progress_bar: { instance: null, max_hp: boss_level_entities.boss.hp }
+}
+
+const dialogs = {
+    start_panel: { element: null, template_url: UI_CONFIG.DIALOGS.START.TEMPLATE},
+    score_panel: { element: null, is_open: false, template_url: UI_CONFIG.DIALOGS.SCORE.TEMPLATE}
+};
+
 const game_data = {
     counters : { enemies: 0, killed: 0, score: 0, a_bomb: 3},    
     game_states : { traffic_flag: true, boss_flag: false, exit_flag: false, dialog_flag: true, bounty_flag: false},

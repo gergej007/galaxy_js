@@ -19,7 +19,6 @@ function bazis_damage(act_damage, bazis_data)                            // Bazi
         bazis_explode( bazis_data);
         bazis_element.remove();
         base_level_entities.bazis.element = null;
-        // base_level_entities.bazis.rect = null;                   
 
         game_data.game_states.traffic_flag = false;
 
@@ -27,7 +26,7 @@ function bazis_damage(act_damage, bazis_data)                            // Bazi
         {   
             boss_exit();       
         }
-        update_center_display(BAZIS_CONFIG.DAMAGE.GAME_OVER_TEXT);         
+        handle_victory_display(BAZIS_CONFIG.DAMAGE.GAME_OVER_TEXT);
        
         show_scores_table();            
     }     

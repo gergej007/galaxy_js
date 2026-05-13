@@ -8,23 +8,3 @@ function is_entity_valid(entity_data) {
     return !!(entity_data?.element && entity_data?.rect);
 }
 
-
-/**
- * Validates if an entity is initialized and active on the game board.
- * @param {Object} entity - The entity object to validate.
- * @param {boolean} check_position - If true, ensures the entity isn't at (0,0).
- */
-// function is_entity_valid(entity, check_position = false) {
-//     // 1. Basic existence check
-//     const bazis_valid = !!(entity?.element?.length && entity?.rect);
-    
-//     if (!bazis_valid) return false;
-
-//     // 2. Optional: check if it's been moved out of the "zero state"
-//     if (check_position) {
-//         const is_at_zero = entity.rect.top === 0 && entity.rect.left === 0;
-//         return !is_at_zero;
-//     }
-
-//     return true;
-// }

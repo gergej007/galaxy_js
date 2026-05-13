@@ -112,7 +112,7 @@ function shots_explosion_lightning(pos_x, pos_y) {
  */
 function final_fireworks() {
     const {
-        IMAGE_SRC, CLASS, ANIM_DURATION, HIDE_DURATION, FINAL_WIDTH, AUDIO_KEY,
+        IMAGE_SRC, CLASS, ANIM_DURATION, HIDE_DURATION, FINAL_WIDTH, AUDIO_KEY, ANIM_EASING,
         LEFT_FIREWORK_OFFSET_X_PERCENT, RIGHT_FIREWORK_OFFSET_X_PERCENT, Y_OFFSET_PERCENT
     } = ANIMATION_CONFIG.FIREWORKS;
 
@@ -141,7 +141,7 @@ function final_fireworks() {
             firework_img.show();
             firework_container.animate({
                 "width": FINAL_WIDTH
-            }, ANIM_DURATION, "linear", function () {
+            }, ANIM_DURATION, ANIM_EASING, function () {
                 // Fade out and remove the firework after animation
                 $(this).hide(HIDE_DURATION, function () {
                     $(this).remove();

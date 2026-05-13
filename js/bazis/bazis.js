@@ -38,13 +38,13 @@ function create_bazis() {
  *                        valid and fully ready (element present and positioned),
  *                        otherwise `null`.
  */
-function validate_bazis_presence(){
-    const bazis_data = base_level_entities.bazis;
-    if( !bazis_data || !bazis_data.element || bazis_data.element.length === 0 || ! bazis_data.rect
-        || (bazis_data.rect.top === 0 && bazis_data.rect.left === 0))
-    {
-        console.log("Invalid Bazis data!");
-        return null;
-    }
-    return bazis_data;
-}
+// function validate_bazis_presence(){
+//     const bazis_data = base_level_entities.bazis;
+//     if( !bazis_data || !bazis_data.element || bazis_data.element.length === 0 || ! bazis_data.rect
+//         || (bazis_data.rect.top === 0 && bazis_data.rect.left === 0))
+//     {
+//         console.log("Invalid Bazis data!");
+//         return null;
+//     }
+//     return bazis_data;
+// }

@@ -125,22 +125,3 @@ function base_level_a_bomb_explosion_reactions(delay) {
                                                                   
     }, delay);
 }
-
-/**
- * Triggers a screen shake effect for a specified duration.
- * @param {number} delay - Initial delay of effect in milliseconds.
- * @param {number} duration - How long the shake lasts in milliseconds.
- */
-function trigger_screen_shake( delay, duration) {
-    setTimeout(() => {        
-    const SHAKE_CLASS = SECONDARY_WEAPONS_CONFIG.A_BOMB.SHAKE_ACTIVE_CLASS;
-    const $container = $("body"); 
-    
-    $container.addClass(SHAKE_CLASS);
-    
-    setTimeout(() => {
-        $container.removeClass(SHAKE_CLASS);
-        $container.css("transform", ""); 
-    }, duration);
-   }, delay); 
-}

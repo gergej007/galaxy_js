@@ -51,7 +51,7 @@ function show_boss_damage(bazis_shot_data, boss_data) {
     const {
         IMAGE_SRC, CLASS, INITIAL_WIDTH, FINAL_WIDTH, ANIM_DURATION,
         ZONE_PERCENTAGES, ALIGNMENT, SAFE_EDGE_ZONE, HORIZONTAL_FOLLOW_RATE_WINDOW_WIDTH_PERCENT,
-        EDGE_CORRECTION
+        EDGE_CORRECTION, MOVING_LEFT, MOVING_RIGHT, ANIM_EASING
     } = IMPACT_VISUALS_CONFIG;
    
     let impact_x = bazis_shot_data.rect.left; 
@@ -105,9 +105,9 @@ function show_boss_damage(bazis_shot_data, boss_data) {
         // Calculate horizontal slide during animation based on WINDOW WIDTH 
         let slide_amount_pixels = $(window).width() * HORIZONTAL_FOLLOW_RATE_WINDOW_WIDTH_PERCENT;
         
-        if (boss_data.direction === "moving_left") {
+        if (boss_data.direction === MOVING_LEFT) {
             slide_amount_pixels = -slide_amount_pixels; 
-        } else if (boss_data.direction === "moving_right") {
+        } else if (boss_data.direction === MOVING_RIGHT) {
             
         } else {
             slide_amount_pixels = 0; // No horizontal slide if boss isn't moving horizontally
@@ -116,7 +116,7 @@ function show_boss_damage(bazis_shot_data, boss_data) {
         boss_hit_explosion_img.animate({
             "width": FINAL_WIDTH,       
             "left": `+=${slide_amount_pixels}` // Slide horizontally relative to current position
-        }, ANIM_DURATION, "linear", function () {
+        }, ANIM_DURATION, ANIM_EASING, function () {
             $(this).remove(); 
         });
     });

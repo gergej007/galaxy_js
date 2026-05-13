@@ -5,7 +5,7 @@ window.keys_pressed = {};
 function bazis_key_binding() {
     
     $(document).on('keydown', (e) => {
-        // We use e.key for modern standard compliance
+
         window.keys_pressed[e.key] = true;
 
         switch (e.key){

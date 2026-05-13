@@ -32,7 +32,8 @@ const IMPACT_VISUALS_CONFIG = {
     IMAGE_SRC: 'robban2.png', CLASS: 'robbanas_y',    
     INITIAL_WIDTH: 15, 
     FINAL_WIDTH: 50, 
-    ANIM_DURATION: 250,   
+    ANIM_DURATION: 250, 
+    ANIM_EASING: 'linear',  
     ZONE_PERCENTAGES: { SIDE_WIDTH_PERCENT: 0.25 },
     EDGE_CORRECTION : { THRESHOLD_PERCENT: 0.1, 
                         AMOUNT_X: 15, 
@@ -41,7 +42,10 @@ const IMPACT_VISUALS_CONFIG = {
   ALIGNMENT: { Y_OUTER: 68, Y_MIDDLE: 50 },
   SAFE_EDGE_ZONE : 12,
   // --- Horizontal Following for Animation (based on window width) ---
-  HORIZONTAL_FOLLOW_RATE_WINDOW_WIDTH_PERCENT: 0.04 
+  HORIZONTAL_FOLLOW_RATE_WINDOW_WIDTH_PERCENT: 0.04,
+  MOVING_LEFT: "moving_left",
+  MOVING_RIGHT: "moving_right"
+
 }  
 
 const BOSS_DIES_CONFIG = { ANIM_DURATION : 500, BOSS_KILLED_SCORE : 15000, DELAY_AUDIO : 1700, 
@@ -79,6 +83,7 @@ const ANIMATION_CONFIG = {
         CLASS: 'tuzijatek',
         ANIM_DURATION: 4000,
         HIDE_DURATION: 500,
+        ANIM_EASING: 'linear',
         FINAL_WIDTH: 620,
         // Positioning percentages relative to window dimensions
         LEFT_FIREWORK_OFFSET_X_PERCENT: 0.05, 
@@ -99,7 +104,7 @@ const ANIMATION_CONFIG = {
         VERTICAL_DURATION_THRESHOLD_PERCENT: 0.75,
         VERTICAL_DURATION_LONG: 1350,
         VERTICAL_DURATION_SHORT: 900,
-        
+
         ANIM_EASING: 'linear', 
         AUDIO_KEY: "#exit1"
     }                     

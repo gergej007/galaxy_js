@@ -1,4 +1,4 @@
-<div class="high_scores_keret">
+<div class="high_scores_frame">
 
 <div class="headline">
   <div>POSITION</div> 
@@ -7,16 +7,16 @@
   <div>KILLED</div> 
 </div>
 
- <div class="record_keret">
+ <div class="record_frame">
 
 <div class="score_records">
-    <div id="position" class="scores_mezo"></div>
-    <div id="name" class="scores_mezo"></div>
-    <div id="score" class="scores_mezo"></div>
-    <div id="killed" class="scores_mezo"></div>
+    <div class ="position scores_field"></div>
+    <div class ="name scores_field"></div>
+    <div class ="score scores_field"></div>
+    <div class ="killed scores_field"></div>
 </div>
  </div>
 
-<div class="instrukciok_panel"></div>
-<div class="instrukciok_panel_also"></div>
+<div class="info_lane_top"></div>
+<div class="info_lane_bottom"></div>
 </div>
