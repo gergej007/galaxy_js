@@ -1,4 +1,3 @@
-
 let current_boss_phase_index = 0; 
 let boss_phase_timeout_id = null; 
 
@@ -28,7 +27,7 @@ async function boss_phase_scheduler(boss_data) {
         return; // Stop the scheduler if the boss is dead
     }
 
-    // --- Access the top-level configuration objects from BOSS_BEHAVIOR_CONFIG ---   
+    // --- Access the configuration objects from BOSS_BEHAVIOR_CONFIG ---   
     const { MOVEMENT_PHASES, PHASE_SEQUENCE } = BOSS_BEHAVIOR_CONFIG; 
 
     // --- Determine the current phase plan from the sequence ---
@@ -122,7 +121,7 @@ function execute_boss_movement(boss_data, movement_config, function_name, get_ta
             boss_data.direction = null;
             // Update boss's bounding rectangle after animation
             boss_data.rect = boss_data.element[0].getBoundingClientRect();
-            resolve_movement_phase(); // Resolve the Promise here!
+            resolve_movement_phase(); // Resolve the Promise here
         });
     });
 }
@@ -143,7 +142,7 @@ function boss_movement_1(boss_data, movement_config) {
         return { x: anim_poz_x, y: anim_poz_y };
     };   
 
-    return execute_boss_movement(boss_data, movement_config, "boss_movement_1", get_target_position/*, pre_animation_setup*/);
+    return execute_boss_movement(boss_data, movement_config, "boss_movement_1", get_target_position);
 }
 
 /**
@@ -162,7 +161,7 @@ function boss_movement_2(boss_data, movement_config) {
         return { x: anim_poz_x, y: anim_poz_y };
     };   
 
-    return execute_boss_movement(boss_data, movement_config, "boss_movement_2", get_target_position/*, pre_animation_setup*/);
+    return execute_boss_movement(boss_data, movement_config, "boss_movement_2", get_target_position);
 }
 
 /**
@@ -181,7 +180,7 @@ function boss_movement_3(boss_data, movement_config) {
         return { x: anim_poz_x, y: anim_poz_y };
     };   
 
-    return execute_boss_movement(boss_data, movement_config, "boss_movement_3", get_target_position/*, pre_animation_setup*/);
+    return execute_boss_movement(boss_data, movement_config, "boss_movement_3", get_target_position);
 }
 
 /**
@@ -203,7 +202,7 @@ function boss_movement_4(boss_data, movement_config) {
         return { x: anim_poz_x, y: anim_poz_y };
     };
     
-    return execute_boss_movement(boss_data, movement_config, "boss_movement_4", get_target_position /*,pre_animation_setup*/);
+    return execute_boss_movement(boss_data, movement_config, "boss_movement_4", get_target_position);
 }
 
 

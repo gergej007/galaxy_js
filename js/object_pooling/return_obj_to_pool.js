@@ -1,6 +1,6 @@
 /**
  * Returns a bazis shot data object to the pool, resets its state.
- * @param {object} bazis_shot_data - The bazis shot data object to return to the pool.
+ * @param {object} shot_data - The bazis shot data object to return to the pool.
  */
 function return_bazis_shot_to_pool(shot_data) { 
     if (!shot_data) {
@@ -8,6 +8,9 @@ function return_bazis_shot_to_pool(shot_data) {
         return;
     }        
         clean_pool_element(shot_data);  
+        if(shot_data.enemies_hit_ids){
+            shot_data.enemies_hit_ids.clear();
+        }
 }
 
 /**
@@ -52,7 +55,6 @@ function return_homing_missile_to_pool(missile_data) {
         console.warn("Attempted to return a null homing missile to the pool!");
         return;
     }
-    // missile_data.element.find(`.${SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.IMAGE.IMG_CLASS}`).hide();  
     clean_pool_element(missile_data);
     missile_data.parent_side = null;
     missile_data?.element.find(`.${POOL_STYLES.H_IGNITION_IMG_CLASS}`).remove();   

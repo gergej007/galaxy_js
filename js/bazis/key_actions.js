@@ -73,13 +73,13 @@ let last_frame_time = performance.now();
  * @returns {number} The delta time multiplier (1.0 = 60 FPS speed).
  */
 function calculate_delta_time(current_time) {
-    // 1. Calculate time passed since last frame in milliseconds
+    //  Calculate time passed since last frame in milliseconds
     const delta_time_MS = current_time - last_frame_time;
     
-    // 2. Update lastFrameTime for the next frame
+    //  Update lastFrameTime for the next frame
     last_frame_time = current_time;
 
-    // 3. Normalize against 60 FPS (1000ms / 60 frames ≈ 16.67ms)
+    //  Normalize against 60 FPS (1000ms / 60 frames ≈ 16.67ms)
     // This returns a multiplier: 
     // If game runs at 60fps, dt = 1.0
     // If game runs at 30fps, dt = 2.0 (moves twice as far per frame)

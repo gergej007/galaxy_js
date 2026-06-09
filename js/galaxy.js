@@ -146,15 +146,15 @@ function unified_image_loader(relative_src, on_ready) {
         }
     };
 
-    // 1. Attach the load listener
+    //  Attach the load listener
     $img.on("load", handle_ready);
 
-    // 2. Immediate cache check
+    //  Immediate cache check
     if ($img[0].complete && $img[0].naturalWidth !== 0) {
         handle_ready();
     }
 
-    // 3. Error handling
+    //  Error handling
     $img.on("error", () => {
         console.error(`Failed to load image: ${relative_src}`);
         $img.remove();
@@ -185,7 +185,7 @@ function score_dependent_fns() {
     const player_score = game_data.counters.score;
     const { act_limit, boss_limit, bounty_limit } = game_data.limits;
 
-    // --- 1. Level Up Logic ---
+    // ---  Level Up Logic ---
     if (player_score >= act_limit && game_data.game_states.traffic_flag) {
 
         if (game_data.levels.act_level >= GAME_CONSTANTS.MAX_GAME_LEVEL) {
@@ -198,6 +198,7 @@ function score_dependent_fns() {
 
         game_data.levels.act_level++;
         console.log(`Level Up! New Level: ${game_data.levels.act_level}`);
+        audio_play(CORE_CONFIG.LEVEL_UP_AUDIO_KEY);
 
         // Call game_level_change to load the new level's configuration and calculate its next act_limit
         game_level_change(game_data.levels.act_level);
@@ -207,13 +208,12 @@ function score_dependent_fns() {
 
         access_missed_weapons();
 
-        // --- 2. Bounty Logic (Linked to Level Up) ---
-        // This will now use the new bounty_score_threshold from the currentLevelConfig
+        // ---  Bounty Logic (Linked to Level Up) ---
         bounty_container_controller();
         base_level_entities.powerup.level++;      
     }
 
-    // --- 3. First Bounty Trigger (if it's independent of level up for level 1) ---
+    // ---  First Bounty Trigger  ---
     
     if (game_data.levels.act_level === 1 && player_score >= bounty_limit) {
         bounty_container_controller();
@@ -221,22 +221,18 @@ function score_dependent_fns() {
         base_level_entities.powerup.level++;          
     }
 
-    // --- 4. UI Updates ---
+    // ---  UI Updates ---
     update_left_display();   
 
-    // --- 5. Boss Logic ---
+    // ---  Boss Logic ---
     // Initalize Boss level
     if (player_score >= boss_limit) {
        
         game_data.game_states.traffic_flag = false;
-        stop_base_level_enemies();                                      
         if (!game_data.game_states.boss_flag ) {
           game_data.game_states.boss_flag = true;
           initalize_boss_level();
-    }
-        setTimeout(() => {
-            explode_all_spacekrafts();
-        }, CORE_CONFIG.BOSS_LEVEL.ERASE_ENEMIES_DELAY_MS);
+    }       
     }
 }
 
@@ -255,12 +251,10 @@ function score_dependent_fns() {
  * @requires score_dependent_fns - Evaluates if the new score triggers a state change.
  * @requires update_right_display - Refreshes the score and kill count UI.
  */
-function add_score_n_hit()
-{   if( game_data.game_states.traffic_flag){
+function add_score_n_hit() {
     game_data.counters.killed++;
-}
-    const {hit_score_multiplier, hit_score_seed} = current_level_config;
-    game_data.counters.score += Math.ceil(Math.random() * hit_score_multiplier) + hit_score_seed;
+    game_data.counters.score += SCORE_PROVIDER.get_hit_score();
+
     score_dependent_fns();   
     update_right_display();
 }

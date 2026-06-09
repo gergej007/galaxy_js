@@ -1,3 +1,42 @@
+const POOLED_ENTITY_TYPES = {    
+    ENEMY: GAME_ENTITY_TYPES.ENEMY,
+    ENEMY_SHOT: GAME_ENTITY_TYPES.ENEMY_SHOT,
+    BAZIS_SHOT: GAME_ENTITY_TYPES.BAZIS_SHOT,
+    HOMING_MISSILE: GAME_ENTITY_TYPES.HOMING_MISSILE,
+    TRACKING_LAZER: GAME_ENTITY_TYPES.TRACKING_LAZER,
+    BOSS_SHOT: GAME_ENTITY_TYPES.BOSS_SHOT
+};
+
+const POOL_DEFAULT_PROPS = {
+    [POOLED_ENTITY_TYPES.ENEMY]: () => ({
+        img_element: null,
+        damage: DEFAULT_VALUES.ENEMY_DAMAGE,
+        speed: 0,
+        moving_direction: null,
+        hp: current_level_config.enemy_hp,
+        max_hp: current_level_config.enemy_hp,
+        id: 0
+    }),
+    [POOLED_ENTITY_TYPES.BAZIS_SHOT]: () => ({
+        damage: DEFAULT_VALUES.BAZIS_SHOT_DAMAGE,
+        enemies_hit_ids: new Set() // New Set for every shot instance
+    }),
+    [POOLED_ENTITY_TYPES.ENEMY_SHOT]: () => ({
+        damage: DEFAULT_VALUES.ENEMY_SHOT_DAMAGE,
+        shooter_id: 0
+    }),
+    [POOLED_ENTITY_TYPES.HOMING_MISSILE]: ()=> ({
+        parent_side : null
+    }),
+    [POOLED_ENTITY_TYPES.TRACKING_LAZER]: ()=> ({
+        damage: DEFAULT_VALUES.TRACK_LAZER_DAMAGE
+    }),
+    [POOLED_ENTITY_TYPES.BAZIS_SHOT]: ()=> ({
+        damage : DEFAULT_VALUES.BOSS_SHOT_DAMAGE, 
+        speed : 0
+    })
+};
+
 const POOL_KEYS = {
     ENEMY: 'enemy_pool',           
     BAZIS_SHOT: 'bazis_shot_pool', 
@@ -7,21 +46,13 @@ const POOL_KEYS = {
     BOSS_SHOT: 'boss_shot_pool'
 }
 
-
 const POOL_LIMITS = {
     // Pool size
     H_MISSILE_COUNT: 4,
     TRACK_LAZER_COUNT: 10,
     BOSS_SHOT_COUNT: 20
 };
-const ENTITY_TYPES = {    
-    ENEMY: 'Enemy',
-    ENEMY_SHOT: 'Enemy Shot',
-    BAZIS_SHOT: 'Bazis Shot',
-    HOMING_MISSILE: 'Homing Missile',
-    TRACKING_LAZER: 'Tracking Lazer',
-    BOSS_SHOT: 'Boss Shot'
-};
+
 const DEFAULT_VALUES = { 
     ENEMY_DAMAGE: 25,
     BAZIS_SHOT_DAMAGE: 10,
@@ -57,12 +88,12 @@ const POOL_STYLES = {
     }
 };
 const BASE_CLASSES= {
-    [ENTITY_TYPES.BAZIS_SHOT]: POOL_STYLES.BAZIS_SHOT_ELEM_CLASS,  
-    [ENTITY_TYPES.HOMING_MISSILE]:POOL_STYLES.H_MISSILE_WRAPPER_CLASS,
-    [ENTITY_TYPES.TRACKING_LAZER]: POOL_STYLES.TRACK_LAZER_ELEM_CLASS,
-    [ENTITY_TYPES.ENEMY]: POOL_STYLES.ENEMY_ELEM_CLASS,
-    [ENTITY_TYPES.ENEMY_SHOT]: POOL_STYLES.ENEMY_SHOT_ELEM_CLASS,
-    [ENTITY_TYPES.BOSS_SHOT]: POOL_STYLES.BOSS_SHOT_ELEM_CLASS,
+    [POOLED_ENTITY_TYPES.BAZIS_SHOT]: POOL_STYLES.BAZIS_SHOT_ELEM_CLASS,  
+    [POOLED_ENTITY_TYPES.HOMING_MISSILE]:POOL_STYLES.H_MISSILE_WRAPPER_CLASS,
+    [POOLED_ENTITY_TYPES.TRACKING_LAZER]: POOL_STYLES.TRACK_LAZER_ELEM_CLASS,
+    [POOLED_ENTITY_TYPES.ENEMY]: POOL_STYLES.ENEMY_ELEM_CLASS,
+    [POOLED_ENTITY_TYPES.ENEMY_SHOT]: POOL_STYLES.ENEMY_SHOT_ELEM_CLASS,
+    [POOLED_ENTITY_TYPES.BOSS_SHOT]: POOL_STYLES.BOSS_SHOT_ELEM_CLASS,
     // Weapon specific
     'single': POOL_STYLES.BAZIS_SHOT_ELEM_CLASS,
     'dual': POOL_STYLES.BAZIS_SHOT_ELEM_CLASS,

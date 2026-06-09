@@ -6,8 +6,8 @@
  *                               Expected to contain a 'type' property (e.g., 'enemy', 'missile').
  * @returns {void}
  */                                                 
-function explode_spacekraft( object_data )
-{       
+function explode_spacekraft( object_data ) {
+       
     const { ENEMY_TYPE, HOMING_MISSILE_TYPE, BOUNTY_TYPE, ASTEROID_TYPE} = DAMAGE_N_EXPLOSION;
 
     if( !is_entity_valid(object_data) || !object_data.type){
@@ -36,7 +36,6 @@ function explode_spacekraft( object_data )
 
         case ASTEROID_TYPE: 
                       object_data.element.remove();
-                      console.log('Asteroid exploded!'); 
                       break;              
         default: console.warn(`Unknown object type: ${object_data.type}`);                      
     }
@@ -83,30 +82,30 @@ function play_explosion_visual(rnd_height, explosion_x, explosion_y) {
  * @function explode_all_spacekrafts
  * @returns {void} 
  */
-function explode_all_spacekrafts() 
-{                
+function explode_all_spacekrafts() {
+                
     const all_enemy_spacekrafts = base_level_entities.enemy_ships;
     audio_play(DAMAGE_N_EXPLOSION.AUDIO_KEY);
 
     all_enemy_spacekrafts.filter( enemy_data => enemy_data.is_active)
     .forEach( enemy_data => {   
-        if (!enemy_data || !enemy_data.element || enemy_data.element.length === 0 || !enemy_data.rect) {
+        if (!is_entity_valid(enemy_data)) {
             console.warn("explode_spacekraft called without valid enemy_data.");
             return;
         }
-        const{ rnd_height, explosion_x, explosion_y} = calculate_explosion_coordinates( enemy_data.rect);       
+    const{ rnd_height, explosion_x, explosion_y} = calculate_explosion_coordinates( enemy_data.rect);       
        
-        play_explosion_visual( rnd_height, explosion_x, explosion_y);
+    play_explosion_visual( rnd_height, explosion_x, explosion_y);
              
-        add_score_n_hit(); 
+    add_score_n_hit(); 
 
-        return_enemy_to_pool( enemy_data);
-        });
+    return_enemy_to_pool( enemy_data);
+    });
             
-        base_level_entities.enemy_shots.filter( enemy_shot_data => enemy_shot_data.is_active)
-                                        .forEach(enemy_shot_data => {
-                                        return_enemy_shot_to_pool(enemy_shot_data);
-                                        });   
+    base_level_entities.enemy_shots.filter( enemy_shot_data => enemy_shot_data.is_active)
+                                    .forEach(enemy_shot_data => {
+                                    return_enemy_shot_to_pool(enemy_shot_data);
+                                    });   
 }
 
 /**
@@ -117,7 +116,7 @@ function explode_all_spacekrafts()
  */
 function calculate_explosion_coordinates( enemy_rect) {
     const { RND_HEIGHT_MULTIPLIER, RND_HEIGHT_SEED, HORIZONTAL_OFFSET_PX} = DAMAGE_N_EXPLOSION;
-    const rnd_height = Math.round(Math.random() * RND_HEIGHT_MULTIPLIER) + RND_HEIGHT_SEED;    
+    const rnd_height = RANDOM_PROVIDER.get_in_range(RND_HEIGHT_MULTIPLIER, RND_HEIGHT_SEED);   
     const xpoz = enemy_rect.left;
     const ypoz = enemy_rect.top;
     const explosion_x = xpoz + (enemy_rect.width / 2) - HORIZONTAL_OFFSET_PX;

@@ -14,7 +14,7 @@ function handle_bomb_input() {
 
 /**
  * Processes the player's fire command.
- * Manages weapon limits and state checks before triggering a shot.
+ * Manages game state checks before triggering a shot.
  */
 function handle_fire_input() {      
         

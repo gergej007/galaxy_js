@@ -5,33 +5,43 @@ Run Galaxy Js via localhost in Chrome browser
 
 Supported browser: Google Chrome
 Recommended screen resolution: 1920 * 1080 (tested) up to 4K
-Memory usage ~ 100 Mbyte (at 1920 * 1080)
+Memory usage ~
 
 Controls:
     keyboard:
-        fire: space,
+        fire: Space,
         move left: left-arrow,
         move right: right-arrow,
         move up: up-arrow,
         move down: right-down,
-        launch A-bomb: alt / alt-gr
+        launch A-bomb: Alt / AltGr
 
         toggle fullscreen: F11,
-        pause: esc  (disabled when fighting with the Boss),
+        pause: Esc  (disabled when fighting with the Boss),
         restart / new game: F5  (reload page),
-        start game: space
+        start game: Space
 
 Game rules: 
     Neutralize as much enemy spaceship as you can.
-    Enemy spaceships hunt you and they can shot down themeselves.
+    Enemy spaceships will hunt you.
     You start the game with 4 lives. 
-    1 life contains 100 health unit.
-    1 extra life is gained after every 10 000 scores.
-    +5 unit of health is gained after neutralize enemy shots.
-    Your spaceship loose   health units after an enemy hit.
-    Your spaceship loose 35  health units after crushing with enemy ship.
+    1 life contains 99 health unit.
+    1 extra life is gained after each level up.    
+    Player loose health points after an enemy hit.
+    Player loose health points when colliding with other objects.
+    Collect powerups to have better chance.
 
-    Face the Boss enemy at 50 000 scores.        
+    Face the Boss in the end-game.        
     Do not go close to the Boss :)
 
     Enjoy! 
+
+    Music and inspiration from: 
+        Raptor: Call of the Shadows (1994)
+
+key technologies and patterns: 
+     Spatial Partitioning, Object Pooling,  Axis-Aligned Bounding Box (AABB), High-Performance Game Loop,
+     Input Polling, Adaptive Shuffle Bag, Optional Chaining, Spread Syntax, Destructuring Assignment, Arrow Functions, DOM-Based Rendering,
+     Finite State Machine (FSM), Data-Driven Design,  Pure Utility Functions, State Synchronizers,
+     Lifecycle Managers, Orchestrator Functions, Validation Guards, Recursive Schedulers,
+     jQuery & jQuery UI, jQuery Animation, AJAX, HTML5 Templates

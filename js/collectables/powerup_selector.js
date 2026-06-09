@@ -3,9 +3,9 @@
  * @returns {Object} The image source and type for the selected power-up.
  */
 function select_actual_powerup() {                                                 
-        const level = base_level_entities.powerup.level;
+        const pwrup_level = base_level_entities.powerup.level;
         
-        const data = POWERUP_REGISTRY[level] || POWERUP_REGISTRY[1];
+        const data = POWERUP_REGISTRY[pwrup_level] || POWERUP_REGISTRY[1];
                                                                    
         return { 
             powerup_img_src: data.src, 
@@ -24,7 +24,7 @@ function select_actual_powerup() {
         const powerup_actions = {
             a_bomb() {
                 game_data.counters.a_bomb++;
-                score_dependent_fns();
+                update_left_display();
                 update_center_display("A-BOMB COLLECTED !");
             },
             dual_fire() {
@@ -57,7 +57,7 @@ function select_actual_powerup() {
             },
             shield() {
                 bazis_invulnerability = true;  
-                update_center_display(`SHIELD FOR ${POWERUP_SPAWN_CONFIG.PRESENCE_DURATION} SEC !`/*"SHIELD FOR 60 SEC !"*/);        
+                update_center_display(`SHIELD FOR ${SECONDARY_WEAPONS_CONFIG.GOD_MODE.DURATION_MS/1000} SEC !`);        
                 god_mode();
             }
         };

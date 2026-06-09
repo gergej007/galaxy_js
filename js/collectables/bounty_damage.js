@@ -1,3 +1,9 @@
+/**
+ * Reduces the bounty entity's health, plays a sound effect, 
+ * and updates the damage and health indicators.
+ * 
+ * @param {number} damage - The amount of health to subtract.
+ */
 function bounty_container_damage(damage)
 {  
     base_level_entities.bounty.hp -= damage;                

@@ -27,24 +27,3 @@ function create_bazis() {
        base_level_entities.bazis.img_element = bazis_img;
     });   
 }
-
-/**
- * Validates the presence and readiness of the Bazis game entity.
- * This function checks for the existence of the Bazis data object, its associated
- * DOM element, and ensures that the element is both present in the DOM and has
- * been rendered with non-zero position coordinates.
- *
- * @returns {object|null} The `base_level_entities.bazis` data object if it is
- *                        valid and fully ready (element present and positioned),
- *                        otherwise `null`.
- */
-// function validate_bazis_presence(){
-//     const bazis_data = base_level_entities.bazis;
-//     if( !bazis_data || !bazis_data.element || bazis_data.element.length === 0 || ! bazis_data.rect
-//         || (bazis_data.rect.top === 0 && bazis_data.rect.left === 0))
-//     {
-//         console.log("Invalid Bazis data!");
-//         return null;
-//     }
-//     return bazis_data;
-// }

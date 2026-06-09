@@ -1,99 +1,82 @@
 /**
- * Initiates and manages the automated firing sequence for an individual enemy ship.
+ * Initiates the recursive firing loop for an enemy ship, managing timing, 
+ * geometry calculation, and projectile initialization.
  * 
- * The function implements a recursive firing loop that continues as long as the 
- * enemy is visible. It includes safety checks to prevent firing when the enemy 
- * is too close to the base or off-screen, and uses a pooling system for projectiles.
- * 
- * @function spacekraft_shot
- * @param {Object} enemy_data - The data object for the enemy ship attempting to shoot.
- * 
- * @returns {void}
- * 
- * @description
- * 1. Schedules an initial shot after a random delay defined in `ENEMY_SHOT_CONFIG`.
- * 2. Validates the existence and active state of both the enemy and the player base.
- * 3. Calculates target coordinates (`target_coords`) aimed at the base or the bottom of the screen.
- * 4. Requests a projectile from the pool via `get_enemy_shot_from_pool`.
- * 5. Performs safety checks: calls check_no_fire_zones( bazis_data, enemy_data)
- * 6. If safe, initializes the projectile's starting position and triggers `projectile_selector`.
- * 7. Recursively calls itself with a new random frequency defined by `current_level_config` 
- *    as long as the enemy remains visible.
+ * @param {Object} enemy_data - Data object of the enemy ship attempting to shoot.
  */
-function spacekraft_shot( enemy_data) {
+function spacekraft_shot(enemy_data) {
+    const { FIRST_SHOT_DELAY_MULTIPLIER, FIRST_SHOT_DELAY_SEED } = ENEMY_SHOT_CONFIG;
+    const initial_delay = RANDOM_PROVIDER.get_in_range(FIRST_SHOT_DELAY_MULTIPLIER, FIRST_SHOT_DELAY_SEED);
 
-    const { FIRST_SHOT_DELAY_MULTIPLIER, FIRST_SHOT_DELAY_SEED} = ENEMY_SHOT_CONFIG;
-    const first_shot_delay = Math.round( Math.random() * FIRST_SHOT_DELAY_MULTIPLIER) + FIRST_SHOT_DELAY_SEED ;         
+    setTimeout(() => {
+        const bazis_data = base_level_entities.bazis;
 
-    setTimeout( ()=> {  
-    const bazis_data = base_level_entities.bazis;
+        if (!is_entity_valid(enemy_data) || !enemy_data.is_active || !is_entity_valid(bazis_data)) return;
 
-    if(!is_entity_valid(enemy_data) || !enemy_data.is_active || !is_entity_valid(bazis_data)){
-        return;
-    }   
+        if (check_no_fire_zones(bazis_data, enemy_data)) {
+            const { initial, target } = calculate_shot_geometry(enemy_data, bazis_data);
+            const shot_data = initialize_shot_element(initial, enemy_data.id);
 
-    const bazis_rect = bazis_data.rect;      
-    const enemy_element = enemy_data.element;
-    const enemy_rect = enemy_data.rect;    
-       
-    const bazis_left = bazis_rect.left;
-    const bazis_top = bazis_rect.top;
-    const bazis_width = bazis_rect.width;
-    const bazis_height = bazis_rect.height;
-    const enemy_left = enemy_rect.left;
-    const enemy_bottom = enemy_rect.bottom;
-    const enemy_width = enemy_rect.width;
-
-    const { BAZIS_TARGET_Y_DIVISOR, CSS_POSITION} = ENEMY_SHOT_CONFIG;
-    
-    // Bazis target X , Y
-    let bazis_target_x = bazis_left + bazis_width / 2;
-    let bazis_target_y = bazis_top + bazis_height / BAZIS_TARGET_Y_DIVISOR;
-    
-    const shot_initial_x = Math.round(enemy_left + enemy_width / 2); 
-    const shot_initial_y = enemy_bottom;                
-
-    if (bazis_top <= enemy_bottom) {                               // If Bazis is above enemy
-        bazis_target_x = shot_initial_x; 
-        bazis_target_y = $(window).height();   
-    }    
-
-    const target_coords = { bazis_target_x, bazis_target_y};
-
-    const enemy_shot_data = get_from_pool(POOL_KEYS.ENEMY_SHOT);
-    if( !enemy_shot_data) {
-        console.log("enemy shot dropped due to invalid shot data!");
-        return;
-    }    
-    enemy_shot_data.shooter_id = enemy_data.id;   
-    
-    if (check_no_fire_zones(bazis_data, enemy_data))
-    {
-        if( !enemy_shot_data?.element?.length ){
-            console.log("enemy shot dropped due to invalid shot element!");
-            return;
+            if (shot_data) {
+                projectile_selector(enemy_data, shot_data, target);
+            }
         }
-        const enemy_shot_element = enemy_shot_data.element;
 
-        enemy_shot_element.hide();
-        enemy_shot_element.appendTo($("body"));
-        enemy_shot_element.css({
-            "left": shot_initial_x,
-            "top": shot_initial_y,
-            "position" : CSS_POSITION
-        });                             
-                
-        projectile_selector( enemy_data, enemy_shot_data, target_coords);       
-    }
-    const {frequency_multiplier_projectile, frequency_seed_projectile } = current_level_config;
-    
-    if( enemy_element?.is(':visible')){
-          let frequency = Math.round(Math.random() * frequency_multiplier_projectile) + frequency_seed_projectile;
-          setTimeout(function () { 
-            spacekraft_shot( enemy_data ); }, frequency);  
+        if (enemy_data.element?.is(':visible')) {
+            const { frequency_multiplier_projectile, frequency_seed_projectile } = current_level_config;
+            const next_delay = RANDOM_PROVIDER.get_in_range(frequency_multiplier_projectile, frequency_seed_projectile);
+            
+            setTimeout(() => spacekraft_shot(enemy_data), next_delay);
         }
-    }, first_shot_delay); 
+    }, initial_delay);
 }
+
+/**
+ * Retrieves a shot from the pool and positions it at the starting point.
+ */
+function initialize_shot_element(initial_pos, enemy_id) {
+    const shot_data = get_from_pool(POOL_KEYS.ENEMY_SHOT);
+    
+    if (!is_entity_valid(shot_data)) {
+        console.warn("Shot dropped: Invalid shot data or element");
+        return null;
+    }
+
+    shot_data.shooter_id = enemy_id;
+    shot_data.element.hide().appendTo($("body")).css({
+        left: initial_pos.x,
+        top: initial_pos.y,
+        position: ENEMY_SHOT_CONFIG.CSS_POSITION
+    });
+
+    return shot_data;
+}
+
+/**
+ * Calculates initial spawn coordinates and target destination for a shot.
+ */
+function calculate_shot_geometry(enemy_data, bazis_data) {
+    const { BAZIS_TARGET_Y_DIVISOR, HORIZONTAL_SAFE_ZONE_PX } = ENEMY_SHOT_CONFIG;
+    const { rect: e_rect } = enemy_data;
+    const { rect: b_rect } = bazis_data;
+
+    const initial = {
+        x: Math.round(e_rect.left + e_rect.width / 2),
+        y: e_rect.bottom
+    };
+
+    let target_x = b_rect.left + b_rect.width / 2;
+    let target_y = b_rect.top + b_rect.height / BAZIS_TARGET_Y_DIVISOR;
+
+    // Override if player is above enemy
+    if (b_rect.top - HORIZONTAL_SAFE_ZONE_PX <= e_rect.bottom) {
+        target_x = initial.x;
+        target_y = $(window).height();
+    }
+
+    return { initial, target: { bazis_target_x: target_x, bazis_target_y: target_y } };
+}
+
 
 /**
  * Determines if an enemy is in a valid position to fire a projectile.
@@ -145,24 +128,24 @@ function check_no_fire_zones( bazis_data, enemy_data) {
 function projectile_selector(enemy_data, shot_data, target_coords) {    
     if (!is_entity_valid(enemy_data) || !shot_data) return;
 
-    // 1. Config & Data Setup
+    //  Config & Data Setup
     const { RND_SHOT_TYPE, SHOT_X_SLIDE_PX } = ENEMY_SHOT_CONFIG;
     const { left: enemy_left, bottom: enemy_bottom } = enemy_data.rect;
     const { speed_multiplier_projectile, speed_seed_projectile } = current_level_config;
 
-    // 2. Calculations
+    //  Calculations
     const rnd_speed = Math.round(Math.random() * (speed_multiplier_projectile * ($(window).height() - enemy_bottom))) + speed_seed_projectile;
-    const rnd_type = Math.round(Math.random() * RND_SHOT_TYPE);
+    const rnd_type = RANDOM_PROVIDER.get_in_range(RND_SHOT_TYPE);
     const slide_px = (enemy_data.moving_direction === ENEMY_SPAWN_CONFIG.RIGHT_DIRECTION ? 1 : -1) * 
                      parseInt((enemy_data.speed / $(window).width()) * SHOT_X_SLIDE_PX);
 
-    // 3. Get Trajectory & Class name
+    //  Get Trajectory & Class name
     const target = get_shot_trajectory(rnd_type, enemy_left, slide_px, target_coords);
     const type_class = ENEMY_SHOT_CONFIG[`SHOT_TYPE_CLASS_${rnd_type}`];
 
-    // 4. Fire
+    //  Fire
     lazer_audio();
-    execute_projectile_animation(shot_data, target, rnd_speed, type_class);
+    execute_projectile_animation(shot_data, target, rnd_speed, type_class, rnd_type);
 }
 
 /**
@@ -209,7 +192,7 @@ function get_shot_trajectory(type, enemy_left, slide_px, target_coords) {
  * @param {string} typeClass - The CSS class associated with the specific shot type.
  * @returns {void}
  */
-function execute_projectile_animation(shot_data, target, speed, type_class) {
+function execute_projectile_animation(shot_data, target, speed, type_class, type) {
     const { element } = shot_data;
     const { ANIM_EASING } = ENEMY_SPAWN_CONFIG;
 
@@ -220,7 +203,11 @@ function execute_projectile_animation(shot_data, target, speed, type_class) {
             "top": target.y,
             "left": target.x
         }, speed, ANIM_EASING, function () {
-           
+            
+            if (type === 0 || type === 2){
+                shots_explosion_lightning( shot_data.rect.left, shot_data.rect.top);
+            }
+
             return_enemy_shot_to_pool(shot_data);
         });
 }

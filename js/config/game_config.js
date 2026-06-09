@@ -1,11 +1,50 @@
 const GAME_CONSTANTS = {    
-    INITIAL_LEVEL_UP_SCORE: 2000,
-    SUBSEQUENT_LEVEL_UP_SCORE_INCREMENT: 3000,
+    INITIAL_LEVEL_UP_SCORE: 5000,
+    // LEVEL_SCORE_LIMITS: [5000, 10000, 17500, 30000, 45000, 60000, 67500],   // Prod Config
+    LEVEL_SCORE_LIMITS: [2500, 4000, 7200, 10000, 15000, 20000, 25000],   // Dev Config
     MAX_GAME_LEVEL: 7,
-    INITIAL_BOUNTY_LIMIT: 1000,
-    BOSS_LIMIT: 6000,
+    INITIAL_BOUNTY_LIMIT: 1500,
+    // BOSS_LIMIT: 90000,        // Prod Config
+    BOSS_LIMIT: 26000,        // Dev Config
     ENEMY_AI_LEVEL: 4
 };
+
+const GAME_ENTITY_TYPES = {
+  ASTEROID: 'Asteroid',
+  BAZIS: 'Bazis',
+  BAZIS_SHOT: 'Bazis Shot',
+  HOMING_MISSILE: 'Homing Missile',
+  TRACKING_LAZER: 'Tracking Lazer',
+  BOUNTY: 'Bounty',
+  ENEMY: 'Enemy',
+  ENEMY_SHOT: 'Enemy Shot',
+  BOSS: 'Boss',
+  BOSS_SHOT: 'Boss Shot'
+}
+
+const MISSED_WEAPONS_ACCESS_LEVEL = {
+  DUAL_FIRE_SHOT_LEVEL_3: 3,
+  SINGLE_LAZER_LEVEL_5: 5,
+  TRACKING_LAZER_LEVEL_6: 6,
+  DUAL_LAZER_LEVEL_7: 7
+
+}
+
+const VARIABLE_POOLSIZE_AT_STAGE = {
+  ENEMY_POOLSIZE: {
+    STAGE_1: 15,
+    STAGE_2: 30,
+    STAGE_3: 40
+  },
+  ENEMY_SHOT_POOLSIZE: {
+    STAGE_1: 30,
+    STAGE_2: 65,
+    STAGE_3: 120
+  },
+  BAZIS_SHOT_POOLSIZE: {
+    DEFAULT: 26
+  }
+}
 
 const GAME_LEVELS = {   
     1: { // Spacekraft attrs                                       // LEVEL 1
@@ -15,10 +54,11 @@ const GAME_LEVELS = {
         level_seed_load : 750,
         level_multiplier_speed : 800,              
         level_seed_speed : 3.70,
-        spacekraft_variance_multiplier : 5,
+        spacekraft_variance_multiplier : 7,
+        spacekraft_variance_seed : 1,
          // Spacekraft shots' attrs
-        speed_seed_projectile : 1300,       
-        speed_multiplier_projectile : 1.3,
+        speed_seed_projectile : 1400,       
+        speed_multiplier_projectile : 1.4,
         frequency_seed_projectile : 1900,
         frequency_multiplier_projectile : 1600,
          // Score manipulating
@@ -31,16 +71,17 @@ const GAME_LEVELS = {
         bazis_shot_speed : 1.00   
     },
    2: {  // Spacekraft attrs                                     // LEVEL 2
-        enemy_hp : 24,                                 
+        enemy_hp : 22,                                 
         direction_pattern : 2,
         level_multiplier_load : 450,
         level_seed_load : 550,
         level_multiplier_speed : 600,              
         level_seed_speed :  3.3,
-        spacekraft_variance_multiplier : 6,
+        spacekraft_variance_multiplier : 8,
+        spacekraft_variance_seed : 1,
          // Spacekraft shots' attrs
-        speed_seed_projectile : 1100,
-        speed_multiplier_projectile : 1.2,
+        speed_seed_projectile : 1200,
+        speed_multiplier_projectile : 1.3,
         frequency_seed_projectile : 1500,
         frequency_multiplier_projectile : 1400,
          // Score manipulating
@@ -54,18 +95,19 @@ const GAME_LEVELS = {
    },
    3: {
         // Spacekraft attrs                                        // LEVEL 3
-        enemy_hp : 36,                              
+        enemy_hp : 34,                              
         direction_pattern : 2,                               
         level_multiplier_load : 200,
         level_seed_load : 200,
         level_multiplier_speed : 500,              
         level_seed_speed : 3.30,
-        spacekraft_variance_multiplier : 7,
+        spacekraft_variance_multiplier : 11,
+        spacekraft_variance_seed : 3,
          // Spacekraft shots' attrs
-        speed_seed_projectile : 1000,
+        speed_seed_projectile : 1100,
         speed_multiplier_projectile : 1.3,
-        frequency_seed_projectile : 1500,
-        frequency_multiplier_projectile : 1400,
+        frequency_seed_projectile : 1700,
+        frequency_multiplier_projectile : 1600,
          // Score manipulating
         hit_score_multiplier : 55,
         hit_score_seed : 40,
@@ -81,14 +123,15 @@ const GAME_LEVELS = {
         direction_pattern : 4,
         level_multiplier_load : 200,
         level_seed_load : 200,
-        level_multiplier_speed : 400,              
-        level_seed_speed : 3.10,
-        spacekraft_variance_multiplier : 9,
+        level_multiplier_speed : 450,              
+        level_seed_speed : 3.20,        
+        spacekraft_variance_multiplier : 12,
+        spacekraft_variance_seed : 4,
           // Spacekraft shots' attrs
-        speed_seed_projectile : 900,
-        speed_multiplier_projectile : 1.6,
-        frequency_seed_projectile : 1400,
-        frequency_multiplier_projectile : 1300,
+        speed_seed_projectile : 1000,
+        speed_multiplier_projectile : 1.3,
+        frequency_seed_projectile : 1600,
+        frequency_multiplier_projectile : 1500,
          // Score manipulating
         hit_score_multiplier : 60,
         hit_score_seed : 30,
@@ -102,16 +145,17 @@ const GAME_LEVELS = {
         // Spacekraft attrs                             // LEVEL 5 
         enemy_hp : 32,
         direction_pattern : 4,                                           
-        level_multiplier_load : 200,
-        level_seed_load : 200,
+        level_multiplier_load : 140,
+        level_seed_load : 140,
         level_multiplier_speed : 300,              
-        level_seed_speed : 2.80,
-        spacekraft_variance_multiplier : 10,
+        level_seed_speed : 2.80,        
+        spacekraft_variance_multiplier : 13,
+        spacekraft_variance_seed : 4,
          // Spacekraft shots' attrs
-        speed_seed_projectile : 800,
-        speed_multiplier_projectile : 1.5,
-        frequency_seed_projectile : 1300,
-        frequency_multiplier_projectile : 1200,
+        speed_seed_projectile : 900,
+        speed_multiplier_projectile : 1.3,
+        frequency_seed_projectile : 1600,
+        frequency_multiplier_projectile : 1500,
          // Score manipulating
         hit_score_multiplier : 50,
         hit_score_seed : 20,
@@ -123,18 +167,19 @@ const GAME_LEVELS = {
     },
     6: {
         // Spacekraft attrs                               // LEVEL 6
-        enemy_hp : 32,
+        enemy_hp : 38,
         direction_pattern : 4,
         level_multiplier_load : 120,
         level_seed_load : 120,
         level_multiplier_speed : 200,      
-        level_seed_speed : 2.60,
-        spacekraft_variance_multiplier : 10,
+        level_seed_speed : 2.60,        
+        spacekraft_variance_multiplier : 13,
+        spacekraft_variance_seed : 5,
           // Spacekraft shots' attrs
-        speed_seed_projectile : 650,
-        speed_multiplier_projectile : 1.4,
-        frequency_seed_projectile : 1100,
-        frequency_multiplier_projectile : 900,
+        speed_seed_projectile : 850,
+        speed_multiplier_projectile : 1.2,
+        frequency_seed_projectile : 1500,
+        frequency_multiplier_projectile : 1400,
           // Score manipulating
         hit_score_multiplier : 20,
         hit_score_seed : 20,
@@ -146,18 +191,19 @@ const GAME_LEVELS = {
     },
     7: {
         // Spacekraft attrs                             // DEFAULT | 7
-        enemy_hp : 32,                             
+        enemy_hp : 38,                             
         direction_pattern : 4,                      
-        level_multiplier_load : 100,              
-        level_seed_load : 100,                    
+        level_multiplier_load : 90,              
+        level_seed_load : 90,                    
         level_multiplier_speed : 100,                 
         level_seed_speed : 2.40,                  
-        spacekraft_variance_multiplier : 10,      
+        spacekraft_variance_multiplier : 16, 
+        spacekraft_variance_seed : 5,     
          // Spacekraft shots' attrs
-        speed_seed_projectile : 650,              
-        speed_multiplier_projectile : 1.4,        
-        frequency_seed_projectile : 1000,         
-        frequency_multiplier_projectile : 800,     
+        speed_seed_projectile : 800,              
+        speed_multiplier_projectile : 1.2,        
+        frequency_seed_projectile : 1500,         
+        frequency_multiplier_projectile : 1400,     
          // Score manipulating
         hit_score_multiplier : 20,                
         hit_score_seed : 20,                      

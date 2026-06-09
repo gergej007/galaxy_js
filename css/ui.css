@@ -127,9 +127,13 @@
 
 .result_display {
     margin: 15px;
-    padding: 5px;
+    padding: 5px 10px;
     z-index: 220;
-    width: 360px;
+    min-width: 300px;
+    width: fit-content;
+    white-space: nowrap;
+    transition: min-width 0.3s ease-out;
+
     height: 33px;
     text-align: center;
     font-variant-numeric: tabular-nums;

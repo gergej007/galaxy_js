@@ -12,19 +12,26 @@
  * @param {number} damage_value - The amount of damage to subtract from the boss's current HP.
  * @returns {void}
  */
-function boss_damage(bazis_shot_data, boss_data, damage_value){
-
-    boss_level_entities.boss.hp -= damage_value;
-    score_dependent_fns();  
-    update_progressbar( boss_level_entities.boss.hp);                
-
-    if ( boss_level_entities.boss.hp < 1) {
-        boss_dies();
-        }
+function boss_damage(bazis_shot_data, boss_data, damage_value) {
+    if (!boss_data) {
+        console.warn("boss_damage called without valid boss_data");
+        return;
+    }
+    if (boss_data.hp <= 0) return;   
    
-    if( bazis_shot_data && (bazis_shot_data.type === "single" || bazis_shot_data.type === "Hyper Shot")){
-        show_boss_damage( bazis_shot_data, boss_data);   
-    }       
+    //  If it's a direct projectile hit, show impact effect
+    if (bazis_shot_data && bazis_shot_data.is_active) {
+        show_boss_damage(bazis_shot_data, boss_data);   
+    }
+
+    //  Apply damage and update UI (this now runs for BOTH projectiles and A-bombs)
+    boss_data.hp -= damage_value;
+    update_progressbar(boss_data.hp);      
+    
+    //  Check for death
+    if (boss_data.hp <= 0) {
+        boss_dies();
+    }
 }
 
 
@@ -38,7 +45,7 @@ function boss_damage(bazis_shot_data, boss_data, damage_value){
  *                                   Expected to have `rect` for impact coordinates.
  * @param {object} boss_data - The boss's data object, including `element`, `rect`, and `direction`.
  * @returns {void}
- */
+ */                                                           /*
 function show_boss_damage(bazis_shot_data, boss_data) {
     impact_player();
 
@@ -121,70 +128,83 @@ function show_boss_damage(bazis_shot_data, boss_data) {
         });
     });
 }  
-
+*/
 
 /**
- * Initiates the boss's death sequence when its HP falls below 1.
- * This function performs several critical actions to transition the game state
- * from active boss fight to boss defeated, including:
- * - Activating player invincibility (god mode).
- * - Triggering visual and audio effects for the boss's destruction.
- * - Stopping all boss movement and clearing its scheduled actions.
- * - Cleaning up all active projectiles from both the player and the boss.
- * - Exploding asteroid. 
- * - Updating the game score and displaying relevant UI changes.
- * - Preparing the game state for potential level transition or win condition.
- *
- * @returns {void}
+ * Orchestrates the visual feedback for boss hits by calculating impact coordinates,
+ * determining horizontal slide based on boss movement, and triggering the explosion animation.
+ * 
+ * @param {object} bazis_shot_data - Data of the projectile hitting the boss, including its bounding rect.
+ * @param {object} boss_data - Current state of the boss, including its bounding rect and movement direction.
  */
-function boss_dies() {  
-    weapons.flags.god_mode = true;    
+function show_boss_damage(bazis_shot_data, boss_data) {
+    impact_player();
 
-    const {ANIM_DURATION, BOSS_KILLED_SCORE, DELAY_AUDIO, SCREEN_SHAKE_DURATION, AUDIO_KEYS, LAZER_SOUND} 
-          = BOSS_DIES_CONFIG;
+    if (!is_entity_valid(bazis_shot_data) || !is_entity_valid(boss_data)) return;
 
-    audio_stop(LAZER_SOUND);
-    const boss_data = boss_level_entities.boss;
-    if(!is_entity_valid(boss_data)) return;
+    const { SAFE_EDGE_ZONE, IMAGE_SRC, CLASS, INITIAL_WIDTH, FINAL_WIDTH, ANIM_DURATION, ANIM_EASING } = IMPACT_VISUALS_CONFIG;
+    const { rect: bazis_rect } = bazis_shot_data;
+    const { rect: boss_rect, direction } = boss_data;
 
-    const boss_element = validate_boss_for_movement(boss_data, "boss_dies");
-    const boss_rect = boss_level_entities.boss.rect;
-    
-    boss_dies_main_explosion(boss_rect);
-    boss_dies_side_explosion(boss_rect);
-    trigger_screen_shake(0,SCREEN_SHAKE_DURATION);
+    // Boundary Guard
+    if (bazis_rect.left < boss_rect.left + SAFE_EDGE_ZONE || bazis_rect.left > boss_rect.right - SAFE_EDGE_ZONE) return;
 
-    game_data.game_states.boss_flag = false;  
+    const { x, y } = calculate_impact_position(bazis_rect, boss_rect);
+    const slide = get_impact_slide_amount(direction);
 
-    base_level_entities.bazis_shots.filter( bazis_shot_data => bazis_shot_data.is_active)
-    .forEach( bazis_shot_data => {
-        return_bazis_shot_to_pool(bazis_shot_data);
-    });         
-    boss_level_entities.boss_shots.filter( boss_shot_data => boss_shot_data.is_active)
-    .forEach(boss_shot_data => {
-        return_boss_shot_to_pool(boss_shot_data);
+    unified_image_loader(IMAGE_SRC, ($img) => {
+        $img.addClass(CLASS).appendTo("body").show().css({
+            left: x,
+            top: y,
+            width: INITIAL_WIDTH,
+            position: "absolute"
+        }).animate({
+            width: FINAL_WIDTH,
+            left: `+=${slide}`
+        }, ANIM_DURATION, ANIM_EASING, function() {
+            $(this).remove();
+        });
     });
+}
 
-    boss_element.stop(true, false);
-    boss_element.animate({
-        "opacity" : 0
-    }, ANIM_DURATION, function(){
-        $(this).remove();
-    });    
-    boss_data.attack_timeout_ids = null;
-    game_data.counters.killed++;
-    game_data.counters.score += BOSS_KILLED_SCORE;
-    update_right_display();
-       
-    bazis_exit();
+/**
+ * Calculates adjusted impact coordinates based on boss zones and edge correction.
+ * @returns {{x: number, y: number}}
+ */
+function calculate_impact_position(bazis_rect, boss_rect) {
+    const { ZONE_PERCENTAGES, ALIGNMENT, EDGE_CORRECTION } = IMPACT_VISUALS_CONFIG;
+    
+    let x = bazis_rect.left;
+    let y = bazis_rect.top;
+    const side_width = boss_rect.width * ZONE_PERCENTAGES.SIDE_WIDTH_PERCENT;
+    const threshold = boss_rect.width * EDGE_CORRECTION.THRESHOLD_PERCENT;
 
-    const asteroid_data = boss_level_entities.asteroid;
-    if( is_entity_valid(asteroid_data )){
-       explode_spacekraft(asteroid_data);                                                             
+    // Vertical Alignment
+    const is_side_zone = (x < boss_rect.left + side_width) || (x > boss_rect.right - side_width);
+    y -= is_side_zone ? ALIGNMENT.Y_OUTER : ALIGNMENT.Y_MIDDLE;
+
+    // Edge Correction
+    if (x <= boss_rect.left + threshold) {
+        x += EDGE_CORRECTION.AMOUNT_X;
+        y -= EDGE_CORRECTION.AMOUNT_Y;
+    } else if (x >= boss_rect.right - threshold) {
+        x -= EDGE_CORRECTION.AMOUNT_X;
+        y -= EDGE_CORRECTION.AMOUNT_Y;
     }
- 
-    audio_play(AUDIO_KEYS[0]);
-    setTimeout(function(){
-        audio_play(AUDIO_KEYS[1]);
-    },DELAY_AUDIO);
-}   
+
+    return { x, y };
+}
+
+/**
+ * Determines the horizontal slide amount for the impact animation.
+ */
+function get_impact_slide_amount(direction) {
+    const { MOVING_LEFT, MOVING_RIGHT, HORIZONTAL_FOLLOW_RATE_WINDOW_WIDTH_PERCENT } = IMPACT_VISUALS_CONFIG;
+    const base_slide = $(window).width() * HORIZONTAL_FOLLOW_RATE_WINDOW_WIDTH_PERCENT;
+
+    if (direction === MOVING_LEFT) return -base_slide;
+    if (direction === MOVING_RIGHT) return base_slide;
+    return 0;
+}
+
+

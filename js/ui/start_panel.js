@@ -102,5 +102,13 @@ $(document).on("keydown", (e) => {
     // ESCAPE - Pause Game
     if (e.key === PAUSE && !states.boss_flag && !states.exit_flag && states.traffic_flag && !states.bounty_flag) {
         show_start_panel();
+        const homing_missiles = base_level_entities.homing_missiles;
+       
+        homing_missiles.forEach(missile => {
+             if (missile.is_active) {
+                   if (missile.element) missile.element.stop(true, true);        
+                      return_homing_missile_to_pool(missile);
+            }
+        });
     }
 });

@@ -42,8 +42,9 @@ const BAZIS_CONFIG = {
         ANIM_EASING: 'linear'
     },
     COLLISION: {
-        KICK_DISTANCE: 90,
-        DURATION: 100
+        KICK_DISTANCE: 70,
+        DURATION: 250,
+        EASING: "easeOutExpo"
     }  
 }
 

@@ -7,8 +7,8 @@ const ENEMY_SPAWN_CONFIG = {
     LANE_PADDING_PX: 5,
     RESET_STYLE: { "transition": "none", "display": "block", "left": "-999px", "transform":"none", "filter":"none" },
 
-    ELEM_WIDTH_MULTIPLIER: 86,            // Spawning logic
-    ELEM_WIDTH_SEED: 110,
+    ELEM_WIDTH_MULTIPLIER: 60,            // Spawning logic
+    ELEM_WIDTH_SEED: 130,
     ELEM_CLASS: 'urhajo_img',
     LOCKED_CLASS: 'locked',
     IMG_SRC: 'enemy/urhajo',
@@ -28,6 +28,7 @@ const  ENEMY_SHOT_CONFIG = {
     FIRST_SHOT_DELAY_MULTIPLIER: 600,      
     FIRST_SHOT_DELAY_SEED: 200,
     BAZIS_TARGET_Y_DIVISOR: 4,
+    HORIZONTAL_SAFE_ZONE_PX: 20,
     VERTICAL_SAFE_ZONE_OFFSET_PX: 80,       
     VERTICAL_SCREEN_EDGE_SAFE_PX: 200,
     SHOT_X_SLIDE_PX: 100,

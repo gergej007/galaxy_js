@@ -1,3 +1,30 @@
+/**
+ * Executes a fan-shaped projectile burst (cone attack) from the boss entity.
+ * 
+ * This function handles the initialization of multiple projectiles from the pool, 
+ * configures their appearance and damage based on the provided style key, and 
+ * animates them in a spread pattern toward the bottom of the screen.
+ * 
+ * @function boss_cone_shooting
+ * @param {number} shot_repeat - The number of projectiles to fire in the burst.
+ * @param {number} distance_between_shots - The horizontal spacing (in pixels) between landing points.
+ * @param {number} shot_duration - The duration of the movement animation in milliseconds.
+ * @param {string} shot_style_key - The key used to look up configuration in `BOSS_SHOTS_CONFIG`.
+ * @param {string} audio_key - The ID of the audio element to play when firing.
+ * @returns {void}
+ * 
+ * @description
+ * 1. Verifies that the boss encounter is still active via `boss_flag`.
+ * 2. Validates the boss entity and retrieves its current screen coordinates.
+ * 3. Fetches `shot_repeat` projectiles from the `POOL_KEYS.BOSS_SHOT` pool.
+ * 4. Configures each projectile with CSS classes, damage values, and starting positions.
+ * 5. Calculates a symmetrical horizontal spread centered on the boss's current X position.
+ * 6. Triggers a jQuery `.animate()` call for each projectile toward its calculated target X at the screen bottom.
+ * 7. Recycles projectiles back to the pool using a completion callback.
+ * 
+ * @see {@link get_from_pool} For the projectile retrieval logic.
+ * @see {@link return_boss_shot_to_pool} For the projectile recycling logic.
+ */
 function boss_cone_shooting( shot_repeat, distance_between_shots, shot_duration, shot_style_key, audio_key){
         
     if ( !game_data.game_states.boss_flag) {
@@ -32,8 +59,6 @@ function boss_cone_shooting( shot_repeat, distance_between_shots, shot_duration,
             break; // Stop if pool is empty
         }
         const boss_shot_element = boss_shot_data.element;
-
-        // --- Configure the shot from config ---        
         
         boss_shot_element.attr('class', '').addClass(CONE_SHOT_CONFIG.CLASS);
 

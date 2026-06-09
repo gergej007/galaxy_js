@@ -136,7 +136,7 @@ function setup_lazer_styles(lazer_data, boss_rect, x_offset, direction, config) 
     const lazer_initial_y = boss_rect.top + boss_rect.height - config.Y_OFFSET_CORRECTION;
 
     // 4. Apply horizontal slide correction based on boss velocity
-    let direction_correction = direction === "moving_right" 
+    let direction_correction = direction === IMPACT_VISUALS_CONFIG.MOVING_RIGHT      // "moving_right" 
         ? config.DIRECTION_CORRECTION * $(window).width()
         : -config.DIRECTION_CORRECTION * $(window).width();
 

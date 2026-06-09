@@ -1,75 +1,67 @@
 /**
- * Spawns and initializes a power-up at the location of a destroyed bounty ship.
+ * Orchestrates the visual feedback for boss hits by calculating impact coordinates,
+ * determining horizontal slide based on boss movement, and triggering the explosion animation.
  * 
- * This function handles the selection of the power-up type based on current progress,
- * calculates a safe spawn position to ensure the item remains within the viewport 
- * boundaries, loads the appropriate asset, and triggers the floating animation.
- * 
- * @function spawn_actual_powerup
- * @param {Object} bounty_data - The data object of the bounty ship that was destroyed.
- * 
- * @returns {void}
- * 
- * @description
- * 1. Validates bounty_data; aborts if missing.
- * 2. Destructures spatial and styling constants from `POWER_UP_CONFIG`.
- * 3. Calculates initial (x, y) coordinates based on the bounty's last position.
- * 4. Adjusts 'poz_x' if the bounty was too close to the screen edges to keep the power-up visible.
- * 5. Loads the power-up image via `unified_image_loader`.
- * 6. Updates `base_level_entities.powerup` state with the new type and DOM element.
- * 7. Applies `BASE_STYLE` and calculated coordinates to the element before initiating `animate_powerup`.
+ * @param {object} bazis_shot_data - Data of the projectile hitting the boss, including its bounding rect.
+ * @param {object} boss_data - Current state of the boss, including its bounding rect and movement direction.
  */
-function spawn_actual_powerup( bounty_data) {     
-    if( !bounty_data){
-        console.warn("spawn powerup failed due to missing bounty_data!");
-        return;
-    }
+function spawn_actual_powerup(bounty_data) {
+    if (!bounty_data) return console.warn("spawn powerup failed: missing bounty_data");
 
-    const { INITIAL_POS_OFFSET, LEFT_SCREEN_EDGE_SAFE_ZONE, SAFE_LEFT_EDGE_POSITION,SAFE_RIGHT_EDGE_OFFSET, 
-            RIGHT_SCREEN_EDGE_SAFE_ZONE, PARENT_RIGHT_DIRECTION, PARENT_LEFT_DIRECTION, IMG_CLASS, BASE_STYLE}
-             = POWERUP_SPAWN_CONFIG;
-        
     const { powerup_img_src, type } = select_actual_powerup();
-    const spawn_data = extract_powerup_spawn_data(bounty_data);   
-
-    const bounty_direction = spawn_data.direction;
-    const win_width = $(window).width();
-
-    let poz_x = spawn_data.left + INITIAL_POS_OFFSET;
-    let poz_y = spawn_data.top + INITIAL_POS_OFFSET;
-                                                       // Powerup stays in screen when appears close to edges
-     if( bounty_direction === PARENT_LEFT_DIRECTION && poz_x < LEFT_SCREEN_EDGE_SAFE_ZONE )            
-        { poz_x = SAFE_LEFT_EDGE_POSITION; }                                  
-    else if( bounty_direction === PARENT_RIGHT_DIRECTION && poz_x > win_width - RIGHT_SCREEN_EDGE_SAFE_ZONE)
-        { poz_x = win_width - SAFE_RIGHT_EDGE_OFFSET; }   
+    const spawn_data = extract_powerup_spawn_data(bounty_data);
+    const position = calculate_safe_spawn_position(spawn_data);
 
     unified_image_loader(powerup_img_src, (powerup_img_element) => {
-
-            if (!powerup_img_element?.length){
-
-            console.warn("image was not find or corrupted!");
-            return; }
-
-        powerup_img_element.addClass(IMG_CLASS);
-
-        const powerup_data = base_level_entities.powerup;        
-        powerup_data.type = type; 
-        powerup_data.element = powerup_img_element;
-        powerup_img_element.appendTo($("body"));                    
-
-            if(!spawn_data?.element){
-            console.warn("image position is 0 or undefined!");
-            $(powerup_img_element).remove();
-            return;
+        if (!powerup_img_element?.length || !spawn_data?.element) {
+            powerup_img_element?.remove();
+            return console.warn("Powerup spawn aborted: element missing or invalid");
         }
-        powerup_img_element.css({
-            ...BASE_STYLE,
-            "left" : poz_x, 
-            "top" : poz_y
-    });   
-    powerup_img_element.show();                   
-    animate_powerup(powerup_data);  
+
+        const powerup_data = initialize_powerup_entity(powerup_img_element, type, position);
+        animate_powerup(powerup_data);
     });
+}
+
+/**
+ * Calculates the safe spawn position for a powerup within screen bounds.
+ * @returns {{x: number, y: number}}
+ */
+function calculate_safe_spawn_position(spawn_data) {
+    const { INITIAL_POS_OFFSET, LEFT_SCREEN_EDGE_SAFE_ZONE, SAFE_LEFT_EDGE_POSITION, 
+            SAFE_RIGHT_EDGE_OFFSET, RIGHT_SCREEN_EDGE_SAFE_ZONE, 
+            PARENT_RIGHT_DIRECTION, PARENT_LEFT_DIRECTION } = POWERUP_SPAWN_CONFIG;
+
+    const win_width = $(window).width();
+    let poz_x = spawn_data.left + INITIAL_POS_OFFSET;
+    let poz_y = spawn_data.top + INITIAL_POS_OFFSET;
+
+    if (spawn_data.direction === PARENT_LEFT_DIRECTION && poz_x < LEFT_SCREEN_EDGE_SAFE_ZONE) {
+        poz_x = SAFE_LEFT_EDGE_POSITION;
+    } else if (spawn_data.direction === PARENT_RIGHT_DIRECTION && poz_x > win_width - RIGHT_SCREEN_EDGE_SAFE_ZONE) {
+        poz_x = win_width - SAFE_RIGHT_EDGE_OFFSET;
+    }
+
+    return { x: poz_x, y: poz_y };
+}
+
+/**
+ * Configures the powerup entity data and applies initial styles.
+ */
+function initialize_powerup_entity(element, type, position) {
+    const { IMG_CLASS, BASE_STYLE } = POWERUP_SPAWN_CONFIG;
+    
+    element.addClass(IMG_CLASS).css({
+        ...BASE_STYLE,
+        left: position.x,
+        top: position.y
+    }).appendTo($("body")).show();
+
+    const powerup_data = base_level_entities.powerup;
+    powerup_data.type = type;
+    powerup_data.element = element;
+
+    return powerup_data;
 }
 
 /**
@@ -122,8 +114,7 @@ function animate_powerup(powerup_data) {
 
     pulse_animation_loop();
 
-    // 3. The Presence Timer (Set ONLY ONCE)
-    // Clear any old timer just in case
+    //  The Presence Timer    
     if (powerup_data.timer) clearTimeout(powerup_data.timer);
 
     powerup_data.timer = setTimeout(() => {

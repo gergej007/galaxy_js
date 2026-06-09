@@ -49,7 +49,7 @@ const BAZIS_SHOTS_CONFIG = {           // --- Primary weapon system config ---
     },
     HYPER_SHOT: {
         CLASS: 'hyper_lovedek', 
-        DAMAGE: 6, 
+        DAMAGE: 3, 
         TYPE: 'Hyper Shot',
         OFFSET_X_FACTOR: 0.24, 
         INITIAL_TOP_OFFSET: 10, 
@@ -88,7 +88,7 @@ const BAZIS_SHOTS_CONFIG = {           // --- Primary weapon system config ---
     },
     DUAL_LAZER_SHOT: {
         CLASS: 'lazer_lovedek',
-        DAMAGE: 12,
+        DAMAGE: 10,
         TYPE: 'dual_lazer',
         SHOT_WIDTH: 5,
         OFFSET_X_FACTOR: 0.24,
@@ -192,7 +192,7 @@ const SECONDARY_WEAPONS_CONFIG = {                 // --- Secondary weapon syste
         SCREEN_SHAKE_DURATION: 800        
     },
     GOD_MODE: {
-        DURATION_MS: 60000, 
+        DURATION_MS: 90000, 
         BAZIS_IMG_NORMAL_SRC: 'kepek/bazis.png', 
         BAZIS_IMG_GOD_MODE_SRC: 'kepek/bounties/god_mode.png', 
         AUDIO_ACTIVATE_KEY: '#powerdwn1' 

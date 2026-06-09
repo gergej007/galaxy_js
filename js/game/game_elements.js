@@ -1,15 +1,15 @@
 const boss_level_entities = {
     asteroid : { element: null, img_element: null, current_image_src: '', rect: null,
-                direction: null, damage :5, type :'Asteroid' },
-    boss : { element: null, img_element: null, rect: null, hp: 1000, damage: 20 , 
-             direction: null, attack_timeout_ids: [] },   
+                direction: null, damage :5, type :GAME_ENTITY_TYPES.ASTEROID },
+    boss : { element: null, img_element: null, rect: null, hp: 1000, damage: 20,  
+             direction: null, attack_timeout_ids: [], type: GAME_ENTITY_TYPES.BOSS },   
     boss_shots : pool_state.pools.boss_shot_pool 
 }
 
 const base_level_entities = {
     bazis : { element: null, rect: null, img_element: null, lives: 3, hp: 99, max_hp: 99, damage: 25, 
-              is_exploding: false, is_colliding: false},
-    bounty : { element: null, rect: null, type: 'Bounty', direction: null, hp: 100, max_hp: 100, damage: 5 },
+              is_exploding: false, is_colliding: false, type: GAME_ENTITY_TYPES.BAZIS},
+    bounty : { element: null, rect: null, type: GAME_ENTITY_TYPES.BOUNTY, direction: null, hp: 100, max_hp: 100, damage: 5 },
     hp_indicator: { element: null, fill: null},
     powerup : { element: null, rect: null, level: 0, type: null, timer: null },
     enemy_ships : pool_state.pools.enemy_pool,
@@ -47,17 +47,15 @@ const weapons = {
 }
 
     function update_boss_entity_rects() {                            //Dynamic Element Discovery
-    // Update Boss's rect                                           
-    if( boss_level_entities.boss.element) {  
-        boss_level_entities.boss.rect = boss_level_entities.boss.element[0].getBoundingClientRect();
-    }
-
-    // Update asteroids' rect
+    //  Update Boss's rect    
+    boss_level_entities.boss.rect = boss_level_entities.boss.element[0].getBoundingClientRect();
+   
+    //  Update asteroids' rect
     if( boss_level_entities.asteroid.element){
         boss_level_entities.asteroid.rect = boss_level_entities.asteroid.element[0].getBoundingClientRect();
     }
 
-    // Update Boss shots' rects
+    //  Update Boss shots' rects
     boss_level_entities.boss_shots.forEach(boss_shot_data => {
         if (boss_shot_data.is_active) {
             if (boss_shot_data.element && boss_shot_data.element.length > 0 && $.contains(document.body, boss_shot_data.element[0])) {
@@ -68,13 +66,13 @@ const weapons = {
     }
 
 function update_base_entity_rects(){
-      // Update bazis' rect
+      //   Update bazis' rect
     const bazis = base_level_entities.bazis;         
        if( bazis.element) {
            bazis.rect = base_level_entities.bazis.element[0].getBoundingClientRect();
        } 
     
-      // Update bazis shots' rects    
+      //  Update bazis shots' rects    
     base_level_entities.bazis_shots.forEach(shot_data => {
         if (shot_data.is_active) {         
             if (shot_data.element && shot_data.element.length > 0 && $.contains(document.body, shot_data.element[0])) {
@@ -83,7 +81,7 @@ function update_base_entity_rects(){
     }        
     });
 
-    // Update homing missiles' rects
+    //  Update homing missiles' rects
     base_level_entities.homing_missiles.forEach( missile_data => {
         if(missile_data.is_active){
             if (missile_data.element && missile_data.element.length > 0 && $.contains(document.body, missile_data.element[0])) {
@@ -92,7 +90,7 @@ function update_base_entity_rects(){
         }
     });
 
-     // Update enemy ships' rect
+     //  Update enemy ships' rect
     base_level_entities.enemy_ships.forEach(enemy_data => {
         if (enemy_data.is_active) { 
             if (enemy_data.element && enemy_data.element.length > 0 && $.contains(document.body, enemy_data.element[0])) {
@@ -101,7 +99,7 @@ function update_base_entity_rects(){
         }              
     });
    
-        // Update enemy shot's rect
+        //  Update enemy shot's rect
       base_level_entities.enemy_shots.forEach(enemy_shot_data => {
         if (enemy_shot_data.is_active) {
             if (enemy_shot_data.element && enemy_shot_data.element.length > 0 && $.contains(document.body, enemy_shot_data.element[0])) {
@@ -110,13 +108,13 @@ function update_base_entity_rects(){
         }         
         });       
 
-      // Update bounty container's rect
+      //  Update bounty container's rect
       const bounty = base_level_entities.bounty;                           
     if (bounty.element &&  bounty.element.length > 0 && $.contains(document.body, bounty.element[0])) {   
         bounty.rect = bounty.element[0].getBoundingClientRect();
     } 
    
-      // Update powerup's rect
+      //  Update powerup's rect
       const powerup = base_level_entities.powerup;
       if (powerup.element && powerup.element.length > 0 && $.contains(document.body, powerup.element[0])) {
           powerup.rect = powerup.element[0].getBoundingClientRect();

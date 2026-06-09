@@ -101,7 +101,6 @@ async function animate_asteroid() {
 
     let current_asteroid_container;
     try {
-        // if (!asteroid_data.element || asteroid_data.element.length === 0) {
         if ((asteroid_data.element?.length ?? 0) === 0) {
             // First time: setup the container and initial image
             current_asteroid_container = await setup_asteroid_async();
@@ -111,18 +110,14 @@ async function animate_asteroid() {
         } else {
             // Subsequent times: reuse the existing container, change image
             current_asteroid_container = await reuse_asteroid(asteroid_data); 
-        }
-       
-        // Now current_asteroid_container holds the *actual* jQuery element for the asteroid
-        // This is where boss_level_entities.asteroid.element gets its value for the current cycle
+        }       
+        
         asteroid_data.element = current_asteroid_container;
         const asteroid_element = asteroid_data.element; 
 
-        // Generate Movement Parameters - pass the currently active asteroid element
+        // Generate Movement Parameters 
         const params = asteroid_params(asteroid_element );
 
-        // Apply initial CSS and classes (clear previous classes first for clean reuse)
-        // boss_level_entities.asteroid.element.removeClass().addClass("asteroida_container");
         asteroid_element.css({
             "width": params.rnd_width,
             "left": params.css_xpoz,
@@ -130,10 +125,9 @@ async function animate_asteroid() {
             "transform": params.rotate_y
         }).show(); 
 
-        // Update initial bounding box
         asteroid_data.rect = asteroid_element[0].getBoundingClientRect();
 
-        // Animate the asteroid
+        // Animate asteroid
         asteroid_element.animate({ 
             "left": params.anim_xpoz
         }, params.rnd_duration, "easeInGentle", function() {
@@ -143,7 +137,6 @@ async function animate_asteroid() {
 
     } catch (error) {
         console.error("Failed to setup or animate asteroid:", error);
-        // If an asteroid setup fails, ensure the element is hidden if it exists
         if (asteroid_element) {
             asteroid_element.hide();
         }

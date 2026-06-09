@@ -58,7 +58,8 @@ async function mobilize_spacekraft(move_pattern) {
 
     const current_move_pattern = move_pattern; 
     const { level_multiplier_load, level_seed_load } = current_level_config;
-    const rnd_load_time = (Math.random() * level_multiplier_load) + level_seed_load; 
+    // const rnd_load_time = (Math.random() * level_multiplier_load) + level_seed_load; 
+    const rnd_load_time = RANDOM_PROVIDER.get_in_range(level_multiplier_load, level_seed_load); 
     
     const enemy_data = get_from_pool(POOL_KEYS.ENEMY);
     if (!enemy_data) {

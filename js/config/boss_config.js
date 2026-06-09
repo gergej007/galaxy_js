@@ -1,3 +1,17 @@
+const BOSS_SETUP_CONFIG= {
+    LEVEL_DELAY_MS: 600,
+    OUT_OF_SCREEN_POS_X: 100,
+    OUT_OF_SCREEN_POS_Y: -90,
+    BOSS_WRAPPER_CLASS: 'boss_container',
+    BOSS_IMG_SRC: 'boss/boss.png',
+    BOSS_IMG_CLASS: 'boss_main_img',
+    AUDIO_KEY: '#boss_hang4',
+    INITIAL_ANIM_DURATION_MS: 2500, 
+    INITIAL_ANIM_OFFSET_X: -40,
+    INITIAL_ANIM_POS_Y: 40,
+    BG_AUDIO_KEY: "#track1"
+};
+
 const BOSS_BEHAVIOR_CONFIG = {
     MOVEMENT_PHASES : {
         MOVEMENT_1: { direction_1: "moving_right", direction_2: "moving_left", audio_key: "#boss_hang2", 
@@ -16,15 +30,21 @@ const BOSS_BEHAVIOR_CONFIG = {
         { type: "boss_movement_4", config_key: "MOVEMENT_4", attacks_config_key: "PHASE_2" }
         ]
     }
-    
+
+const BOSS_ATTACK_TYPES = {
+    CONE: 'cone_shots',
+    HOMING: 'homing_shots',
+    LAZER: 'lazer_shots'
+};  
+
 const BOSS_ATTACK_CONFIG = {
-    PHASE_1: [ { type: 'cone_shots', shots: 9, spread_dist: 33, speed: 1000, type_key: "CONE_SHOT_TYPE_1", audio: "#lazer11" , delay_ms: 300  },
-               { type: 'cone_shots', shots: 9, spread_dist: 33, speed: 1000, type_key: "CONE_SHOT_TYPE_1", audio: "#lazer8" ,  delay_ms: 900  },
-               { type: 'cone_shots', shots: 9, spread_dist: 33, speed: 1000, type_key: "CONE_SHOT_TYPE_1", audio: "#lazer13" , delay_ms: 1500  },
-               { type: 'cone_shots', shots: 9, spread_dist: 33, speed: 900,  type_key: "CONE_SHOT_TYPE_3", audio: "#lazer15" , delay_ms: 2100  },
-               { type: 'homing_shots', shots: 4, speed: 900, audio: "#lazer5", interval_ms: 400, delay_ms: 3200, type_key: "HOMING_SHOT" }               
+    PHASE_1: [ { type: BOSS_ATTACK_TYPES.CONE, shots: 9, spread_dist: 33, speed: 1000, type_key: "CONE_SHOT_TYPE_1", audio: "#lazer11" , delay_ms: 300  },
+               { type: BOSS_ATTACK_TYPES.CONE, shots: 9, spread_dist: 33, speed: 1000, type_key: "CONE_SHOT_TYPE_1", audio: "#lazer8" ,  delay_ms: 900  },
+               { type: BOSS_ATTACK_TYPES.CONE, shots: 9, spread_dist: 33, speed: 1000, type_key: "CONE_SHOT_TYPE_1", audio: "#lazer13" , delay_ms: 1500  },
+               { type: BOSS_ATTACK_TYPES.CONE, shots: 9, spread_dist: 33, speed: 900,  type_key: "CONE_SHOT_TYPE_3", audio: "#lazer15" , delay_ms: 2100  },
+               { type: BOSS_ATTACK_TYPES.HOMING, shots: 4, speed: 900, audio: "#lazer5", interval_ms: 400, delay_ms: 3200, type_key: "HOMING_SHOT" }               
             ],
-    PHASE_2: [ { type: 'lazer_shots', shots: 5, speed: 0, audio: "#r_lazer5", interval_ms: 50, delay_ms: 100, type_key: "LAZER_SHOT"} ]
+    PHASE_2: [ { type: BOSS_ATTACK_TYPES.LAZER, shots: 5, speed: 0, audio: "#r_lazer5", interval_ms: 50, delay_ms: 100, type_key: "LAZER_SHOT"} ]
 }; 
 
 //   --- Damage and Death ---
@@ -65,7 +85,7 @@ const SIDE_EXPLOSION_CONFIG = { IMAGE_SRC : 'robban.gif', IMAGE_CLASS: 'robbanas
   
 //  --- Boss Animations ---
 const ANIMATION_CONFIG = {
-    BOSS_EXIT: { DISTANCE_Y: -200, ANIM_DURATION: 1400},
+    BOSS_EXIT: { DISTANCE_Y: -200, ANIM_DURATION: 1400, FINAL_DELAY: 1500},
 
     A_BOMB_REACTION_CONFIG: { IMG_SRC: "villam1.gif", IMG_CLASS: "villam2",
                               ANIM_OPACITY: 0.5, ANIM_INITIAL_DELAY: 800, 
@@ -73,7 +93,7 @@ const ANIMATION_CONFIG = {
                               ANIM_DURATION_1: 140, ANIM_DURATION_2: 100, 
                               ANIM_DURATION_HIDE: 50, LIGHTNING_INITIAL_WIDTH: 200, 
                               LIGHTNING_FINAL_WIDTH: 380, ANIM_X_RELATIVE: 40, 
-                              ANIM_Y_RELATIVE: 20, A_BOMB_DAMAGE_FOR_BOSS: 25
+                              ANIM_Y_RELATIVE: 20, A_BOMB_DAMAGE_FOR_BOSS: 35
     },
 
     SHOTS_EXPLOSION: { ANIM_SIZE_PX: 35, ANIM_DURATION: 250 },

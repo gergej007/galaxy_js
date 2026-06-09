@@ -14,7 +14,7 @@ function schedule_next_missile_launch_attempt() {
     }
     
     homing_missile_timeout = setTimeout(() => {     
-        if(!weapons.flags.homing_missile){
+        if(!weapons.flags.homing_missile || weapons.flags.tracking_lazer){
             homing_missile_timeout = null;            
             return; 
         }      

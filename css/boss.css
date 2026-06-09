@@ -68,6 +68,7 @@
 .tuzijatek{
     position: absolute;
     width: 500px;  
+    mix-blend-mode: screen;
 }
 
 .asteroida_container{

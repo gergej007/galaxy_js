@@ -1,14 +1,43 @@
+/**
+ * Orchestrates the removal of the boss entity and its associated components from the game.
+ * 
+ * This function handles the players defeat phase of a boss encounter. It stops boss-specific 
+ * audio, destroys the health HUD, deactivates the boss game state, recycles all remaining 
+ * boss projectiles, and executes an animation to move the boss off-screen before clearing references.
+ * 
+ * @function boss_exit
+ * @returns {void}
+ * 
+ * @description
+ * 1. Validates the existence of the boss entity.
+ * 2. Manages audio transitions by stopping the boss theme and playing the death/defeat track.
+ * 3. Destroys the jQuery UI progress bar widget used for boss health.
+ * 4. Disables the `boss_flag` to stop boss-related game loop logic.
+ * 5. Iterates through all active boss projectiles and returns them to the object pool.
+ * 6. Animates the boss element vertically to an "off-screen" position.
+ * 7. On animation completion: hides the element and nullifies state references to the boss.
+ * 
+ * @see {@link return_boss_shot_to_pool} For the projectile recycling logic.
+ * @see {@link is_entity_valid} For the initial validation guard.
+ */
 function boss_exit() {       
 
     const boss_data = boss_level_entities.boss;
-    const {DISTANCE_Y, ANIM_DURTION} = ANIMATION_CONFIG.BOSS_EXIT;
+    const {DISTANCE_Y, ANIM_DURATION, FINAL_DELAY} = ANIMATION_CONFIG.BOSS_EXIT;
 
     if (!is_entity_valid(boss_data)) {
         return;
     }
+    audio_stop(AUDIO_CONFIG.TRACKS.BOSS);
+    audio_play(AUDIO_CONFIG.TRACKS.DEATH);
+
     const boss_element = $(boss_data.element);
 
-    $(progress_bar).progressbar("destroy");
+    const $p_bar = $(UI_CONFIG.HUD.CENTER.PROGRESS_BAR.SELECTOR);
+    if ($p_bar.length && $p_bar.data("ui-progressbar")) {
+        $p_bar.progressbar("destroy");
+    }
+
     game_data.game_states.boss_flag = false;
 
     boss_level_entities.boss_shots.filter(boss_shot_data => boss_shot_data.is_active)
@@ -16,13 +45,17 @@ function boss_exit() {
             return_boss_shot_to_pool(boss_shot_data);
         });
 
-    boss_element.animate({
-        "top": DISTANCE_Y
-    }, ANIM_DURTION, function () {
-        $(this).hide();
-        boss_data.element = null;
-        boss_data.rect = null;
-    });
+        setTimeout(() => {
+            boss_element.animate({
+            "top": DISTANCE_Y
+        }, ANIM_DURATION, function () {
+          $(this).hide();
+          boss_data.element = null;
+          boss_data.rect = null;
+
+          handle_victory_display(BAZIS_CONFIG.DAMAGE.GAME_OVER_TEXT);
+        });
+    }, FINAL_DELAY);    
 }
 
 
@@ -81,7 +114,30 @@ function boss_a_bomb_reaction() {
     boss_damage(null, boss_data, A_BOMB_DAMAGE_FOR_BOSS);
 }
 
-
+/**
+ * Triggers an electrical explosion effect at a specific coordinate.
+ * 
+ * This function dynamically loads an electrical burst sprite, positions it at 
+ * the point of impact, and executes a scaling animation before removing the 
+ * element from the DOM. It is primarily used for projectile clashing effects.
+ * 
+ * @function shots_explosion_lightning
+ * @param {number} pos_x - The horizontal (left) pixel coordinate for the effect.
+ * @param {number} pos_y - The vertical (top) pixel coordinate for the effect.
+ * @returns {void}
+ * 
+ * @description
+ * 1. Retrieves animation parameters (size and duration) from `ANIMATION_CONFIG.SHOTS_EXPLOSION`.
+ * 2. Invokes `unified_image_loader` to asynchronously fetch 'electric2.png'.
+ * 3. On successful load:
+ *    - Applies the 'bs_loves_explosion' CSS class for base styling.
+ *    - Positions the element at the (x, y) origin.
+ *    - Animates both width and height to `ANIM_SIZE_PX` to create an expansion effect.
+ *    - Completely removes the element from the DOM upon animation completion to prevent memory leaks.
+ * 
+ * @see {@link unified_image_loader} For the asset loading pattern.
+ * @see {@link boss_shot_bazis_shot_collision_detection} A common trigger for this effect.
+ */
 function shots_explosion_lightning(pos_x, pos_y) {
     
     const { ANIM_SIZE_PX, ANIM_DURATION} = ANIMATION_CONFIG.SHOTS_EXPLOSION;
@@ -130,7 +186,7 @@ function final_fireworks() {
             const target_top_y = $(window).height() * Y_OFFSET_PERCENT;
 
             if (is_right_side) {
-                target_left_x -= firework_container.width();
+                target_left_x -= FINAL_WIDTH / 2;
             }
 
             firework_container.css({
@@ -153,6 +209,29 @@ function final_fireworks() {
     create_and_animate_firework(RIGHT_FIREWORK_OFFSET_X_PERCENT, true);
 }
 
+/**
+ * Triggers a localized lightning visual effect over the boss entity upon its arrival.
+ * 
+ * This function loads a specific lightning sprite (usually a GIF) and overlays it 
+ * directly onto the boss container. The effect is timed to coincide with the boss's 
+ * introductory animation, providing visual flair before being removed from the DOM.
+ * 
+ * @function initial_lightning_effect
+ * @returns {void}
+ * 
+ * @description
+ * 1. Retrieves configuration (duration, source, styling) from `ANIMATION_CONFIG.INITIAL_LIGHTNING`.
+ * 2. Validates that the boss entity and its DOM element are ready via `is_entity_valid`.
+ * 3. Invokes `unified_image_loader` to fetch the lightning asset.
+ * 4. On successful load:
+ *    - Appends the lightning sprite directly to the `boss_element`.
+ *    - Sets the initial width and anchors the effect to the top-left (0,0) of the boss container.
+ *    - Uses jQuery `.hide(DURATION)` to perform a timed fade-out.
+ * 5. Uses a `setTimeout` to ensure the element is physically removed from the DOM after the animation.
+ * 
+ * @see {@link boss_enemy_setup} The function that typically triggers this intro effect.
+ * @see {@link unified_image_loader} For the asynchronous asset fetching logic.
+ */
 function initial_lightning_effect() {                      // Boss incoming lightning
     
     const {DURATION, IMG_SRC,IMG_CLASS,IMG_WIDTH} = ANIMATION_CONFIG.INITIAL_LIGHTNING;
@@ -236,8 +315,31 @@ function bazis_exit() {
 }
 
 /**
- * Calculates dynamic durations for the exit animation based on screen position.
- * @returns {Object} An object containing horizontal_duration and vertical_duration.
+ * Calculates adaptive animation durations for the player ship's exit sequence based on screen position.
+ * 
+ * This utility function evaluates how far the player is from the screen edges and returns 
+ * longer or shorter durations. This ensures that the exit animation feels consistent 
+ * regardless of whether the ship has a long or short distance to travel.
+ * 
+ * @function get_bazis_exit_durations
+ * @param {DOMRect} bazis_rect - The current bounding box of the player ship.
+ * @param {Object} config - Configuration object containing timing and threshold values.
+ * @param {number} config.HORIZONTAL_DURATION_THRESHOLD_PERCENT - Percentage of screen width used as a boundary.
+ * @param {number} config.HORIZONTAL_DURATION_LONG - Duration in ms for long horizontal travel.
+ * @param {number} config.HORIZONTAL_DURATION_SHORT - Duration in ms for short horizontal travel.
+ * @param {number} config.VERTICAL_DURATION_THRESHOLD_PERCENT - Percentage of screen height used as a boundary.
+ * @param {number} config.VERTICAL_DURATION_LONG - Duration in ms for long vertical travel.
+ * @param {number} config.VERTICAL_DURATION_SHORT - Duration in ms for short vertical travel.
+ * @returns {Object} An object containing the calculated { horizontal_duration, vertical_duration }.
+ * 
+ * @description
+ * 1. Measures current window dimensions via jQuery.
+ * 2. Compares the ship's `left` position against horizontal thresholds:
+ *    - Uses 'LONG' duration if near the left or right screen edges.
+ *    - Uses 'SHORT' duration if centrally located.
+ * 3. Compares the ship's `top` position against the vertical threshold:
+ *    - Uses 'LONG' duration if deep in the lower half of the screen.
+ *    - Uses 'SHORT' duration if already near the top.
  */
 function get_bazis_exit_durations(bazis_rect, config) {
     let horizontal_duration;

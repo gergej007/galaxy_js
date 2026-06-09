@@ -15,4 +15,3 @@ function check_collision(rect1, rect2) {
         rect1.bottom > rect2.top
     );
 }
-// Axis-Aligned Bounding Box (AABB) collision detection

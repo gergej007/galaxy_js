@@ -20,7 +20,6 @@ const UI_CONFIG = {
             TITLE: "High Scores:",
             TEMPLATE: "tpl/high_scores.tpl",
             CLASS: "final_panel",
-            // HIGH_SCORES: "tpl/high_scores.tpl",
             READ_URL: "modulok/read_high_scores.php",
             SAVE_URL: "modulok/save_high_scores.php",            
             MAX_RECORDS: 10,

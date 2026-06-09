@@ -1,3 +1,8 @@
+/**
+ * Updates the visual state of the HP indicator based on current health percentage.
+ * Applies CSS classes for low/critical thresholds and handles entity destruction
+ * when health reaches zero, triggering powerup spawns and explosion effects.
+ */
 function hp_indicator_handler() {
     const { LOW_TRESHOLD, CRITICAL_TRESHOLD, LOW_HEALTH_CLASS, CRITICAL_HEALTH_CLASS} = HP_INDICATOR_CONFIG;
     const hp_indicator_container = base_level_entities.hp_indicator.element;
@@ -11,7 +16,7 @@ function hp_indicator_handler() {
     const hp_percentage = (current_hp / max_hp) * 100;
     
     hp_fill.css({
-        "width": hp_percentage + '%'
+        "width": `${hp_percentage}%`
     });
 
     hp_fill.removeClass(`${LOW_HEALTH_CLASS} ${CRITICAL_HEALTH_CLASS}`); 
@@ -39,6 +44,11 @@ function hp_indicator_handler() {
     }
 }
 
+/**
+ * Creates the HP indicator DOM structure and initializes its references.
+ * 
+ * @returns {jQuery} The jQuery object representing the HP indicator container.
+ */
 function get_hp_indicator(){     
     const { WRAPPER_CLASS, FILL_CLASS} = HP_INDICATOR_CONFIG;            
    

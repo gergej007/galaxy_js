@@ -18,9 +18,10 @@ const CORE_CONFIG = {
         AUDIO_KEY: "#impact3"
     },
     PATHS: {
-        IMAGES: "kepek/" // Centralized image directory
+        IMAGES: "kepek/"          // Centralized image directory
     },
     BOSS_LEVEL: {
         ERASE_ENEMIES_DELAY_MS: 800 
-    }   
+    },
+    LEVEL_UP_AUDIO_KEY: '#bounty1'   
 };

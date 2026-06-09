@@ -3,6 +3,7 @@
     <audio src="audio/loves1.mp3" class="hang" id="loves1"></audio>
     <audio src="audio/r_lazer2.mp3" class="hang" id="r_lazer2"></audio>
     <audio src="audio/r_lazer3.mp3" class="hang" id="r_lazer3"></audio>
+    <audio src="audio/r_lazer4.mp3" class="hang" id="r_lazer4"></audio>
     <audio src="audio/r_lazer5.mp3" class="hang" id="r_lazer5"></audio>
 
     <audio src="audio/abomb1.mp3" class="hang" id="abomb1"></audio>
@@ -39,6 +40,7 @@
     <audio src="audio/missile_launch2.mp3" class="hang" id="missile_launch2"></audio>
     
     <audio src="audio/track_lazer2.mp3" class="hang" id="track_lazer2"></audio>
+    <audio src="audio/death.mp3" class="hang" id="death"></audio>
 
     <audio src="audio/robbanas1.mp3" class="robbanas" id="robbanas1"></audio>
     <audio src="audio/robbanas2.mp3" class="robbanas" id="robbanas2"></audio>

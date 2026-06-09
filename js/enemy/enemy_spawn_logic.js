@@ -14,14 +14,12 @@
  */
 async function configure_pooled_spacekraft( enemy_data) {
 
-    const {level_multiplier_speed, level_seed_speed, spacekraft_variance_multiplier, enemy_hp} = current_level_config;
-    const { ELEM_WIDTH_MULTIPLIER, ELEM_WIDTH_SEED, IMG_SRC, IMG_EXTENSION, ELEM_CLASS,
-            LOCKED_CLASS, 
-    } = ENEMY_SPAWN_CONFIG;
+    const { enemy_hp} = current_level_config;
+    const { IMG_SRC, IMG_EXTENSION, ELEM_CLASS, LOCKED_CLASS} = ENEMY_SPAWN_CONFIG;
 
-    const rnd_duration = Math.round(Math.random() * level_multiplier_speed) + (level_seed_speed * $(window).width());
-    const rnd_width = Math.round(Math.random() * ELEM_WIDTH_MULTIPLIER) + ELEM_WIDTH_SEED;
-    const spacekraft_variance = Math.ceil(Math.random() * spacekraft_variance_multiplier);
+    const rnd_duration = RANDOM_PROVIDER.get_enemy_duration();
+    const rnd_width = RANDOM_PROVIDER.get_enemy_width();
+    const spacekraft_variance = ENEMY_VARIETY_MANAGER.get_next();
 
     const enemy_element = enemy_data.element;
        
@@ -114,40 +112,6 @@ function setup_spacekraft_animation_behaviour( enemy_data, lane_info) {
     });
 }
 
-
-/**
- * Executes a GPU-accelerated smooth movement animation.
- */  /*
-function setup_spacekraft_animation_behaviour(enemy_data, lane_info) {
-    const { element, speed } = enemy_data;
-    const { pozx, anim_pozx, transform_Y } = lane_info;
-    const $el = $(element);
-
-    // 1. Reset state & Teleport to start
-    $el.css({
-        "transition": "none",
-        "display": "block",
-        "top": enemy_data.rect.top + "px",
-        "left": "0px", // Base position at 0
-        "transform": `${transform_Y} translateX(${pozx}px)`, // Start off-screen
-        "will-change": "transform" // Hint to the GPU to prepare
-    });
-
-    // 2. Force reflow to commit start position
-    void $el[0].offsetHeight;
-
-    // 3. Start the smooth GPU-accelerated journey
-    $el.css({
-        "transition": `transform ${speed}ms linear`,
-        "transform": `${transform_Y} translateX(${anim_pozx}px)`
-    });
-
-    // 4. Cleanup when finished
-    $el.one('transitionend', () => {
-        return_enemy_to_pool(enemy_data);
-    });
-}*/
-
 /**
  * Divides the screen into horizontal lanes and determines which lane an enemy
  * should spawn in based on its random vertical position (`pozy_top`).
@@ -164,9 +128,9 @@ function setup_spacekraft_animation_behaviour(enemy_data, lane_info) {
  *          Returns `null` if no valid lane is found (enemy spawns out of vertical bounds).
  */
 function divide_screen_to_lanes(enemy_data, pozy_top, move_pattern) {
-    if( !enemy_data || !enemy_data.element){
-        return;
-    }
+    
+    if( !is_entity_valid(enemy_data)) return;
+
     const enemy_element = $(enemy_data.element);
 
     const {VERTICAL_OFFSET, PLAY_AREA_HEIGHT_FACTOR } = ENEMY_SPAWN_CONFIG;
@@ -199,7 +163,7 @@ function divide_screen_to_lanes(enemy_data, pozy_top, move_pattern) {
             anim_pozx = $(window).width();
             transform_Y = ROTATE_0_DEG;
         } else {
-            pozx = $(window).width() /*+ 10*/;
+            pozx = $(window).width();
             moving_class = LEFT_DIRECTION;
             anim_pozx = -enemy_element.width();
             transform_Y = ROTATE_180_DEG;
@@ -228,7 +192,6 @@ function check_spawn_proximity_conflict(proposed_enemy_data) {
     const p_bottom = p_rect.top + p_rect.height;
     const p_right = p_rect.left + p_rect.width;
 
-    // Check against the array of active enemy data, not the DOM
     return base_level_entities.enemy_ships.some(active_enemy => {
         if (!active_enemy.is_active || active_enemy.id === proposed_enemy_data.id) return false;
 
@@ -260,9 +223,8 @@ function check_spawn_proximity_conflict(proposed_enemy_data) {
  * @returns {boolean} True if the enemy is in the bounty lane and meets removal criteria, false otherwise.
  */
 function check_enemy_in_bounty_lane( enemy_element, pozy_top, move_pattern, bounty_data) {
-    if (!bounty_data || !bounty_data.element || bounty_data.element.length === 0) {
-        return false;
-    } 
+
+    if( !is_entity_valid(bounty_data)) return false;
 
     const {BOUNTY_SAFE_ZONE_X_FACTOR} = ENEMY_SPAWN_CONFIG;
     
