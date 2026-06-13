@@ -69,3 +69,5 @@ const POWERUP_REGISTRY = {
             6:{type: 'twin_lazer', src: 'bounties/twin_lazer1.png'},
             7:{type: 'shield', src: 'bounties/shield1.png'}    
 }
+
+const POWERUP_TYPES = Object.values(POWERUP_REGISTRY).map(p => p.type);

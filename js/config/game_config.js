@@ -5,7 +5,7 @@ const GAME_CONSTANTS = {
     MAX_GAME_LEVEL: 7,
     INITIAL_BOUNTY_LIMIT: 1500,
     // BOSS_LIMIT: 90000,        // Prod Config
-    BOSS_LIMIT: 26000,        // Dev Config
+    BOSS_LIMIT: 29000,        // Dev Config
     ENEMY_AI_LEVEL: 4
 };
 
@@ -15,7 +15,7 @@ const GAME_ENTITY_TYPES = {
   BAZIS_SHOT: 'Bazis Shot',
   HOMING_MISSILE: 'Homing Missile',
   TRACKING_LAZER: 'Tracking Lazer',
-  BOUNTY: 'Bounty',
+  BOUNTY: 'Bounty',  
   ENEMY: 'Enemy',
   ENEMY_SHOT: 'Enemy Shot',
   BOSS: 'Boss',

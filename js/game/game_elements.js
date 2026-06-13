@@ -11,7 +11,7 @@ const base_level_entities = {
               is_exploding: false, is_colliding: false, type: GAME_ENTITY_TYPES.BAZIS},
     bounty : { element: null, rect: null, type: GAME_ENTITY_TYPES.BOUNTY, direction: null, hp: 100, max_hp: 100, damage: 5 },
     hp_indicator: { element: null, fill: null},
-    powerup : { element: null, rect: null, level: 0, type: null, timer: null },
+    powerup : { element: null, rect: null, level: 0, type: null, timer: null, type: null },
     enemy_ships : pool_state.pools.enemy_pool,
     bazis_shots : pool_state.pools.bazis_shot_pool,
     homing_missiles : pool_state.pools.homing_missile_pool,

@@ -1,4 +1,25 @@
 /**
+ * Iterates through a pool of entities and dispatches those currently active 
+ * to a resolver function along with their spatial neighbors.
+ * 
+ * @param {Array<Object>} pool - The collection of entities to check for collisions.
+ * @param {Function} resolver_fn - The callback function to handle interaction logic 
+ *                                 between an entity and its nearby neighbors.
+ */
+function dispatch_collisions(pool, resolver_fn) {
+    if (!pool) return;
+    for (let i = 0; i < pool.length; i++) {
+        const entity = pool[i];
+        if (entity.is_active && is_entity_valid(entity)) {
+            const neighbors = SPATIAL_GRID.get_entities_in_rect(entity.rect);
+            if (neighbors.size > 0) {
+                resolver_fn(entity, neighbors);
+            }
+        }
+    }
+}
+
+/**
  * Performs Axis-Aligned Bounding Box (AABB) collision detection between two rectangular objects.
  * This function checks if two DOMRect objects are overlapping in 2D space.
  *

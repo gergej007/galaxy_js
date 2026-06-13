@@ -1,37 +1,65 @@
 const SPATIAL_GRID = {
-    cell_size: 100, 
-    cells: {},
-    
-    // Convert coordinate to a string key e.g. "5,12"
-    get_key(x, y) {
-        return `${Math.floor(x / this.cell_size)},${Math.floor(y / this.cell_size)}`;
+    cell_size: 100,
+    cells: {}, // Stores string keys like "5,12" mapped to arrays
+
+    /**
+     * Reuses existing bucket arrays by clearing them, 
+     * avoiding the creation of new object literals.
+     */
+    clear() {
+        for (const key in this.cells) {
+            this.cells[key].length = 0;
+        }
     },
 
-    clear() { this.cells = {}; },
+    /**
+     * Converts a coordinate to a grid index.
+     */
+    get_key(col, row) {
+        return `${col},${row}`;
+    },
 
-    // Insert an entity into all cells it overlaps
-    insert(entity) {
-        const rect = entity.rect;
-        if (!rect || (rect.width === 0 && rect.height === 0)) return;
-        
-        for (let x = rect.left; x < rect.right + this.cell_size; x += this.cell_size) {
-            for (let y = rect.top; y < rect.bottom + this.cell_size; y += this.cell_size) {
-                const key = this.get_key(x, y);
+    /**
+     * Inserts an entity into every cell its bounding box overlaps.
+     */
+    insert(entity,  override_rect = null) {                            // Coordinate mapping
+        const rect = override_rect || entity.rect;
+        if (!rect || rect.width === 0) return;
+
+        // Calculate index ranges instead of pixel steps
+        const start_col = Math.floor(rect.left / this.cell_size);
+        const end_col = Math.floor(rect.right / this.cell_size);
+        const start_row = Math.floor(rect.top / this.cell_size);
+        const end_row = Math.floor(rect.bottom / this.cell_size);
+
+        for (let col = start_col; col <= end_col; col++) {
+            for (let row = start_row; row <= end_row; row++) {
+                const key = this.get_key(col, row);
                 if (!this.cells[key]) this.cells[key] = [];
                 this.cells[key].push(entity);
             }
         }
-    },  
-    
+    },
+
+    /**
+     * Retrieves all unique entities within the cells covered by the rect.
+     * @returns {Set<Object>} A unique set of entities.
+     */
     get_entities_in_rect(rect) {
         const found_entities = new Set();
-        // Loop through cells covered by the rect
-        for (let x = rect.left; x < rect.right + this.cell_size; x += this.cell_size) {
-            for (let y = rect.top; y < rect.bottom + this.cell_size; y += this.cell_size) {
-                const key = this.get_key(x, y);
-                const cell = this.cells[key];
+        
+        const start_col = Math.floor(rect.left / this.cell_size);
+        const end_col = Math.floor(rect.right / this.cell_size);
+        const start_row = Math.floor(rect.top / this.cell_size);
+        const end_row = Math.floor(rect.bottom / this.cell_size);
+
+        for (let col = start_col; col <= end_col; col++) {
+            for (let row = start_row; row <= end_row; row++) {
+                const cell = this.cells[this.get_key(col, row)];
                 if (cell) {
-                    cell.forEach(entity => found_entities.add(entity));
+                    for (let i = 0; i < cell.length; i++) {
+                        found_entities.add(cell[i]);
+                    }
                 }
             }
         }
@@ -39,75 +67,61 @@ const SPATIAL_GRID = {
     }
 };
 
+/**
+ * High-level orchestrator to rebuild the grid every frame.
+ * Only inserts entities relevant to the current game state.
+ */
 function rebuild_spatial_hash() {
     SPATIAL_GRID.clear();
 
-    // 1. Array of all pools that need to be in the grid
-    const entity_pools = [
-        base_level_entities.bazis_shots,
-        base_level_entities.homing_missiles,
-        base_level_entities.tracking_lazers,
-        base_level_entities.enemy_ships,
-        base_level_entities.enemy_shots,
-        boss_level_entities.boss_shots,       
-    ];
+    //  Player is always relevant
+    if (is_entity_valid(base_level_entities.bazis)) {
+        SPATIAL_GRID.insert(base_level_entities.bazis);
+        insert_active_pool_to_grid(base_level_entities.bazis_shots);
+    }
 
-    const solo_entities = [
-        base_level_entities.bazis,
-        base_level_entities.bounty,
-        boss_level_entities.asteroid,
-        boss_level_entities.boss
-    ];
+    //  Traffic State: standard combat
+    if (game_data.game_states.traffic_flag) {
+        insert_active_pool_to_grid(base_level_entities.enemy_ships);
+        insert_active_pool_to_grid(base_level_entities.enemy_shots);
+        
+    }
 
-    // 2. Single pass to insert all active entities
-    entity_pools.forEach(pool => {
-        if (!pool) return;
-        pool.forEach(entity => {
-            if (entity.is_active && is_entity_valid(entity)) {
-                SPATIAL_GRID.insert(entity);
-            }
-        });
-    });
-    solo_entities.forEach(entity => {
-        if (is_entity_valid(entity) ) {           
-            SPATIAL_GRID.insert(entity);           
+    //  Bounty State
+    if (game_data.game_states.bounty_flag) {
+        if (is_entity_valid(base_level_entities.bounty)) SPATIAL_GRID.insert(base_level_entities.bounty);
+        if (is_entity_valid(base_level_entities.powerup)) SPATIAL_GRID.insert(base_level_entities.powerup);
+    }
+
+    //  Boss State
+    if (game_data.game_states.boss_flag) {
+        if (is_entity_valid(boss_level_entities.boss)){
+            boss_data = boss_level_entities.boss;
+            const { EMP_STRIKE_ZONE_X_PX, EMP_STRIKE_ZONE_Y_PX } = COLLISION_CONFIG;
+            const influence_rect = {
+                left: boss_data.rect.left - EMP_STRIKE_ZONE_X_PX,
+                right: boss_data.rect.right + EMP_STRIKE_ZONE_X_PX,
+                top: boss_data.rect.top - EMP_STRIKE_ZONE_Y_PX,
+                bottom: boss_data.rect.bottom + EMP_STRIKE_ZONE_Y_PX,
+                width: boss_data.rect.width + (EMP_STRIKE_ZONE_X_PX * 2),
+                height: boss_data.rect.height + (EMP_STRIKE_ZONE_Y_PX * 2)
+            };
+            SPATIAL_GRID.insert(boss_data, influence_rect);
         }
-        });
+        if (is_entity_valid(boss_level_entities.asteroid)) SPATIAL_GRID.insert(boss_level_entities.asteroid);
+        insert_active_pool_to_grid(boss_level_entities.boss_shots);
+    }
 }
 
-
-// js
-// /**
-//  * Fast clear for the Spatial Grid. 
-//  * Reuses the top-level objects to avoid memory allocations.
-//  */
-// function clear_spatial_grid() {
-//     // Assuming SPATIAL_GRID.buckets is an object or Map
-//     for (const key in SPATIAL_GRID.buckets) {
-//         // Option A: Just empty the array (Preserves the array object)
-//         SPATIAL_GRID.buckets[key].length = 0;
-        
-//         // Option B: If the bucket is empty for a while, delete it to save memory
-//         // delete SPATIAL_GRID.buckets[key]; 
-//     }
-// }
-
-// js
-// function rebuild_spatial_hash() {
-//     clear_spatial_grid();
-
-//     // 1. Always track the player
-//     SPATIAL_GRID.insert(base_level_entities.bazis);
-
-//     // 2. Only insert enemies/shots if traffic is active
-//     if (game_data.game_states.traffic_flag) {
-//         insert_pool_to_grid(pool_state.pools.enemy_pool);
-//         insert_pool_to_grid(pool_state.pools.enemy_shot_pool);
-//     }
-
-//     // 3. Only insert boss/asteroids if boss flag is active
-//     if (game_data.game_states.boss_flag) {
-//         SPATIAL_GRID.insert(boss_level_entities.boss);
-//         SPATIAL_GRID.insert(boss_level_entities.asteroid);
-//     }
-// }
+/**
+ * Helper to filter and insert active entities from a pool.
+ */
+function insert_active_pool_to_grid(pool) {
+    if (!pool) return;
+    for (let i = 0; i < pool.length; i++) {
+        const entity = pool[i];
+        if (entity.is_active && is_entity_valid(entity)) {
+            SPATIAL_GRID.insert(entity);
+        }
+    }
+}

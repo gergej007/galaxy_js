@@ -18,7 +18,7 @@ function select_actual_powerup() {
  * Uses a data-driven action map for better scalability.
  * @param {Object} powerup_data - The power-up data object from base_level_entities.
  */
-    function pick_up_powerup(powerup_data) {    
+    function pick_up_powerup(powerup_data) {            
         audio_play(POWERUP_SPAWN_CONFIG.AUDIO_KEY);        
         
         const powerup_actions = {

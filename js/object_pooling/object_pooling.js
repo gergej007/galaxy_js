@@ -66,9 +66,7 @@ function initialize_generic_pool(pool, factory, target_size, type, props) {
 
     //  Selective Reset: Only reset items NOT currently in use
     pool.forEach(item => {
-        if (item.is_active) {
-            // If the entity is currently on screen, do NOT hide it or reset it.
-            // It will be reset the next time it is retrieved from the pool.
+        if (item.is_active) {           
             return; 
         }
 

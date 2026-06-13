@@ -12,7 +12,6 @@ function primary_game_loop(timestamp) {
     update_all_entity_positions(); 
     //  Hash
     rebuild_spatial_hash();
-
     //  Interaction  
     handle_active_collisions();
 
@@ -36,61 +35,22 @@ function update_all_entity_positions() {
  * based on the current game state flags.
  */
 function handle_active_collisions() {
-    if (game_data.game_states.traffic_flag) {
-        handle_base_level_collisions();
+    const bazis = base_level_entities.bazis;
+    if (is_entity_valid(bazis)) {
+        // Broad Phase: Find everyone near the player
+        const nearby = SPATIAL_GRID.get_entities_in_rect(bazis.rect);
+        
+        // Narrow Phase: Handle damage, crashes, and powerups
+        resolve_bazis_interactions(bazis, nearby);
     }
-    
-    if (game_data.game_states.bounty_flag) {
-        handle_bounty_system_collisions();
-    }
+    dispatch_collisions(base_level_entities.bazis_shots, resolve_bazis_shot_interactions);
+
+    if (game_data.game_states.traffic_flag ) {
+        dispatch_collisions(base_level_entities.enemy_shots, resolve_enemy_shot_interactions);
+        dispatch_collisions(base_level_entities.enemy_ships, resolve_enemy_ship_interactions);
+    }    
 
     if (game_data.game_states.boss_flag) {
-        handle_boss_level_collisions();
+        dispatch_collisions(boss_level_entities.boss_shots, resolve_boss_shot_interactions);
     }
 }
-
-/**
- * Orchestrates all collision detection logic for the base game level.
- * Handles interactions between the player (Bazis), standard enemies, and their respective projectiles.
- * Includes a conditional check for enemy-on-enemy projectile hits based on current level AI.
- */
-function handle_base_level_collisions() {
-    bazis_enemy_shots_collision_detection();
-    bazis_enemy_collision_detection();
-    bazis_shot_enemy_shot_collision_detection();
-    bazis_shots_enemy_collision_detection();
-    enemy_enemy_collision_detection();
-    if (game_data.levels.act_level < GAME_CONSTANTS.ENEMY_AI_LEVEL) {
-        enemy_shots_enemy_collision_detection();
-    }
-}
-
-/**
- * Manages collision detection for the bounty system.
- * Handles interactions between the player (Bazis), enemies, and containers, 
- * as well as powerup collection by the player.
- */
-function handle_bounty_system_collisions() {
-    bazis_container_collision();
-    enemy_shots_container_collision_detection();
-    bazis_shots_container_collision_detection();
-    bazis_powerup_collision_detection();
-}
-
-/**
- * Orchestrates all collision detection logic for the boss encounter.
- * Handles interactions between the player (Bazis), the boss, their respective projectiles,
- * and environmental hazards like asteroids.
- */
-function handle_boss_level_collisions() {
-    bazis_shots_boss_collision_detection();
-    boss_shots_bazis_collision_detection();
-    boss_bazis_collision_detection();
-    boss_shot_bazis_shot_collision_detection();
-
-    asteroid_bazis_collision_detection();
-    asteroid_bazis_shots_collision_detection();
-    asteroid_boss_shots_collision_detection();
-}
-
-
