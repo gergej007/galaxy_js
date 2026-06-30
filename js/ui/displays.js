@@ -23,12 +23,12 @@ function initalize_displays() {
  * Initializes the static structure (labels and images) only once.
  */
 function update_left_display() {
-    const { hp, lives } = base_level_entities.bazis;
+    const { hp, lives, critical_hp } = base_level_entities.bazis;
     const { a_bomb } = game_data.counters;
     const display = displays.left_display;
     const display_element = displays.left_display.element;
 
-    const { HP, LIVES, ATOMIC, DIFF_COLOR} = UI_CONFIG.HUD.LEFT.VALUE_CLASSES;
+    const { HP, LIVES, ATOMIC, DIFF_COLOR, HP_CRITICAL} = UI_CONFIG.HUD.LEFT.VALUE_CLASSES;
     const { URL, WRAPPER_CLASS, IMG_CLASS, TXT_CLASS} = UI_CONFIG.HUD.LEFT.IMAGE;
 
     if (!display_element) {
@@ -57,6 +57,8 @@ function update_left_display() {
     display.hp_val.text(hp);
     display.lives_val.text(lives);
     display.atomic_val.text(`: ${a_bomb}`);
+
+    display.hp_val.toggleClass(HP_CRITICAL, hp <= critical_hp);
 }
 
 /**
@@ -110,12 +112,12 @@ function update_center_display(txt) {
     // Animation Start
     $text.addClass(POP);
     
-    // 2. Schedule Exit: 800ms + 1500ms
+    //  Schedule Exit: 800ms + 1500ms
     setTimeout(() => {
         if ($text.parent().length > 0) { 
             $text.addClass(EXIT);
             
-            // 3. Final Cleanup
+            //  Final Cleanup
             setTimeout(() => {
                 $container.empty();
             }, DURATION); 
@@ -190,17 +192,17 @@ function handle_victory_display(text) {
 
     const { DATA_KEY, METHOD_DESTROY, TEXT_CLASS, LIFE_BONUS_DELAY} = UI_CONFIG.HUD.CENTER.VICTORY;
 
-    // 1. Cleanup Health Bar
+    //  Cleanup Health Bar
     if (bar_instance && $container.data(DATA_KEY)) {
         $container.progressbar(METHOD_DESTROY);
         displays.progress_bar.instance = null;
     }
     
-    // 2. Inject Animated Text
+    //  Inject Animated Text
     $container.stop(true, true).empty();
     $(`<span class="${TEXT_CLASS}">${text}</span>`).appendTo($container);
 
-    // 3. Chain Bonus Calculation
+    //  Bonus Calculation
     setTimeout(() => {
         check_for_life_bonus();
     }, LIFE_BONUS_DELAY);
@@ -232,9 +234,12 @@ async function check_for_life_bonus() {
             
     const lifebonus = (base_level_entities.bazis.lives - 1) * BONUS_SCORE_PER_LIFE;
     game_data.counters.score += lifebonus;
-    const $container = displays.center_display.element.empty();
+    
+    const $container = displays.center_display.element;
             
     await new Promise(resolve => setTimeout(resolve, INITIAL_DELAY));
+    
+    $container.empty();
     
     $(`<div class='${CONTAINER_CLASS}'>Life bonus :</div>`).appendTo($container);
     const $center_display = $(`<div class='${BONUS_CLASS}'>0</div>`).appendTo($container);

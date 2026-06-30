@@ -4,14 +4,9 @@ const BAZIS_CONFIG = {
         BAZIS_IMG_CLASS: 'bazis_img',
         BAZIS_IMG_SRC: 'bazis.png'
     },
-    ACTIONS: {
-        /*MOVE_UP: 'ArrowUp',
-        MOVE_DOWN: 'ArrowDown',
-        MOVE_LEFT: 'ArrowLeft',
-        MOVE_RIGHT: 'ArrowRight',
-        SPACEBAR: ' ',
-        A_BOMB: 'Alt',*/
-        MOTION_DISTANCE_PX: 8
+    ACTIONS: {      
+        MOTION_DISTANCE_PX: 8,
+        HP_RESTORE_VALUE: 4,
     },  
     DAMAGE: {
         GAME_OVER_TEXT: "Game Over",

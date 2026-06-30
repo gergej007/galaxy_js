@@ -1,4 +1,3 @@
-
 /*  --- START PANEL ---  */
 /**
  * Initializes and displays the main menu or pause dialog.
@@ -18,7 +17,7 @@
  * @global {Object} displays - Accesses center_display for status messages.
  */                                                     
 function show_start_panel() {
-    // 1. Update Game State
+    //  Update Game State
     game_data.game_states.dialog_flag = true;
     game_data.game_states.traffic_flag = false;
     stop_base_level_enemies();
@@ -26,13 +25,13 @@ function show_start_panel() {
     const { WIDTH, HEIGHT, MODAL, DRAGGABLE, RESIZABLE} = UI_CONFIG.DIALOGS.COMMON;
     const { TITLE, CLASS, SECONDARY_COLOR} = UI_CONFIG.DIALOGS.START;
 
-    // 2. Create/Reference Element
+    //  Create/Reference Element
     if (!dialogs.start_panel.element) {
         dialogs.start_panel.element = $(`<div class='${CLASS}'>`);
     }
     const $panel = dialogs.start_panel.element;
 
-    // 3. Initialize jQuery UI Dialog
+    //  Initialize jQuery UI Dialog
     $panel.dialog({
         title: TITLE,
         resizable: RESIZABLE,

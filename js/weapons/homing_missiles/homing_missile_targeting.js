@@ -62,9 +62,9 @@ function missile_target_lock( {missile_data, mid_line, target_left_bound, target
     const { HORIZONTAL_TARGETING_DEAD_ZONE, RIGHT_MISSILE_SIDE, LEFT_MISSILE_SIDE} = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.TARGETING;
     let search_conditions;  
     
-    if(missile_data.parent_side === RIGHT_MISSILE_SIDE){
+    if(missile_data.parent_side === RIGHT_MISSILE_SIDE) {
         search_conditions = {
-            left_bound :  mid_line - HORIZONTAL_TARGETING_DEAD_ZONE,
+            left_bound :  mid_line  + HORIZONTAL_TARGETING_DEAD_ZONE ,
             right_bound : target_right_bound ,
             bottom_bound : target_bottom_bound 
         };
@@ -72,7 +72,7 @@ function missile_target_lock( {missile_data, mid_line, target_left_bound, target
     else if(missile_data.parent_side === LEFT_MISSILE_SIDE) {
         search_conditions = {
             left_bound : target_left_bound ,
-            right_bound : mid_line + HORIZONTAL_TARGETING_DEAD_ZONE,                 
+            right_bound : mid_line  - HORIZONTAL_TARGETING_DEAD_ZONE ,                 
             bottom_bound : target_bottom_bound
         };                                               
     }         
@@ -85,76 +85,54 @@ function missile_target_lock( {missile_data, mid_line, target_left_bound, target
     return final_enemy_data;
 }
 
-
 /**
- * Searches through all active enemy ships to find a suitable target based on
- * provided conditions. It performs a two-pass search:
- * 1. First Pass: Attempts to find an enemy that matches the given targeting conditions
- *    (positional bounds, not locked, and optionally matching the missile's direction).
- * 2. Second Pass (Fallback): If no specific target is found, it looks for any
- *    unlocked enemy currently in the game.
- *
- * Once a target is found, it is marked as 'locked' to prevent other missiles
- * from targeting the same enemy.
- *
- * @param {object} targeting_conditions - An object defining the spatial boundaries for the target search.
- *   - `left_bound {number}`: The absolute X-coordinate of the leftmost edge of the search area.
- *   - `right_bound {number}`: The absolute X-coordinate of the rightmost edge of the search area.
- *   - `bottom_bound {number}`: The absolute Y-coordinate of the lower boundary of the search area. Enemies must be above this line. 
- * @returns {object|null} The data object for the found enemy target, or `null` if no suitable target is found.
- *   This object is expected to contain `element` (jQueryObject) and `rect` (DOMRect) properties, and an `is_active` flag.
+ * Selects a suitable enemy target for a homing missile using iterative search passes.
+ * 
+ * Logic flow:
+ * 1. Checks active enemies against current spatial boundaries.
+ * 2. Skips entities already locked by other projectiles to ensure target variety.
+ * 3. If no target is found, expands the search radius and retries up to a maximum limit.
+ * 4. Marks the successful target with a 'locked' class to prevent double-targeting.
+ * 
+ * @param {Object} targeting_conditions - Spatial bounds for acquisition {left_bound, right_bound, bottom_bound}.
+ * @returns {Object|null} The data object of the acquired enemy ship, or null if all attempts fail.
  */
-function target_selector( targeting_conditions ) {   
-   
-    let found_enemy_data = null;        
-    
-    const locked_target_class = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.TARGETING.TARGET_LOCKED_CLASS;
-    const all_enemy_data_objects = base_level_entities.enemy_ships;        
-    
-    for (let i = 0; i < all_enemy_data_objects.length; i++) {    
-            const enemy_data = all_enemy_data_objects[i];        
-        
-        if (!enemy_data.is_active || !is_entity_valid(enemy_data) ) {
-            continue; 
-        }
+function target_selector(targeting_conditions) {
+    let found_enemy_data = null;
+    let targeting_attempts = 0;  
 
-        const enemy_element = enemy_data.element; 
-        const enemy_rect = enemy_data.rect;              
-            
-        if (
-               enemy_rect.left >= targeting_conditions.left_bound
-            && enemy_rect.right <= targeting_conditions.right_bound         
-            && enemy_rect.bottom < targeting_conditions.bottom_bound
-            && !enemy_element.hasClass(locked_target_class)            
-        ) {           
-            found_enemy_data = enemy_data;  
-            enemy_element.addClass(locked_target_class);         
-            break; 
-        }
-    }
-    
-    if (!found_enemy_data) {
-        
-        for (let i = 0; i < all_enemy_data_objects.length; i++) {
-            const enemy_data = all_enemy_data_objects[i];
-           
-            if (!enemy_data.is_active || !is_entity_valid(enemy_data) ) {
-                continue; 
-            }
+    const { TARGET_LOCKED_CLASS, MAX_ATTEMPTS, EXPAND_SEARCH_AREA_PX } = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.TARGETING;
+    const all_enemies = base_level_entities.enemy_ships;
 
-            const enemy_element = $(enemy_data.element);
+    while (targeting_attempts < MAX_ATTEMPTS && !found_enemy_data) {
+        for (let i = 0; i < all_enemies.length; i++) {
+            const enemy_data = all_enemies[i];
 
-            if (!enemy_element.hasClass(locked_target_class)) {
-               
+            if (!enemy_data.is_active || !is_entity_valid(enemy_data)) continue;
+
+            const $el = enemy_data.element;
+            const rect = enemy_data.rect;
+
+            // Targeting Logic
+            const is_in_bounds = rect.left >= targeting_conditions.left_bound &&
+                                 rect.right <= targeting_conditions.right_bound &&
+                                 rect.bottom < targeting_conditions.bottom_bound;
+
+            if (is_in_bounds && !$el.hasClass(TARGET_LOCKED_CLASS)) {
                 found_enemy_data = enemy_data;
-                enemy_element.addClass(locked_target_class);             
+                $el.addClass(TARGET_LOCKED_CLASS);
                 break; 
             }
         }
-    }         
-    if ( !found_enemy_data) {
-        return null;
+        
+        targeting_attempts++;
+        
+        // If no target found, expand search bounds for the next attempt
+        if (!found_enemy_data) {
+            targeting_conditions.left_bound -= EXPAND_SEARCH_AREA_PX;
+            targeting_conditions.right_bound += EXPAND_SEARCH_AREA_PX;
+        }
     }
-    return found_enemy_data;         
-}  
 
+    return found_enemy_data;  
+}

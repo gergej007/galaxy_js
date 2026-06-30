@@ -42,7 +42,14 @@ function kill_target_obj( missile_data, target_enemy_data ) {
 }
 
 /**
- * Animates the missile toward a specific target and handles the impact logic.
+ * Executes the homing missile animation and handles impact logic.
+ * Triggers enemy destruction if the target is still active upon arrival,
+ * otherwise destroys the missile itself.
+ * 
+ * @param {Object} missile_data - The data object for the active missile.
+ * @param {Object|null} target_enemy_data - The data object for the targeted enemy.
+ * @param {Object} final_pos - The destination coordinates {x, y}.
+ * @param {number} speed - The duration of the flight animation in milliseconds.
  */
 function animate_missile_attack(missile_data, target_enemy_data, final_pos, speed) {
     const { TARGET_LOCKED_CLASS } = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.TARGETING;
@@ -66,7 +73,10 @@ function animate_missile_attack(missile_data, target_enemy_data, final_pos, spee
 }
 
 /**
- * Animates a missile to fly off-screen if its target is lost.
+ * Animates a missile off-screen when no valid target is available 
+ * and returns it to the object pool upon completion.
+ * 
+ * @param {Object} missile_data - The data object for the active missile.
  */
 function animate_missile_off_screen(missile_data) {
     const { NO_TARGET_ANIM_TOP, NO_TARGET_ANIM_DURATION } = SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.TARGETING;
@@ -92,9 +102,9 @@ function animate_missile_off_screen(missile_data) {
  *   - `lead_point`: The calculated horizontal offset (in pixels) for the missile to aim for.
  *   - `missile_speed_value`: The estimated flight duration (in milliseconds) for the missile to reach the target.
  */
-function get_missile_speed_lead_point( missile_data, target_data)
-{    
-    if( !target_data || !target_data.rect || !missile_data || !missile_data.rect) {
+function get_missile_speed_lead_point( missile_data, target_data) {
+      
+    if( !is_entity_valid(target_data) || !is_entity_valid(missile_data)) {
         console.warn("Missile lead point and speed calculation failed due to invalid data!");
         return;
     }       

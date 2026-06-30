@@ -130,21 +130,23 @@ const SECONDARY_WEAPONS_CONFIG = {                 // --- Secondary weapon syste
             LAUNCH_PREPARE_DELAY: 1300,
         },                                           // targeting
         TARGETING: {
-            HORIZONTAL_BOUND_FACTOR: 0.30,
-            BOTTOM_BOUND_PX: 100,
+            HORIZONTAL_BOUND_FACTOR: 0.25,
+            BOTTOM_BOUND_PX: 130,
             NO_TARGET_ANIM_TOP: -30,
             NO_TARGET_ANIM_DURATION: 1000,
             HORIZONTAL_TARGETING_DEAD_ZONE: 50,
             RIGHT_MISSILE_SIDE: 'right_missile',                                 
             LEFT_MISSILE_SIDE: 'left_missile',                                 
             TARGET_LOCKED_CLASS: 'locked',
+            MAX_ATTEMPTS: 3,
+            EXPAND_SEARCH_AREA_PX: 100
         },                                           // impact
         IMPACT: {
             AUDIO_KEY: '#missile_launch1',
             IGNITION_IMG_SRC: 'missile_fire1.png',
             IGNITION_IMG_CLASS: 'missile_fire_img',
             VERTICAL_IMPACT_OFFSET_PX: 20,
-            ANIMATION_EASING: 'linear',
+            ANIMATION_EASING: 'easeInQuad',
             MILLISECONDS_PER_SECOND: 1000,
             WINDOW_WIDTH_SPEED_FACTOR: 4.8,
             SQUARE_EXPONENT: 2,
@@ -166,7 +168,7 @@ const SECONDARY_WEAPONS_CONFIG = {                 // --- Secondary weapon syste
         TARGET_HORIZONTAL_BOUND_PX: 180,
 
         MOVING_SPAWN_MULTIPLIER: 2.8,
-        LINE_THICKNESS_PX: 3,
+        LINE_THICKNESS_PX: 4,
         DEGREES_PER_RADIAN: 180
     },
     A_BOMB: {
@@ -192,7 +194,7 @@ const SECONDARY_WEAPONS_CONFIG = {                 // --- Secondary weapon syste
         SCREEN_SHAKE_DURATION: 800        
     },
     GOD_MODE: {
-        DURATION_MS: 90000, 
+        DURATION_MS: 100000, 
         BAZIS_IMG_NORMAL_SRC: 'kepek/bazis.png', 
         BAZIS_IMG_GOD_MODE_SRC: 'kepek/bounties/god_mode.png', 
         AUDIO_ACTIVATE_KEY: '#powerdwn1' 

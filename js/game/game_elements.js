@@ -7,8 +7,8 @@ const boss_level_entities = {
 }
 
 const base_level_entities = {
-    bazis : { element: null, rect: null, img_element: null, lives: 3, hp: 99, max_hp: 99, damage: 25, 
-              is_exploding: false, is_colliding: false, type: GAME_ENTITY_TYPES.BAZIS},
+    bazis : { element: null, rect: null, img_element: null, lives: 3, hp: 99, max_hp: 99, critical_hp: 25,
+              damage: 25, is_exploding: false, is_colliding: false, type: GAME_ENTITY_TYPES.BAZIS},
     bounty : { element: null, rect: null, type: GAME_ENTITY_TYPES.BOUNTY, direction: null, hp: 100, max_hp: 100, damage: 5 },
     hp_indicator: { element: null, fill: null},
     powerup : { element: null, rect: null, level: 0, type: null, timer: null, type: null },
@@ -33,7 +33,8 @@ const dialogs = {
 
 const game_data = {
     counters : { enemies: 0, killed: 0, score: 0, a_bomb: 3},    
-    game_states : { traffic_flag: true, boss_flag: false, exit_flag: false, dialog_flag: true, bounty_flag: false},
+    game_states : { traffic_flag: true, boss_flag: false, exit_flag: false, dialog_flag: true, 
+                    input_lock: false, bounty_flag: false},
     limits : { boss_limit: GAME_CONSTANTS.BOSS_LIMIT, 
                bounty_limit: GAME_CONSTANTS.INITIAL_BOUNTY_LIMIT, 
                act_limit: GAME_CONSTANTS.INITIAL_LEVEL_UP_SCORE },

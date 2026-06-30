@@ -53,7 +53,7 @@ function get_active_primary_weapon_type() {
     if (weapons.flags.standard_shot) {
         return STANDARD_SHOT;
     }
-    return NONE; // No primary weapon active
+    return NONE;
 }
  
 
@@ -68,19 +68,18 @@ function get_active_primary_weapon_type() {
 async function fire_bazis_shots_orchestrator(launch_specific_shot_callback, shots_per_launch) {
    
     const bazis = base_level_entities.bazis;
-    if (!is_entity_valid(base_level_entities.bazis)) {
+    if (!is_entity_valid(bazis)) {
         console.warn("Bazis element not found for shooting.");
         return;                                                              
     }
 
-    if (!bazis.rect) {
+    const bazis_rect = bazis.rect;
+    if (!bazis_rect) {
         console.warn("Bazis rect not initialized yet. Skipping shot.");
         return; 
-    }
+    }     
 
-    const bazis_rect = bazis.rect; 
-
-    // 3. Active Shots Count and Limit Check (adjusted for shots_per_burst)
+    //  Active Shots Count and Limit Check (adjusted for shots_per_burst)
     const MAX_ACTIVE_BAZIS_SHOTS = current_level_config.max_shots_ammount;     // From game_config.js
     const { bazis_shot_pool } = pool_state.pools;
     const active_bazis_shots_count = bazis_shot_pool.filter(shot => shot.is_active).length;
@@ -91,9 +90,9 @@ async function fire_bazis_shots_orchestrator(launch_specific_shot_callback, shot
         return;
     }
 
-    const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms)); // 4. timeout Promise Helper
+    const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms)); 
 
-    // 5. bazis_shot_repeat Loop Structure
+    //  bazis_shot_repeat Loop Structure
     for (let i = 0; i < current_level_config.bazis_shot_repeat; i++) {
         // Execute the specific shot launching logic provided by the callback
         await launch_specific_shot_callback(bazis_rect, i); // Pass bazis_rect and loop index to callback

@@ -23,6 +23,7 @@ const UI_CONFIG = {
             READ_URL: "modulok/read_high_scores.php",
             SAVE_URL: "modulok/save_high_scores.php",            
             MAX_RECORDS: 10,
+            KEY_LOCK_DURATION: 3000,
 
             TEMPLATE_CLASSES: {
                 DATA_SCORE: "score",
@@ -60,7 +61,9 @@ const UI_CONFIG = {
     HUD: {
         LEFT: {
             SELECTOR: ".player_display",
-            VALUE_CLASSES: { HP: "hp_val", LIVES: "lives_val", ATOMIC: "atomic_val", DIFF_COLOR: 'different_dsp_color' },
+            CRITICAL_HP: "rgb(255, 24, 24)",
+            VALUE_CLASSES: { HP: "hp_val", LIVES: "lives_val", ATOMIC: "atomic_val", 
+                             DIFF_COLOR: 'different_dsp_color', HP_CRITICAL: 'hp_critical' },
             IMAGE: { URL: 'kepek/atomic.png',WRAPPER_CLASS: 'atomic_wrapper', IMG_CLASS: 'atomic', TXT_CLASS: 'atomic_felirat' }
         },
         RIGHT: {
@@ -74,7 +77,7 @@ const UI_CONFIG = {
             ANIMATION: { DELAY: 1500, DURATION: 800 },
             CLASSES: { MAIN: "ui-pop-text" ,POP: "animate-pop", EXIT: "animate-exit", STATIC: "progress_frame_static_text" },
             VICTORY: { TEXT: 'VICTORY!', TEXT_CLASS: "victory-text-animate", DATA_KEY: "ui-progressbar", METHOD_DESTROY: "destroy",
-                       LIFE_BONUS_DELAY: 1500 },
+                       LIFE_BONUS_DELAY: 1600 },
             LIFE_BONUS: { CONTAINER_CLASS: 'life_display', BONUS_CLASS: 'bonus_display',
                           INITIAL_DELAY: 3500, TICK_RATE: 35, BONUS_SCORE_PER_LIFE: 5000, COUNTER_INCREMENT: 100}           
         }

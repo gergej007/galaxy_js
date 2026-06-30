@@ -1,19 +1,17 @@
 Requirements:
+    To run Galaxy Js, Apache Server or similar must be run on your computer.
+    Run Galaxy Js via localhost in your browser.
 
-To run Galaxy Js, apache server must be installed on your computer
-Run Galaxy Js via localhost in Chrome browser
-
-Supported browser: Google Chrome
-Recommended screen resolution: 1920 * 1080 (tested) up to 4K
-Memory usage ~
+    Recommended browser: Google Chrome
+    Recommended screen resolution: 1920 * 1080 
 
 Controls:
     keyboard:
         fire: Space,
-        move left: left-arrow,
-        move right: right-arrow,
-        move up: up-arrow,
-        move down: right-down,
+        move left: Left-Arrow,
+        move right: Right-Arrow,
+        move up: Up-Arrow,
+        move down: Down-Arrow,
         launch A-bomb: Alt / AltGr
 
         toggle fullscreen: F11,
@@ -36,12 +34,12 @@ Game rules:
 
     Enjoy! 
 
-    Music and inspiration from: 
-        Raptor: Call of the Shadows (1994)
+Music and inspiration from: 
+    Raptor: Call of the Shadows (1994)
 
 key technologies and patterns: 
-     Spatial Partitioning, Object Pooling,  Axis-Aligned Bounding Box (AABB), High-Performance Game Loop,
-     Input Polling, Adaptive Shuffle Bag, Optional Chaining, Spread Syntax, Destructuring Assignment, Arrow Functions, DOM-Based Rendering,
-     Finite State Machine (FSM), Data-Driven Design,  Pure Utility Functions, State Synchronizers,
-     Lifecycle Managers, Orchestrator Functions, Validation Guards, Recursive Schedulers,
-     jQuery & jQuery UI, jQuery Animation, AJAX, HTML5 Templates
+    Spatial Partitioning, Object Pooling,  Axis-Aligned Bounding Box (AABB), High-Performance Game Loop,
+    Input Polling, Adaptive Shuffle Bag, Optional Chaining, Spread Syntax, Destructuring Assignment, Arrow Functions, 
+    DOM-Based Rendering, Finite State Machine (FSM), Data-Driven Design,  Pure Utility Functions, 
+    State Synchronizers, Lifecycle Managers, Orchestrator Functions, Validation Guards, Recursive Schedulers,
+    jQuery & jQuery UI, jQuery Animation, AJAX, HTML5 Templates

@@ -22,11 +22,11 @@ const SPATIAL_GRID = {
     /**
      * Inserts an entity into every cell its bounding box overlaps.
      */
-    insert(entity,  override_rect = null) {                            // Coordinate mapping
+    insert(entity,  override_rect = null) {                            
         const rect = override_rect || entity.rect;
         if (!rect || rect.width === 0) return;
 
-        // Calculate index ranges instead of pixel steps
+        // Calculate index ranges 
         const start_col = Math.floor(rect.left / this.cell_size);
         const end_col = Math.floor(rect.right / this.cell_size);
         const start_row = Math.floor(rect.top / this.cell_size);

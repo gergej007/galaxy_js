@@ -12,22 +12,28 @@
  *
  * @returns {void}
  */
-function god_mode(){
-    
+function god_mode() {
     const { DURATION_MS, BAZIS_IMG_NORMAL_SRC, BAZIS_IMG_GOD_MODE_SRC } = SECONDARY_WEAPONS_CONFIG.GOD_MODE;
-
-    weapons.flags.god_mode = true;
     const bazis_data = base_level_entities.bazis;
 
-    if( !bazis_data || !bazis_data.img_element || bazis_data.img_element.length === 0){
-        console.warn("God mode cancelled due to invalid bazis data!");
-        return;
-    }
+    if (!bazis_data?.img_element?.length) return;
 
-    bazis_data.img_element.attr("src", BAZIS_IMG_GOD_MODE_SRC);
-   
-    setTimeout(() => {
-        weapons.flags.god_mode = false;
-        bazis_data.img_element.attr("src", BAZIS_IMG_NORMAL_SRC);        
-    }, DURATION_MS);
+    const god_mode_img = new Image();
+    
+    god_mode_img.onload = function() {
+        
+        weapons.flags.god_mode = true;
+        bazis_data.img_element.attr("src", BAZIS_IMG_GOD_MODE_SRC);
+
+        setTimeout(() => {
+            weapons.flags.god_mode = false;
+            bazis_data.img_element.attr("src", BAZIS_IMG_NORMAL_SRC);
+        }, DURATION_MS);
+    };
+
+    god_mode_img.onerror = function() {
+        console.error(`God Mode failed: Image not found at ${BAZIS_IMG_GOD_MODE_SRC}`);
+    };
+
+    god_mode_img.src = BAZIS_IMG_GOD_MODE_SRC;
 }

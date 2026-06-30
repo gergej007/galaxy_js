@@ -141,8 +141,8 @@ function bazis_explode(bazis_data) {
  * @see {@link show_scores_table} For the final UI transition.
  */
 function bazis_dies(bazis_data) {
-    if(!is_entity_valid(bazis_data)) return;
-
+    if(!is_entity_valid(bazis_data)) return;            
+    
     bazis_data.hp = 0;  
     bazis_data.lives = 0;      
     score_dependent_fns();
@@ -151,7 +151,7 @@ function bazis_dies(bazis_data) {
     bazis_data.element.remove();
     bazis_data.element = null;
 
-    game_data.game_states.traffic_flag = false;
+    game_data.game_states.traffic_flag = false;    
 
     audio_stop(AUDIO_CONFIG.TRACKS.MAIN);
     audio_play(AUDIO_CONFIG.TRACKS.DEATH);
@@ -180,6 +180,9 @@ function bazis_dies(bazis_data) {
  * @see {@link bazis_reset} For the respawn logic.
  */
 function bazis_use_next_life(bazis_data) {
+    if(weapons.homing_missile) {
+        abort_missile_launch();
+    }
     bazis_data.lives--;
     bazis_data.hp = bazis_data.max_hp;
     score_dependent_fns();

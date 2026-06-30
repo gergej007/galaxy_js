@@ -1,4 +1,3 @@
-
 /* --- SCORE PANEL --- */
 /**
  * Initializes and displays the final high score leaderboard dialog.
@@ -22,6 +21,7 @@ function show_scores_table(){
     }
     
     const {  WIDTH, HEIGHT, MODAL, DRAGGABLE, RESIZABLE } = UI_CONFIG.DIALOGS.COMMON;
+    const { KEY_LOCK_DURATION} = UI_CONFIG.DIALOGS.SCORE;
     const score_panel = dialogs.score_panel;
     score_panel.element.dialog({
         title: UI_CONFIG.DIALOGS.SCORE.TITLE,
@@ -36,7 +36,12 @@ function show_scores_table(){
             load_template(score_panel);
             game_data.game_states.dialog_flag = true;     
             game_data.game_states.exit_flag = true;   
-            game_data.game_states.traffic_flag = false;  
+            game_data.game_states.traffic_flag = false; 
+            game_data.game_states.input_lock = true;
+            
+            setTimeout(() => {
+                game_data.game_states.input_lock = false;
+            }, KEY_LOCK_DURATION);
         }
     });
 }
@@ -95,7 +100,7 @@ function render_high_scores(response, tempobj, $dialog) {
     const $target = $(`.${UI_CONFIG.DIALOGS.SCORE.CLASS}`);
     const max_records = UI_CONFIG.DIALOGS.SCORE.MAX_RECORDS;
 
-    // 1. Render existing scores from server
+    //  Render existing scores from server
     response.forEach((item) => {
         const $row = tempobj.find(`.${ROW}`).clone(true, true);
         $row.data(DATA_SCORE, parseInt(item.score));
@@ -276,9 +281,10 @@ function close_scores_dialog(score_panel_element) {
         if (e.key === RESUME) {
             e.preventDefault(); 
             
-            score_panel_element.dialog("close");
-            
-            window.location.reload(true);             
+            if(!game_data.game_states.input_lock){
+                score_panel_element.dialog("close");
+                window.location.reload(true); 
+            }            
         }
     });
 }

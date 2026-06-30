@@ -23,14 +23,11 @@ async function dual_fire_shooting() {
  * Launches standard bazis dual shot from bazis_shots_pool.
  * This helper function retrieves two inactive projectiles from the pool,
  * configures their visual (CSS) and game-state (damage, type) properties,`
- * sets initial positions, plays firing audio, and initiates the animation
- * sets class hyper_lovedek on projectile if Boss enemy comes in.
- * towards the screen's top edge. Upon animation completion, the projectiles
- * are returned to the pool for reuse.
+ * sets initial positions, plays firing audio, and triggers the animation
+ * sets class hyper_lovedek on projectile if Boss enemy comes in. 
  * @param {Object} options - Shooting configuration.
  * @returns {void} This function does not return a value.
  */
-
 function launch_bazis_dual_shot( {offset_x, offset_y, animation_speed, bazis_rect}) {
     
     for (let position_x = -1; position_x <= 1; position_x += 2) { 
@@ -48,33 +45,25 @@ function launch_bazis_dual_shot( {offset_x, offset_y, animation_speed, bazis_rec
             shot_config = BAZIS_SHOTS_CONFIG.HYPER_SHOT;
         } else {
             shot_config = BAZIS_SHOTS_CONFIG.DUAL_FIRE_SHOT;
-        }        
-       
-        dual_shot_element.attr('class','');
-        dual_shot_element.addClass(shot_config.CLASS);                
+        }    
         
+        let initial_left = bazis_rect.left + (bazis_rect.width / 2) + (position_x * offset_x) - (shot_config.SHOT_WIDTH / 2);
+        initial_left += get_player_movement_offset(); 
+
         dual_shot_data.damage = shot_config.DAMAGE;
         dual_shot_data.type = shot_config.TYPE;
 
-        const shot_width = shot_config.SHOT_WIDTH;         
-        let initial_left = bazis_rect.left + (bazis_rect.width / 2) + (position_x * offset_x) - (shot_width / 2);
-        initial_left += get_player_movement_offset();
-
-        dual_shot_element.css({
+        dual_shot_element.attr('class','')
+        .addClass(shot_config.CLASS)                
+        .css({
             ...shot_config.BASE_STYLE,
             "left": initial_left,
             "top": offset_y
-        });  
-                                        
-        dual_shot_element.show();                    
+        }) 
+        .show();                   
 
         audio_play(shot_config.AUDIO_KEY);
-      
-        dual_shot_element.animate({
-            "top": 0
-        }, animation_speed, shot_config.ANIMATION_EASING,
-        function () {            
-            return_bazis_shot_to_pool( dual_shot_data );
-        });
+        animate_standard_shot_upward(dual_shot_data, animation_speed, shot_config.ANIMATION_EASING);      
     }
 }
+

@@ -25,7 +25,7 @@ const ENEMY_SPAWN_CONFIG = {
 };
 
 const  ENEMY_SHOT_CONFIG = {
-    FIRST_SHOT_DELAY_MULTIPLIER: 600,      
+    FIRST_SHOT_DELAY_MULTIPLIER: 1200,      
     FIRST_SHOT_DELAY_SEED: 200,
     BAZIS_TARGET_Y_DIVISOR: 4,
     HORIZONTAL_SAFE_ZONE_PX: 20,
@@ -41,10 +41,10 @@ const  ENEMY_SHOT_CONFIG = {
 };
 
 const DAMAGE_N_EXPLOSION = {      // Explosion
-    ENEMY_TYPE: 'Enemy',          // Object data types          
-    HOMING_MISSILE_TYPE: 'Homing Missile',
-    BOUNTY_TYPE: 'Bounty',
-    ASTEROID_TYPE: 'Asteroid',
+    ENEMY_TYPE: GAME_ENTITY_TYPES.ENEMY,          // Object data types          
+    HOMING_MISSILE_TYPE: GAME_ENTITY_TYPES.HOMING_MISSILE,
+    BOUNTY_TYPE: GAME_ENTITY_TYPES.BOUNTY,
+    ASTEROID_TYPE: GAME_ENTITY_TYPES.ASTEROID,
 
     IMG_SRC: 'robban.gif',        // Visuals
     IMG_CLASS: 'robbanas',

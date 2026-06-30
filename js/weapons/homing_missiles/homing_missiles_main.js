@@ -52,7 +52,7 @@ function launch_missile_projectiles() {
     const bazis_data = base_level_entities.bazis;
 
     missile_prep_timeout = setTimeout(() => {
-        // if (!is_entity_valid(bazis_data) || !missile_launch_conditions_evaluation()) return;
+      
         if (!is_entity_valid(bazis_data) || !bazis_data.rect || !$(bazis_data.element).is(':visible')) return;
 
         for (let factor = config.PLACEMENT_START_VALUE; factor <= config.PLACEMENT_END_VALUE; factor += config.PLACEMENT_INCREMENT) {
@@ -95,7 +95,8 @@ function launch_missile_projectiles() {
 function animate_missile_deployment({missile_data, bazis_data, factor, config}) {
     const side_distance = factor * config.PRE_LAUNCH_DISTANCE_X;
 
-    if (!is_entity_valid(bazis_data)) {
+    if (!is_entity_valid(bazis_data) || bazis_data.is_exploding) {
+        abort_missile_launch();
         return;
     }
     
@@ -106,9 +107,8 @@ function animate_missile_deployment({missile_data, bazis_data, factor, config}) 
 
     initialize_missile_spawn({missile_data, start_X, start_Y, config});
    
-    missile_element.show();   
-          
-    // Show and Place
+    missile_element.show();            
+   
     missile_element.find(`.${SECONDARY_WEAPONS_CONFIG.HOMING_MISSILE.IMAGE.IMG_CLASS}`).show();
     // Virtual Animation
     // Phase 1: Outward Move
@@ -119,14 +119,19 @@ function animate_missile_deployment({missile_data, bazis_data, factor, config}) 
                                                  anim_obj:phase1_anim}),
         complete: () => {
             // Phase 2: Upward Move
-            if(!is_entity_valid(bazis_data) || !missile_data.is_active){ return }
+            if(!is_entity_valid(bazis_data) || !missile_data.is_active || bazis_data.is_exploding
+                || weapons.tracking_lazer) {
+                abort_missile_launch();   
+                return }
             const phase2_anim = { anim_Y: 0 };
             $(phase2_anim).animate({ anim_Y: -config.PRE_LAUNCH_DISTANCE_Y }, {
                 duration: config.ANIMATION_DURATION_2,
                 step: (now_Y) => sync_missile_with_bazis({missile_data, bazis_data, horizontal_offset:side_distance, vertical_offset:now_Y, 
                                                          anim_obj:phase2_anim}),
                 complete: () => {
-                    if(!is_entity_valid(bazis_data) || !missile_data.is_active){ return }
+                    if(!is_entity_valid(bazis_data) || !missile_data.is_active || bazis_data.is_exploding){ 
+                        abort_missile_launch();    
+                        return }
                     missile_target_search(missile_data)
                 }
             });
@@ -197,13 +202,19 @@ function missile_launch_conditions_evaluation(){
 }
 
 /**
- * Synchronizes the missile's physical (DOM) and logical (data) state 
- * for its initial appearance on the ship's wing.
+ * Configures the physical position of a missile in the DOM and initializes its 
+ * bounding box (rect) for collision detection.
+ *
+ * @param {Object} options - Initialization parameters.
+ * @param {Object} options.missile_data - The pooled entity data object.
+ * @param {number} options.start_X - The initial horizontal position in pixels.
+ * @param {number} options.start_Y - The initial vertical position in pixels.
+ * @param {Object} options.config - Configuration containing WIDTH and HEIGHT dimensions.
  */
 function initialize_missile_spawn({missile_data, start_X, start_Y, config}) {
     const missile_element = missile_data.element;
 
-    // 1. Physical Setup: Position and show in one atomic operation
+    //  Physical Setup: Position and show 
     missile_element.css({
         left: start_X,
         top: start_Y,
@@ -211,7 +222,7 @@ function initialize_missile_spawn({missile_data, start_X, start_Y, config}) {
         opacity: 1
     }).appendTo("body");
 
-    // 2. Logical Setup: Ensure the rect object is valid and updated
+    //  Logical Setup: Ensure the rect object is valid and updated
     if (!missile_data.rect) {
         missile_data.rect = { 
             top: start_Y, 
@@ -225,4 +236,16 @@ function initialize_missile_spawn({missile_data, start_X, start_Y, config}) {
         missile_data.rect.left = start_X;
         missile_data.rect.top = start_Y;
     }
+}
+
+/**
+ * return active homing missiles to pool via explode_spacekraft().
+ * @returns {void}
+ */
+function abort_missile_launch() {
+    base_level_entities.homing_missiles
+        .filter(missile => missile.is_active)
+        .forEach(missile => {            
+            explode_spacekraft(missile);
+        });
 }

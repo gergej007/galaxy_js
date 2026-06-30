@@ -6,7 +6,6 @@
  *
  * @returns {Promise<void>} A promise that resolves when the burst of shots (defined by bazis_shot_repeat) has completed.
  */
-
 async function single_fire_shooting() { 
     const { SHOT_WIDTH, INITIAL_TOP_OFFSET, SHOTS_PER_LAUNCH } = BAZIS_SHOTS_CONFIG.SINGLE_SHOT;
 
@@ -27,13 +26,10 @@ async function single_fire_shooting() {
  * Launches standard bazis single shot from bazis_shots_pool.
  * This helper function retrieves an inactive projectile from the pool,
  * configures its visual (CSS) and game-state (damage, type) properties,`
- * sets its initial position, plays firing audio, and initiates its animation
- * towards the screen's top edge. Upon animation completion, the projectile
- * is returned to the pool for reuse.
+ * sets its initial position, plays firing audio, and triggers its animation. 
  * @param {Object} options - Shooting configuration.
  * @returns {void} This function does not return a value.
  */
-
 function launch_bazis_single_shot( {initial_left, initial_top, animation_speed}) {
     const shot_data = get_from_pool(POOL_KEYS.BAZIS_SHOT);  
 
@@ -43,30 +39,36 @@ function launch_bazis_single_shot( {initial_left, initial_top, animation_speed})
     }
                       
     const shot_element = shot_data.element; 
-    const { CLASS, DAMAGE, TYPE, BASE_STYLE, ANIMATION_EASING, AUDIO_KEY } = BAZIS_SHOTS_CONFIG.SINGLE_SHOT;      
+    const { CLASS, DAMAGE, TYPE, BASE_STYLE, AUDIO_KEY } = BAZIS_SHOTS_CONFIG.SINGLE_SHOT;      
    
-    shot_element.attr('class', '');
-    shot_element.addClass(CLASS);
-
-    shot_element.css({
+    shot_data.damage = DAMAGE;
+    shot_data.type = TYPE;  
+    shot_element.attr('class', '')
+    .addClass(CLASS)
+    .css({
         ...BASE_STYLE,
         "left": initial_left,
         "top": initial_top
-    });
-   
-    shot_data.damage = DAMAGE;
-    shot_data.type = TYPE;    
-
-    shot_element.show();
+    })
+    .show();
 
     audio_play(AUDIO_KEY); 
 
-    shot_element.animate({
-        "top": 0 
-    }, animation_speed, ANIMATION_EASING,
-    function () {
-        return_bazis_shot_to_pool( shot_data );        
-    });
+    animate_standard_shot_upward(shot_data, animation_speed, BAZIS_SHOTS_CONFIG.ANIMATION_EASING);   
 }
 
-
+/**
+ * Animates a projectile upward to the top of the screen.
+ * Upon animation completion, the projectiles
+ * are returned to the pool for reuse.
+ * @param {Object} shot_data - Pooled entity data.
+ * @param {number} speed - Animation duration.
+ * @param {string} easing - Easing function name.
+ */
+function animate_standard_shot_upward(shot_data, speed, easing) {
+    shot_data.element.animate({
+        "top": 0
+    }, speed, easing, function () {            
+        return_bazis_shot_to_pool(shot_data);
+    });
+}

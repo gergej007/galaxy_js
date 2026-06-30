@@ -24,17 +24,14 @@ async function dual_lazer_shooting() {
  * Launches bazis dual lazer shot from bazis_shots_pool.
  * This helper function retrieves two inactive projectiles from the pool,
  * configures their visual (CSS) and game-state (damage, type) properties,`
- * sets initial positions, plays firing audio, and initiates the animation 
- * towards the screen's top edge. Upon animation completion, the projectiles
- * are returned to the pool for reuse.
+ * sets initial positions, plays firing audio, and triggers the animation  
  * @param {Object} options - Shooting configuration.
  * @returns {void} This function does not return a value.
  */
 
 function launch_bazis_dual_lazer_shot( {bazis_rect, offset_x, offset_y, lazer_length}) {
 
-    const { CLASS, DAMAGE, TYPE, SHOT_WIDTH, ANIMATION_DURATIONS, ANIMATION_TARGET_HEIGHT_OFFSET,
-            ANIMATION_SECOND_STAGE_TOP_OFFSET, ANIMATION_SECOND_STAGE_HEIGHT_FACTOR, ANIMATION_EASING,
+    const { CLASS, DAMAGE, TYPE, SHOT_WIDTH, 
             BASE_STYLE, AUDIO_KEY , MOVING_SPAWN_MULTIPLIER} = BAZIS_SHOTS_CONFIG.DUAL_LAZER_SHOT;
                                                                                
     for (let position_x = -1; position_x <= 1; position_x += 2) {      
@@ -46,42 +43,24 @@ function launch_bazis_dual_lazer_shot( {bazis_rect, offset_x, offset_y, lazer_le
             continue;
         }
 
-        const shot_element = shot_data.element;        
+        const shot_element = shot_data.element;    
+        let initial_left = bazis_rect.left + (bazis_rect.width / 2) + (position_x * offset_x) - (SHOT_WIDTH / 2);
+        initial_left += get_player_movement_offset() * MOVING_SPAWN_MULTIPLIER;   
                
-        shot_element.attr('class', '');
-        shot_element.addClass(CLASS);
         shot_data.damage = DAMAGE;
         shot_data.type = TYPE;
-
-        const shot_width = SHOT_WIDTH;         
-        let initial_left = bazis_rect.left + (bazis_rect.width / 2) + (position_x * offset_x) - (shot_width / 2);
-        initial_left += get_player_movement_offset() * MOVING_SPAWN_MULTIPLIER;
-
-        shot_element.css({
+        shot_element.attr('class', '')
+        .addClass(CLASS)
+        .css({
             ...BASE_STYLE,
             "left": initial_left,
             "top": offset_y,
             "height" : 0
-        }); 
+        })
+        .show();        
 
         audio_play(AUDIO_KEY);
-        shot_element.show();
-        shot_element.animate(  
-            {
-            "height": lazer_length - ANIMATION_TARGET_HEIGHT_OFFSET,      
-            "top": 0 
-            }, ANIMATION_DURATIONS[0], ANIMATION_EASING,  
-            )
-            .animate(
-            {
-            "top" : -ANIMATION_SECOND_STAGE_TOP_OFFSET,
-            "height" : lazer_length * ANIMATION_SECOND_STAGE_HEIGHT_FACTOR,
-            }, ANIMATION_DURATIONS[1], ANIMATION_EASING,
-            )
-            .animate({
-            "height":0,
-            "top" : - ANIMATION_SECOND_STAGE_TOP_OFFSET 
-            }, ANIMATION_DURATIONS[2], ANIMATION_EASING,
-             function(){ return_bazis_shot_to_pool( shot_data ); });   
+        animate_lazer_sequence(shot_data, lazer_length, BAZIS_SHOTS_CONFIG.DUAL_LAZER_SHOT);       
     }
 }
+

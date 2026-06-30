@@ -19,11 +19,12 @@ function resolve_bazis_shot_interactions(shot_data, neighbors) {
 
         const target_rect = target_data.rect;
 
-        if(target_data.type === ENEMY_SHOT && target_data.is_active) {              // 0. Bazis Shots VS Enemy
+        if(target_data.type === ENEMY_SHOT && target_data.is_active) {              // 0. Bazis Shots VS Enemy Shots
             if (check_collision(shot_data.rect, target_rect)) {
                 shots_explosion_lightning(shot_data.rect.left, shot_data.rect.top);
                 return_bazis_shot_to_pool(shot_data);
                 return_enemy_shot_to_pool(target_data);
+                gain_bazis_healthpoint();
                 break;
             }
         }
@@ -33,11 +34,7 @@ function resolve_bazis_shot_interactions(shot_data, neighbors) {
                 if(target_data.type !== BOSS_LAZER_SHOT) {
                 shots_explosion_lightning(shot_data.rect.left, shot_data.rect.top);
                 return_bazis_shot_to_pool(shot_data);
-                }
-                //  Don't remove the Boss Lazer
-                // if (target_data.type !== BOSS_LAZER_SHOT) {
-                //     return_boss_shot_to_pool(target_data);
-                // }
+                }               
                 break; 
             }
         }

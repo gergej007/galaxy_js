@@ -2,122 +2,133 @@ let lazer_shot_counter = 0;
 let tracking_lazer_timeout = null; 
 /**
  * Main function for the Tracking Lazer weapon.
+ * Manages the lifecycle of the tracking lazer.
  * It checks if the weapon is active and then triggers the core tracking and killing logic.
  * It also manages the recursive call for the next tracking cycle.
  *
  * @returns {void}
- */                                            
-function tracking_lazer_scheduler() {    
+ */                                  
+async function tracking_lazer_scheduler() {
+    
     if (tracking_lazer_timeout) {
         clearTimeout(tracking_lazer_timeout);
-    }
-
-    if (weapons.flags.tracking_lazer) {       
-        tracking_lazer_core_logic(); 
+        tracking_lazer_timeout = null;
     }
     
-    tracking_lazer_timeout = setTimeout(() => {
-        if (weapons.flags.tracking_lazer) {
-            tracking_lazer_scheduler(); 
-        } else {
-            tracking_lazer_timeout = null; 
-            console.log("Tracking Lazer deactivated.");
-        }
-    }, SECONDARY_WEAPONS_CONFIG.TRACKING_LAZER.TRACKING_LAZER_INTERVAL); 
+    if (!weapons.flags.tracking_lazer ) {
+        return;
+    }
+    
+    await tracking_lazer_core_logic();
+    
+    const interval = SECONDARY_WEAPONS_CONFIG.TRACKING_LAZER.TRACKING_LAZER_INTERVAL;
+    tracking_lazer_timeout = setTimeout(tracking_lazer_scheduler, interval);
 }
 
 /**
- * Core asynchronous logic for tracking enemies and firing lazers.
- * It iterates through enemies, identifies valid targets within a simplified field,
- * and animates a lazer shot to them, triggering an explosion.
- * Targets are not 'locked' by this system.
- *
- * @returns {Promise<void>} A promise that resolves when the current lazer burst attempt is complete.
+ * Orchestrates the firing sequence of the Tracking Lazer weapon.
+ * 
+ * Logic flow:
+ * 1. Validates player state and ensures a minimum number of enemies are present.
+ * 2. Filters active enemies currently within the defined targeting field of view.
+ * 3. Iterates through valid targets up to the burst limit.
+ * 4. Triggers a frame-synced animation for each lazer shot, ensuring the line
+ *    visually follows both the moving player and the moving target.
+ * 
+ * @async
+ * @returns {Promise<void>} Resolves when the current burst sequence is complete.
  */
 async function tracking_lazer_core_logic() {
     lazer_shot_counter = 0; 
 
-    const { MIN_ACTIVE_ENEMIES, MAX_TRACKED_ENEMIES_PER_BURST, AUDIO_KEY,        
-            ANIMATION_DURATION, ANIMATION_EASING, MS_BETWEEN_SHOTS
-        } = SECONDARY_WEAPONS_CONFIG.TRACKING_LAZER;
+    const { MIN_ACTIVE_ENEMIES, MAX_TRACKED_ENEMIES_PER_BURST, AUDIO_KEY, MS_BETWEEN_SHOTS
+          } = SECONDARY_WEAPONS_CONFIG.TRACKING_LAZER;
 
     const bazis_data = base_level_entities.bazis;
-    const bazis_element = $(bazis_data.element); 
-    const bazis_rect = bazis_data.rect;
-    if ( !is_entity_valid(bazis_data)) {
+     if ( !is_entity_valid(bazis_data)) {
         console.log("Bazis not found in DOM for tracking lazer.");
         return; 
     }
+   
+    const bazis_rect = bazis_data.rect;   
     
-    const active_enemy_data_objects  = base_level_entities.enemy_ships.filter(enemy_data => {
-        return enemy_data.is_active && enemy_data.element && enemy_data.rect;
+    const active_enemies = base_level_entities.enemy_ships.filter(enemy_data => {
+        return enemy_data.is_active && is_entity_valid(enemy_data);
     });
 
-    if( active_enemy_data_objects.length < MIN_ACTIVE_ENEMIES ){
+    if( active_enemies.length < MIN_ACTIVE_ENEMIES ){
         return;
     }
     const search_conditions = define_target_field_bounds( bazis_rect );
-
-    for (let i = 0; i < active_enemy_data_objects.length; i++) {
+    
+    for (const enemy_data of active_enemies) {
         
         if ( lazer_shot_counter >= MAX_TRACKED_ENEMIES_PER_BURST || !weapons.flags.tracking_lazer) {
-            console.log("Tracking lazer stopped during burst.");    
+            console.log("Tracking lazer stopped.");    
             break;
         }
-
-        const enemy_data = active_enemy_data_objects[i];
-        
-        if (!is_entity_valid(enemy_data)) {
-            continue; 
-        }
-
-        const enemy_rect = enemy_data.rect;
-        const enemy_element = $(enemy_data.element); 
-      
-        if( evaluate_target_field_bounds( enemy_rect, search_conditions))
-            {           
+        if(!evaluate_target_field_bounds(enemy_data.rect, search_conditions)) continue;                
+                         
             
-            const lazer_data = get_from_pool(POOL_KEYS.TRACKING_LAZER);
-            if (!lazer_data) {
-                // If pool exhausted, skip this lazer shot but continue trying for others
-                continue;
-            }
-            const lazer_line = lazer_data.element;
-            audio_play(AUDIO_KEY);  
-            lazer_shot_counter++;   
-
-            const line_properties = create_line_properties(enemy_element, bazis_element);
-            lazer_line.css({
-                "left": line_properties.left,
-                "top": line_properties.top,
-                "width": line_properties.width,
-                "height": line_properties.height,
-                "transform": line_properties.transform, 
-                "opacity": 0, 
-                "display": "block" 
-            });
-            lazer_line.appendTo($("body"));
-
-            await new Promise(resolve => { // Await animation completion
-                
-                lazer_line.animate({
-                    "opacity": 1  
-                }, ANIMATION_DURATION, ANIMATION_EASING, 
-                    function () {
-                        
-                        explode_spacekraft( enemy_data ); 
-                        add_score_n_hit();
-                        
-                        return_tracking_lazer_to_pool(lazer_data);                        
-                        resolve(); 
-                    });
-            });           
-            await new Promise(resolve => setTimeout(resolve, MS_BETWEEN_SHOTS)); 
-        }
+        const lazer_data = get_from_pool(POOL_KEYS.TRACKING_LAZER);
+        if (!lazer_data) {
+            
+            continue;
+        }            
+        audio_play(AUDIO_KEY);  
+        lazer_shot_counter++;   
+     
+        await animate_tracking_lazer_shot(lazer_data, enemy_data, bazis_data);
+           
+        await new Promise(resolve => setTimeout(resolve, MS_BETWEEN_SHOTS)); 
     }
 }
 
-function define_target_field_bounds( bazis_rect){
+/**
+ * Executes the visual lifecycle of a single tracking lazer shot.
+ * 
+ * Sets the initial geometric properties, animates the lazer's opacity,
+ * and handles the destruction of the target ship and pool cleanup 
+ * upon animation completion.
+ * 
+ * @param {Object} lazer_data - The pooled entity data for the lazer line.
+ * @param {Object} enemy_data - The data object for the targeted enemy ship.
+ * @param {Object} bazis_data - The data object for the player entity.
+ * @returns {Promise<void>} A promise that resolves when the shot interaction is finished.
+ */
+function animate_tracking_lazer_shot(lazer_data, enemy_data, bazis_data) {
+    const { ANIMATION_DURATION, ANIMATION_EASING } = SECONDARY_WEAPONS_CONFIG.TRACKING_LAZER;
+    const line_props = create_line_properties(enemy_data.rect, bazis_data.rect);
+    lazer_data.element.css({
+        ...line_props,
+        opacity: 0,
+        display: "block"
+    }).appendTo($("body"));
+
+    return new Promise(resolve => {
+        lazer_data.element.animate({
+            "opacity": 1  
+        }, ANIMATION_DURATION, ANIMATION_EASING, function () {
+           
+            explode_spacekraft(enemy_data); 
+            add_score_n_hit();            
+            
+            return_tracking_lazer_to_pool(lazer_data);                        
+            resolve(); 
+        });
+    });
+}
+
+/**
+ * Calculates the rectangular boundaries of the tracking lazer's effective field of view.
+ * 
+ * Uses configured vertical factors and horizontal offsets relative to the player's 
+ * current position and screen dimensions to define where targets can be acquired.
+ * 
+ * @param {DOMRect} bazis_rect - The bounding box of the player's bazis.
+ * @returns {Object} Boundary coordinates: { left_bound, right_bound, bottom_bound, top_bound }.
+ */
+function define_target_field_bounds( bazis_rect) {
 
     const { TOP_BOUND_FACTOR, BOTTOM_BOUND_FACTOR, RAW_HORIZONTAL_BOUND_FACTOR, TARGET_HORIZONTAL_BOUND_PX} 
     = SECONDARY_WEAPONS_CONFIG.TRACKING_LAZER;
@@ -139,12 +150,14 @@ function define_target_field_bounds( bazis_rect){
 }
 
 /**
-* Evaluates if an enemy is within the defined bounds of the tracking lazer's targeting field.
- * This includes checking horizontal and vertical screen regions relative to the window size
- * and bazis position.
- *
- * @param {DOMRect} enemy_rect - The DOMRect object of the enemy element to evaluate.
- * @returns {boolean} True if the enemy is within all specified bounds and game is not exiting, false otherwise.
+ * Checks if a specific enemy ship is within the acquisition zone of the tracking lazer.
+ * 
+ * Verifies the enemy's coordinates against defined horizontal and vertical bounds, 
+ * ensuring the game is not currently in an exit state.
+ * 
+ * @param {DOMRect} enemy_rect - The bounding box of the enemy ship.
+ * @param {Object} search_conditions - The boundary coordinates calculated for targeting.
+ * @returns {boolean} True if the enemy is a valid target, false otherwise.
  */
 function evaluate_target_field_bounds( enemy_rect, search_conditions ){
 
@@ -158,35 +171,36 @@ function evaluate_target_field_bounds( enemy_rect, search_conditions ){
     return false;    
 }
 
-function create_line_properties(obj1, obj2) {
+/**
+ * Calculates line properties using pre-existing rect data.
+ * @param {Object} enemy_rect - The pre-calculated rect of the target.
+ * @param {Object} bazis_rect - The pre-calculated rect of the player.
+ */
+function create_line_properties(enemy_rect, bazis_rect) {
+    const { LINE_THICKNESS_PX, DEGREES_PER_RADIAN, MOVING_SPAWN_MULTIPLIER } = SECONDARY_WEAPONS_CONFIG.TRACKING_LAZER;
 
-    const { LINE_THICKNESS_PX, DEGREES_PER_RADIAN, MOVING_SPAWN_MULTIPLIER} = SECONDARY_WEAPONS_CONFIG.TRACKING_LAZER;
+    // Center coordinates for enemy
+    const dx1 = enemy_rect.left + enemy_rect.width / 2;
+    const dy1 = enemy_rect.top + enemy_rect.height / 2;
 
-    const off1 = get_element_property(obj1);
-    const off2 = get_element_property(obj2);
+    // Center coordinates for player (including movement inertia offset)
+    const dx2 = bazis_rect.left + bazis_rect.width / 2 + (get_player_movement_offset() * MOVING_SPAWN_MULTIPLIER);
+    const dy2 = bazis_rect.top + bazis_rect.height / 2;
 
-    const dx1 = off1.left + off1.width / 2;
-    const dy1 = off1.top + off1.height / 2;
-    const dx2 = off2.left + off2.width / 2 + (get_player_movement_offset() * MOVING_SPAWN_MULTIPLIER);
-    const dy2 = off2.top + off1.height / 2;
-
-    const length = Math.sqrt(((dx2 - dx1) * (dx2 - dx1)) + ((dy2 - dy1) * (dy2 - dy1)));
-    const line_thickness = LINE_THICKNESS_PX;
+    // Use Math.hypot for cleaner distance calculation
+    const length = Math.hypot(dx2 - dx1, dy2 - dy1);
+    
     const cx = ((dx1 + dx2) / 2) - (length / 2);
-    const cy = ((dy1 + dy2) / 2) - (line_thickness / 2);
+    const cy = ((dy1 + dy2) / 2) - (LINE_THICKNESS_PX / 2);
+    
+    // Calculate angle in degrees
     const angle = parseInt(Math.atan2((dy1 - dy2), (dx1 - dx2)) * (DEGREES_PER_RADIAN / Math.PI));
 
     return {
         left: cx,
         top: cy,
         width: length,
-        height: line_thickness,
+        height: LINE_THICKNESS_PX,
         transform: `rotate(${angle}deg)`
     };
 }
-
-function get_element_property(elem){
-    const elem_rect = elem[0].getBoundingClientRect();	
-    
-    return { top: elem_rect.top, left: elem_rect.left, width: elem_rect.width, height: elem_rect.height };
-};
