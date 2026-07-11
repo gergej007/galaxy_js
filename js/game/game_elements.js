@@ -34,7 +34,7 @@ const dialogs = {
 const game_data = {
     counters : { enemies: 0, killed: 0, score: 0, a_bomb: 3},    
     game_states : { traffic_flag: true, boss_flag: false, exit_flag: false, dialog_flag: true, 
-                    input_lock: false, bounty_flag: false},
+                    input_lock: false, bounty_flag: false, initialize_flag: true},
     limits : { boss_limit: GAME_CONSTANTS.BOSS_LIMIT, 
                bounty_limit: GAME_CONSTANTS.INITIAL_BOUNTY_LIMIT, 
                act_limit: GAME_CONSTANTS.INITIAL_LEVEL_UP_SCORE },

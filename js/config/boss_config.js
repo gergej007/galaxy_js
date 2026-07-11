@@ -127,6 +127,5 @@ const ANIMATION_CONFIG = {
 
         ANIM_EASING: 'linear', 
         AUDIO_KEY: "#exit1"
-    }                     
-                         
+    }       
 }  

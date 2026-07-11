@@ -17,12 +17,6 @@ body {
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
 
-.star {
-    mix-blend-mode: screen;
-    position: absolute;
-    z-index: 10;
-}
-
 .urhajo {
     position: absolute;
     z-index: 150; 

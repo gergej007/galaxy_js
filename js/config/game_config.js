@@ -3,7 +3,7 @@ const GAME_CONSTANTS = {
     // LEVEL_SCORE_LIMITS: [3500, 4500, 7200, 10000, 14000, 20000, 28000],   // Dev Config
     MAX_GAME_LEVEL: 7,
     INITIAL_BOUNTY_LIMIT: 2500,
-    BOSS_LIMIT: 90000,        // Prod Config
+    BOSS_LIMIT: 99000,        // Prod Config
     // BOSS_LIMIT: 29000,        // Dev Config
     ENEMY_AI_LEVEL: 4
 };
@@ -43,6 +43,12 @@ const VARIABLE_POOLSIZE_AT_STAGE = {
   BAZIS_SHOT_POOLSIZE: {
     DEFAULT: 26
   }
+}
+
+const PRELOAD_CONFIG= {
+  MAIN_IMG_FOLDER: 'kepek/',
+  MAIN_AUDIO_FOLDER: 'audio/',
+  AUDIO_EXT: '.mp3'
 }
 
 const GAME_LEVELS = {   

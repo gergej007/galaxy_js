@@ -5,6 +5,7 @@ window.keys_pressed = {};
 function bazis_key_binding() {
     
     $(document).on('keydown', (e) => {
+        if(game_data.game_states.initialize_flag) return;
 
         window.keys_pressed[e.key] = true;
 

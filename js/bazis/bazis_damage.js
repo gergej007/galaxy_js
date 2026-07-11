@@ -156,13 +156,17 @@ function bazis_dies(bazis_data) {
     audio_stop(AUDIO_CONFIG.TRACKS.MAIN);
     audio_play(AUDIO_CONFIG.TRACKS.DEATH);
 
-    show_scores_table();      
+          
     if( game_data.game_states.boss_flag )
         {   
         boss_exit();       
         }
         else
-        handle_victory_display(BAZIS_CONFIG.DAMAGE.GAME_OVER_TEXT);       
+        handle_victory_display(BAZIS_CONFIG.DAMAGE.GAME_OVER_TEXT);   
+
+    setTimeout( ()=>{
+        show_scores_table();
+    }, BAZIS_CONFIG.DAMAGE.GAME_OVER_DELAY);    
 }
 
 /**

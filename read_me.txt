@@ -26,6 +26,7 @@ Game rules:
     1 life contains 99 health unit.
     1 extra life is gained after each level up.    
     Player loose health points after an enemy hit.
+    Recharge your health points by shooting down enemy projectiles.
     Player loose health points when colliding with other objects.
     Collect powerups to have better chance.
 
@@ -40,6 +41,7 @@ Music and inspiration from:
 key technologies and patterns: 
     Spatial Partitioning, Object Pooling,  Axis-Aligned Bounding Box (AABB), High-Performance Game Loop,
     Input Polling, Adaptive Shuffle Bag, Optional Chaining, Spread Syntax, Destructuring Assignment, Arrow Functions, 
-    DOM-Based Rendering, Finite State Machine (FSM), Data-Driven Design,  Pure Utility Functions, 
-    State Synchronizers, Lifecycle Managers, Orchestrator Functions, Validation Guards, Recursive Schedulers,
+    DOM-Based Rendering, Finite State Machine (FSM), Data-Driven Design,  Pure Utility Functions, Asset Preloading, 
+    Framerate Independence, State Synchronizers, Lifecycle Managers, Orchestrator Functions, Validation Guards, 
+    Recursive Schedulers,
     jQuery & jQuery UI, jQuery Animation, AJAX, HTML5 Templates

@@ -9,6 +9,7 @@ const BAZIS_CONFIG = {
         HP_RESTORE_VALUE: 4,
     },  
     DAMAGE: {
+        GAME_OVER_DELAY: 1000,
         GAME_OVER_TEXT: "Game Over",
         CSS_FILTER: "brightness(1.5) sepia(1) hue-rotate(180deg) saturate(5)",
         DAMAGE_DURATION: 150,

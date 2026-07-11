@@ -32,7 +32,7 @@ function show_scores_table(){
         height: HEIGHT,
         closeOnEscape: false,
         open: function () {    
-       
+            set_background_blur(true);
             load_template(score_panel);
             game_data.game_states.dialog_flag = true;     
             game_data.game_states.exit_flag = true;   
@@ -282,7 +282,8 @@ function close_scores_dialog(score_panel_element) {
             e.preventDefault(); 
             
             if(!game_data.game_states.input_lock){
-                score_panel_element.dialog("close");
+                score_panel_element.dialog("close");               
+
                 window.location.reload(true); 
             }            
         }

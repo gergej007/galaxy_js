@@ -41,7 +41,8 @@ function gain_bazis_healthpoint() {
     const {HP_RESTORE_VALUE} = BAZIS_CONFIG.ACTIONS;
 
     const max_hp = bazis_data.max_hp;
-    if(bazis_data.hp < max_hp) {
+    const critical_hp = bazis_data.critical_hp;
+    if(bazis_data.hp < max_hp && bazis_data.hp > critical_hp) {
         bazis_data.hp = Math.min( bazis_data.hp + HP_RESTORE_VALUE, max_hp);
         update_left_display();
     }

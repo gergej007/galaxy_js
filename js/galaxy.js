@@ -13,7 +13,7 @@
 $(document).on("keydown", function(e) {
     if (e.key === CORE_CONFIG.INPUT_KEYS.HARD_RESET) {                           // F5 key
         e.preventDefault(); 
-        
+       
         console.log("F5 pressed: Performing hard reset.");
         
         const url = new URL(window.location.href);
@@ -26,8 +26,12 @@ $(document).on("keydown", function(e) {
 primary_game_loop();
 
 $(document).ready(
-    function () {                         
-        show_start_panel();
+    function () {    
+        initialize_game_assets().then(() => {
+            console.log("Assets preloaded successfully.");
+        });
+        
+        //show_start_panel();
         create_background(); 
         
         initalize_displays();
@@ -217,7 +221,7 @@ function score_dependent_fns() {
     
     if (game_data.levels.act_level === 1 && player_score >= bounty_limit) {
         bounty_container_controller();
-        game_data.limits.bounty_limit = Infinity; // Use Infinity instead of a very large number for clarity
+        game_data.limits.bounty_limit = Infinity; 
         base_level_entities.powerup.level++;          
     }
 

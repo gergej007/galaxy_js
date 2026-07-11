@@ -54,6 +54,7 @@
     <script type="text/javascript" src="js/enemy/enemy_explosions.js"></script>
 
     <script type="text/javascript" src="js/game/init_game.js"></script>
+    <script src="js/game/preload_assets.js"></script>
     <script type="text/javascript" src="js/galaxy.js"></script>
     <script type="text/javascript" src="js/audio.js"></script>
 
@@ -95,14 +96,29 @@
     <script type="text/javascript" src="js/collectables/powerup_selector.js"></script>  
 
     <script type="text/javascript" src="js/config/asteroid_config.js"></script>
-    <script type="text/javascript" src="js/asteroids/asteroids.js"></script>
+    <script type="text/javascript" src="js/asteroids/asteroids.js"></script>    
+
+    <script type="text/javascript" src="js/game/reset_gamestate.js"></script>    
     
     <title>Galaxy js</title>
 </head>
+
+<svg style="position: absolute; width: 0; height: 0;">
+  <filter id="softer-remove-black">
+   
+    <feColorMatrix type="matrix" values="1 0 0 0 0
+                                         0 1 0 0 0
+                                         0 0 1 0 0
+                                         2.5 2.5 2.5 0 -0.17" />    <!-- Alpha = (R*2,5 + G*2,5 + B*2,5) - 0.17 -->
+  </filter>
+</svg>
+
+
 <?php
     include ("modulok/audio_files.php");
 ?>
 <body>
+    <div class="background_wrapper blurred"></div>
     <div class="upper_display_lane">
         <div class="player_display"></div>
         <div id="progress_frame"></div>

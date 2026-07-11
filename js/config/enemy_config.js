@@ -1,4 +1,7 @@
 const ENEMY_SPAWN_CONFIG = {
+    RND_ENEMY_IDX_SEED: 1,
+    RND_ENEMY_IDX_MULTIPLIER: 19,          // Only used in preload_assets/get_all_image_urls()
+
     PLAY_AREA_HEIGHT_FACTOR: 0.82,         // Spawning managment
     VERTICAL_OFFSET: 55,
     MAX_SPAWN_ATTEMPTS: 15,

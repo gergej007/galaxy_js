@@ -1,6 +1,6 @@
 const UI_CONFIG = {
     //  MODAL WINDOWS
-    DIALOGS: {
+    DIALOGS: {       
         COMMON: {
             WIDTH: 600,
             HEIGHT: 530,
@@ -111,9 +111,9 @@ const UI_CONFIG = {
                 PATH: "csillag.gif",
                 CLASS: "star",
                 BASE_DIMENSION_PX: 50,
-                HEIGHT_RND_MULTIPLIER: 50,
-                HEIGHT_RND_SEED: 20,
-                PARENT: "body",
+                HEIGHT_RND_MULTIPLIER: 45,
+                HEIGHT_RND_SEED: 30,
+                PARENT: ".background_wrapper"                
             },
             GRID: {
                 ROWS: 6,
@@ -122,6 +122,6 @@ const UI_CONFIG = {
             }
         },
         SHAKE_ACTIVE_CLASS: 'shake-active'    
-    }
-
+    },
+    UI_IMAGES: [ 'galaxy_bg_2.gif', 'keys1.png', 'key2.png', 'key3.jpg', 'key4.png', 'key5.jpg']
 };

@@ -17,7 +17,7 @@
  * @global {Object} displays - Accesses center_display for status messages.
  */                                                     
 function show_start_panel() {
-    //  Update Game State
+   
     game_data.game_states.dialog_flag = true;
     game_data.game_states.traffic_flag = false;
     stop_base_level_enemies();
@@ -42,6 +42,7 @@ function show_start_panel() {
         closeOnEscape: false,
         open: function () {
             
+            set_background_blur(true);
             $.get(dialogs.start_panel.template_url, (template) => {
                 $panel.html(template);
                 
@@ -54,6 +55,7 @@ function show_start_panel() {
             });
         },
         close: () => {
+            set_background_blur(false);
             game_data.game_states.dialog_flag = false;
             displays.center_display.element.empty();
         }
@@ -82,6 +84,8 @@ function show_start_panel() {
  * @global {Object} dialogs - Accesses start panel dialog reference.
  */
 $(document).on("keydown", (e) => {
+    if(game_data.game_states.initialize_flag) return;
+    
     const states = game_data.game_states;
     const { BG_AUDIO_KEY, DELAY_START_MS} = UI_CONFIG.DIALOGS.START;
     const { RESUME, PAUSE} = UI_CONFIG.INPUT.KEYS;

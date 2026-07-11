@@ -11,3 +11,24 @@
     animation: screen-shake-zoom 0.2s infinite;
     transform-origin: center center; 
   }
+
+  .star {  
+    mix-blend-mode: screen;
+    filter: url(#softer-remove-black) blur(0.5px);  
+    position: absolute;
+    z-index: 10;    
+}
+
+  .background_wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    transition: filter 0.5s ease-in-out;
+}
+
+.background_wrapper.blurred {
+    filter: blur(3px) brightness(0.9);
+}

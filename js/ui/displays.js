@@ -101,6 +101,7 @@ if (!display.score_val || display.score_val.length === 0) {
  */
 function update_center_display(txt) {
     const $container = displays.center_display.element;
+    if(!$container) return;
     
     $container.stop(true, true).empty();
 
